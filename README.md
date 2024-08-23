@@ -13,6 +13,14 @@ Therefore, configuration options are quite limited and the design is very
 opinionated at this moment.
 Reason for writing it was mainly fun and to know more about the Neovim ecosystem.
 
+## Screenshots
+
+Here are some screenshots (might be out of date)
+
+![s1](./doc/screenshots/s1.png)
+![s2](./doc/screenshots/s2.png)
+![s3](./doc/screenshots/s3.png)
+![s4](./doc/screenshots/s4.png)
 
 ## Contributing
 
