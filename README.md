@@ -48,6 +48,7 @@ You'll also need to have a patched font if you want icons.
 require('slimline').setup {
   bold = false,
   verbose_mode = false,
+  component_spacing = " ",
   sep = {
     left = "",
     right = ""
