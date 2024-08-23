@@ -4,10 +4,10 @@ local M = {}
 ---@return string
 function M.render()
   local config = vim.g.slimline_config
-  local hl = require("slimline.highlights")
+  local hl = require('slimline.highlights')
   hl.create()
   local sep = config.component_spacing
-  local components = require("slimline.components")
+  local components = require('slimline.components')
   local mode = components.get_mode()
   local stl = table.concat {
     hl.highlight_content(sep, hl.hls.base),
@@ -16,22 +16,22 @@ function M.render()
     components.path(),
     sep,
     components.git(),
-    "%=",
+    '%=',
     components.diagnostics(),
     sep,
     components.filetype_lsp(),
     sep,
     components.progress(mode),
-    sep
+    sep,
   }
   return stl
 end
 
 ---@param opts table
 function M.setup(opts)
-  require("slimline.autocommands")
+  require('slimline.autocommands')
   vim.o.showmode = false
-  vim.g.slimline_config = vim.tbl_deep_extend("force", require("slimline.default_config"), opts)
+  vim.g.slimline_config = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 end
 

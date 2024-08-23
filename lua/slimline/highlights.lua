@@ -1,29 +1,29 @@
 local config = vim.g.slimline_config
 
-local M      = {}
+local M = {}
 
-M.hls        = {
+M.hls = {
   base = nil,
   primary = {
     text = nil,
     sep = nil,
-    sep_transition = nil
+    sep_transition = nil,
   },
   secondary = {
     text = nil,
-    sep = nil
+    sep = nil,
   },
 }
 
 function M.create()
-  M.hls.base = M.get_or_create("", config.hl.base)
+  M.hls.base = M.get_or_create('', config.hl.base)
 
-  M.hls.primary.text = M.get_or_create("Primary", config.hl.primary, true, config.bold)
-  M.hls.primary.sep = M.get_or_create("PrimarySep", config.hl.primary)
-  M.hls.primary.sep_transition = M.get_or_create("PrimarySepTransition", config.hl.primary, false, false,
-    config.hl.secondary)
+  M.hls.primary.text = M.get_or_create('Primary', config.hl.primary, true, config.bold)
+  M.hls.primary.sep = M.get_or_create('PrimarySep', config.hl.primary)
+  M.hls.primary.sep_transition =
+    M.get_or_create('PrimarySepTransition', config.hl.primary, false, false, config.hl.secondary)
 
-  M.hls.secondary.text = M.get_or_create("Secondary", config.hl.secondary, true, false)
+  M.hls.secondary.text = M.get_or_create('Secondary', config.hl.secondary, true, false)
 end
 
 ---@type table<string, boolean>
@@ -34,7 +34,7 @@ M.hl_cache = {}
 ---@param reverse boolean?
 ---@param bold boolean?
 function M.get_or_create(hl, base, reverse, bold, bg_from)
-  local basename = "Slimline"
+  local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then
     hl = basename .. hl
   end
@@ -42,8 +42,8 @@ function M.get_or_create(hl, base, reverse, bold, bg_from)
   if not M.hl_cache[hl] then
     local hl_ref = vim.api.nvim_get_hl(0, { name = base })
     local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from })
-    local fg = hl_ref.fg or "fg"
-    local bg = hl_bg_ref.fg or hl_ref.bg or "bg"
+    local fg = hl_ref.fg or 'fg'
+    local bg = hl_bg_ref.fg or hl_ref.bg or 'bg'
     if reverse then
       local tmp = fg
       fg = bg
@@ -64,17 +64,17 @@ end
 --- @return string
 function M.highlight_content(content, hl, sep_left, sep_right)
   if content == nil then
-    return ""
+    return ''
   end
-  local rendered = ""
+  local rendered = ''
   if sep_left ~= nil then
-    rendered = rendered .. string.format("%%#%s#%s", M.get_or_create(hl .. "Sep", hl, true), sep_left)
+    rendered = rendered .. string.format('%%#%s#%s', M.get_or_create(hl .. 'Sep', hl, true), sep_left)
   end
-  rendered = rendered .. string.format("%%#%s#%s", hl, content)
+  rendered = rendered .. string.format('%%#%s#%s', hl, content)
   if sep_right ~= nil then
-    rendered = rendered .. string.format("%%#%s#%s", M.get_or_create(hl .. "Sep", hl, true), sep_right)
+    rendered = rendered .. string.format('%%#%s#%s', M.get_or_create(hl .. 'Sep', hl, true), sep_right)
   end
-  rendered = rendered .. "%#" .. M.hls.base .. "#"
+  rendered = rendered .. '%#' .. M.hls.base .. '#'
   return rendered
 end
 
