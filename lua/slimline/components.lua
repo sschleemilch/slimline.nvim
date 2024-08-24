@@ -71,7 +71,7 @@ function M.get_mode_hl(mode)
     hl = config.hl.modes.command or hl
     hl_name = 'Command'
   end
-  return highlights.get_or_create(hl_name .. 'Mode', hl, true, config.bold)
+  return highlights.get_or_create(hl_name .. 'Mode', hl, config.style == "bg", config.bold)
 end
 
 --- Mode component

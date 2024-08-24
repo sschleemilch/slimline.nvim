@@ -1,6 +1,7 @@
 local M = {
   bold = false,
   verbose_mode = false,
+  style = "bg",
   spaces = {
     components = ' ',
     left = ' ',

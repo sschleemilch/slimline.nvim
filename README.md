@@ -39,6 +39,10 @@ Command Mode (kanagawa), default
 ![s4](./doc/screenshots/s4.png)
 Normal Mode (tokyonight moon), `spaces.components = "─"` + `vim.opt.fillchars.stl = "─"`
 ![s5](./doc/screenshots/s5.png)
+Normal Mode (tokyonight moon), `bold=true`, `verbose_mode=true`, `style="fg"`
+![s6](./doc/screenshots/s6.png)
+Normal Mode (tokyonight day), `bold=true`, `verbose_mode=true`
+![s7](./doc/screenshots/s7.png)
 
 ## Contributing
 
@@ -75,6 +79,7 @@ Optional dependencies:
 require('slimline').setup {
   bold = false,
   verbose_mode = false,
+  style = "bg",
   spaces = {
     components = ' ',
     left = ' ',

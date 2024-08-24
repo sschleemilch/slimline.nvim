@@ -29,7 +29,12 @@ end
 function M.setup(opts)
   require('slimline.autocommands')
   vim.o.showmode = false
-  vim.g.slimline_config = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
+  opts = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
+  if opts.style == "fg" then
+    opts.sep.left = ""
+    opts.sep.right = ""
+  end
+  vim.g.slimline_config = opts
   local hl = require('slimline.highlights')
   hl.create()
   vim.o.statusline = "%!v:lua.require'slimline'.render()"

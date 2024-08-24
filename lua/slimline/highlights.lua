@@ -18,12 +18,17 @@ M.hls = {
 function M.create()
   M.hls.base = M.get_or_create('', config.hl.base)
 
-  M.hls.primary.text = M.get_or_create('Primary', config.hl.primary, true, config.bold)
+  local as_background = true
+  if config.style == "fg" then
+    as_background = false
+  end
+
+  M.hls.primary.text = M.get_or_create('Primary', config.hl.primary, as_background, config.bold)
   M.hls.primary.sep = M.get_or_create('PrimarySep', config.hl.primary)
   M.hls.primary.sep_transition =
     M.get_or_create('PrimarySepTransition', config.hl.primary, false, false, config.hl.secondary)
 
-  M.hls.secondary.text = M.get_or_create('Secondary', config.hl.secondary, true, false)
+  M.hls.secondary.text = M.get_or_create('Secondary', config.hl.secondary, as_background, false)
 end
 
 ---@type table<string, boolean>
