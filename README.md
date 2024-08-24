@@ -25,6 +25,11 @@ The default configuration uses highlight groups that are set by ever colorscheme
 Therefore it supports every colorscheme by design and should look quite good with defaults.
 Of course you can tweak that however you want.
 
+> [!CAUTION]
+> Colorschemes that enabled transparent mode will not work since slimline uses
+> the background color as a foreground color for components. I did not find
+> a workaround yet
+
 ## Screenshots
 
 Here are some screenshots and their options changed
