@@ -98,33 +98,33 @@ Optional dependencies:
 
 ```lua
 require('slimline').setup {
-  bold = false,
-  verbose_mode = false,
-  style = "bg",
+  bold = false, -- makes primary parts and mode bold
+  verbose_mode = false, -- Mode as single letter or as a word
+  style = "bg", -- or "fg". Whether highlights should be applied to bg or fg of components
   spaces = {
-    components = ' ',
-    left = ' ',
-    right = ' '
+    components = ' ', -- string between components
+    left = ' ', -- string at the start of the line
+    right = ' ' -- string at the end of the line
   },
   sep = {
     hide = {
-      first = false,
-      last = false,
+      first = false, -- hides the first separator
+      last = false, -- hides the last separator
     },
-    left = '',
-    right = '',
+    left = '', -- left separator of components
+    right = '', -- right separator of components
   },
   hl = {
     modes = {
-      normal = 'Type',
+      normal = 'Type', -- highlight base of modes
       insert = 'Function',
       pending = 'Boolean',
       visual = 'Keyword',
       command = 'String',
     },
-    base = 'Comment',
-    primary = 'Normal',
-    secondary = 'Comment',
+    base = 'Comment', -- highlight of everything in in between components
+    primary = 'Normal', -- highlight or primary parts (e.g. filename)
+    secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
   icons = {
     diagnostics = {
