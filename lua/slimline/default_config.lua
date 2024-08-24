@@ -8,6 +8,10 @@ local M = {
     right = ' '
   },
   sep = {
+    hide = {
+      first = false,
+      last = false,
+    },
     left = '',
     right = '',
   },

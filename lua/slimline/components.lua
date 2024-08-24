@@ -83,7 +83,11 @@ function M.mode(mode)
     render = string.sub(mode, 1, 1)
   end
   local content = ' ' .. render .. ' '
-  return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, config.sep.right)
+  local sep_left = config.sep.left
+  if config.sep.hide.first then
+    sep_left = ""
+  end
+  return highlights.highlight_content(content, M.get_mode_hl(mode), sep_left, config.sep.right)
 end
 
 --- Git component showing branch
@@ -254,7 +258,11 @@ function M.progress(mode)
     content = string.format('%2d%%%%', math.floor(cur / total * 100))
   end
   content = string.format(' %s %s / %s ', config.icons.lines, content, total)
-  return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, config.sep.right)
+  local sep_right = config.sep.right
+  if config.sep.hide.last then
+    sep_right = ""
+  end
+  return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, sep_right)
 end
 
 return M

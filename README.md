@@ -43,6 +43,27 @@ Normal Mode (tokyonight moon), `bold=true`, `verbose_mode=true`, `style="fg"`
 ![s6](./doc/screenshots/s6.png)
 Normal Mode (tokyonight day), `bold=true`, `verbose_mode=true`
 ![s7](./doc/screenshots/s7.png)
+Insert Mode (rose-pine dawn),
+```lua
+opts = {
+    bold = true,
+    verbose_mode = true,
+    spaces = {
+        components = "",
+        left = "",
+        right  = ""
+    },
+    sep = {
+        hide = {
+            first = true,
+            last = true,
+        },
+        left = "",
+        right = ""
+    }
+},
+```
+![s8](./doc/screenshots/s8.png)
 
 ## Contributing
 
@@ -86,6 +107,10 @@ require('slimline').setup {
     right = ' '
   },
   sep = {
+    hide = {
+      first = false,
+      last = false,
+    },
     left = '',
     right = '',
   },
