@@ -128,7 +128,7 @@ require('slimline').setup {
       command = 'String',
     },
     base = 'Comment', -- highlight of everything in in between components
-    primary = 'Normal', -- highlight or primary parts (e.g. filename)
+    primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
   icons = {
