@@ -4,10 +4,11 @@ local M = {}
 ---@return string
 function M.render()
   local config = vim.g.slimline_config
-  local sep = config.component_spacing
+  local sep = config.spaces.components
   local components = require('slimline.components')
   local mode = components.get_mode()
   local stl = table.concat {
+    "%#Slimline#" .. config.spaces.left,
     components.mode(mode),
     sep,
     components.path(),
@@ -19,6 +20,7 @@ function M.render()
     components.filetype_lsp(),
     sep,
     components.progress(mode),
+    config.spaces.right
   }
   return stl
 end

@@ -37,7 +37,7 @@ Insert Mode (rose-pine moon), default
 ![s3](./doc/screenshots/s3.png)
 Command Mode (kanagawa), default
 ![s4](./doc/screenshots/s4.png)
-Normal Mode (tokyonight moon), `component_spacing = "─"` + `vim.opt.fillchars.stl = "─"`
+Normal Mode (tokyonight moon), `spaces.components = "─"` + `vim.opt.fillchars.stl = "─"`
 ![s5](./doc/screenshots/s5.png)
 
 ## Contributing
@@ -75,7 +75,11 @@ Optional dependencies:
 require('slimline').setup {
   bold = false,
   verbose_mode = false,
-  component_spacing = ' ',
+  spaces = {
+    components = ' ',
+    left = ' ',
+    right = ' '
+  },
   sep = {
     left = '',
     right = '',

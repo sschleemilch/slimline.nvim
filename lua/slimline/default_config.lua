@@ -1,7 +1,11 @@
 local M = {
   bold = false,
   verbose_mode = false,
-  component_spacing = ' ',
+  spaces = {
+    components = ' ',
+    left = ' ',
+    right = ' '
+  },
   sep = {
     left = '',
     right = '',
