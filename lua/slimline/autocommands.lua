@@ -17,6 +17,8 @@ vim.api.nvim_create_autocmd('DiagnosticChanged', {
 vim.api.nvim_create_autocmd('Colorscheme', {
   group = augroup,
   callback = function()
-    require('slimline.highlights').hl_cache = {}
+    local hl = require('slimline.highlights')
+    hl.hl_cache = {}
+    hl.create()
   end,
 })

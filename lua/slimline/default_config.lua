@@ -14,7 +14,7 @@ local M = {
       visual = 'Keyword',
       command = 'String',
     },
-    base = 'Normal',
+    base = 'Comment',
     primary = 'Normal',
     secondary = 'Comment',
   },

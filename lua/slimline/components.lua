@@ -125,7 +125,7 @@ function M.git()
     end
     mods = highlights.highlight_content(mods .. ' ', highlights.hls.secondary.text, nil, config.sep.right)
   end
-  return branch .. mods .. ' '
+  return branch .. mods
 end
 
 --- Path component
@@ -205,10 +205,13 @@ function M.filetype_lsp()
   if filetype == '' then
     filetype = '[No Name]'
   end
-  local MiniIcons = require('mini.icons')
-  local icon = MiniIcons.get('filetype', filetype)
+  local icon = ""
+  local status, MiniIcons = pcall(require, 'mini.icons')
+  if status then
+    icon = ' ' .. MiniIcons.get('filetype', filetype)
+  end
   filetype = highlights.highlight_content(
-    ' ' .. icon .. ' ' .. filetype .. ' ',
+    icon .. ' ' .. filetype .. ' ',
     highlights.hls.primary.text,
     nil,
     config.sep.right
