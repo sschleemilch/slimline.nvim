@@ -21,9 +21,9 @@ Currently only those components are available that cannot be reordered or switch
 - File progress and overall number of lines
 
 Slimline creates highlight groups from given highlight groups in the config.
-The default configuration uses highlight groups that are set by ever colorscheme there is.
+The default configuration uses highlight groups that are set by every colorscheme there is.
 Therefore it supports every colorscheme by design and should look quite good with defaults.
-Of course you can tweak that however you want.
+Of course you can tweak that however you want using the `hl` part of the config options.
 
 > [!CAUTION]
 > Colorschemes that enabled transparent mode will not work since slimline uses
