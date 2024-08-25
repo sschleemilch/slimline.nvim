@@ -1,11 +1,11 @@
 local M = {
   bold = false,
   verbose_mode = false,
-  style = "bg",
+  style = 'bg',
   spaces = {
     components = ' ',
     left = ' ',
-    right = ' '
+    right = ' ',
   },
   sep = {
     hide = {

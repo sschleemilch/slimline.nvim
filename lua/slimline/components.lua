@@ -53,25 +53,18 @@ end
 --- @param mode string
 --- @return string
 function M.get_mode_hl(mode)
-  local hl = config.hl.secondary
-  local hl_name = 'Secondary'
   if mode == 'NORMAL' then
-    hl = config.hl.modes.normal
-    hl_name = 'Normal'
+    return highlights.hls.mode.normal.text
   elseif mode:find('PENDING') then
-    hl = config.hl.modes.pending or hl
-    hl_name = 'Pending'
+    return highlights.hls.mode.pending.text
   elseif mode:find('VISUAL') then
-    hl = config.hl.modes.visual or hl
-    hl_name = 'Visual'
+    return highlights.hls.mode.visual.text
   elseif mode:find('INSERT') or mode:find('SELECT') then
-    hl = config.hl.modes.insert or hl
-    hl_name = 'Insert'
+    return highlights.hls.mode.insert.text
   elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
-    hl = config.hl.modes.command or hl
-    hl_name = 'Command'
+    return highlights.hls.mode.command.text
   end
-  return highlights.get_or_create(hl_name .. 'Mode', hl, config.style == "bg", config.bold)
+  return highlights.hls.secondary.text
 end
 
 --- Mode component
@@ -85,7 +78,7 @@ function M.mode(mode)
   local content = ' ' .. render .. ' '
   local sep_left = config.sep.left
   if config.sep.hide.first then
-    sep_left = ""
+    sep_left = ''
   end
   return highlights.highlight_content(content, M.get_mode_hl(mode), sep_left, config.sep.right)
 end
@@ -209,17 +202,13 @@ function M.filetype_lsp()
   if filetype == '' then
     filetype = '[No Name]'
   end
-  local icon = ""
+  local icon = ''
   local status, MiniIcons = pcall(require, 'mini.icons')
   if status then
     icon = ' ' .. MiniIcons.get('filetype', filetype)
   end
-  filetype = highlights.highlight_content(
-    icon .. ' ' .. filetype .. ' ',
-    highlights.hls.primary.text,
-    nil,
-    config.sep.right
-  )
+  filetype =
+    highlights.highlight_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, config.sep.right)
 
   local attached_clients = vim.lsp.get_clients { bufnr = 0 }
   local it = vim.iter(attached_clients)
@@ -260,7 +249,7 @@ function M.progress(mode)
   content = string.format(' %s %s / %s ', config.icons.lines, content, total)
   local sep_right = config.sep.right
   if config.sep.hide.last then
-    sep_right = ""
+    sep_right = ''
   end
   return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, sep_right)
 end

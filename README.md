@@ -12,25 +12,21 @@ Do we need another statusline? Probably not, do we have one? Yep
 It started with doing my own statusline implementation.
 Therefore, configuration options are quite limited and the design is very
 opinionated at this moment.
-Reason for writing it was mainly just 4 fun and having exactly what I want, function and aestetic wise.
+Reason for writing it was mainly just 4 fun and having exactly what I want, function and aesthetic wise.
 
 Currently only those components are available that cannot be reordered or switched off.
 Configuration options are mainly about changing the style:
+
 - Mode
 - Filename + Path
-- Git Branch + File added, modified and removed lines
+- Git Branch + File added, modified and removed lines (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
 - Filetype and attached LSPs
 - File progress and overall number of lines
 
 Slimline creates highlight groups from given highlight groups in the config.
-The default configuration uses highlight groups that are set by every colorscheme there is.
-Therefore it supports every colorscheme by design and should look quite good with defaults.
+The default configuration uses highlight groups that are set by every colorscheme out there.
+Therefore it supports every colorscheme out of the box and should look quite good with defaults.
 Of course you can tweak that however you want using the `hl` part of the config options.
-
-> [!CAUTION]
-> Colorschemes that enabled transparent mode will not work since slimline uses
-> the background color as a foreground color for components. I did not find
-> a workaround yet
 
 ## Screenshots
 
@@ -51,6 +47,7 @@ Normal Mode (tokyonight moon), `bold=true`, `verbose_mode=true`, `style="fg"`
 Normal Mode (tokyonight day), `bold=true`, `verbose_mode=true`
 ![s7](./doc/screenshots/s7.png)
 Insert Mode (rose-pine dawn),
+
 ```lua
 opts = {
     bold = true,
@@ -70,6 +67,7 @@ opts = {
     }
 },
 ```
+
 ![s8](./doc/screenshots/s8.png)
 
 ## Contributing
@@ -84,22 +82,18 @@ Feel free to create an issue/PR if you want to see anything else implemented.
 
 ```lua
 {
+    -- Calls `require('slimline').setup({})`
     "sschleemilch/slimline.nvim",
-    dependencies = {
-        "lewis6991/gitsigns.nvim", --- Optional
-        "echasnovski/mini.icons", --- Optional
-    },
     opts = {}
 },
 ```
 
-You'll also need to have a patched font if you want icons.
-
 Optional dependencies:
 
 - [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be shown
-- [mini.icons](https://github.com/echasnovski/mini.icons) if you want filetype icons next to the filetype
+- [mini.icons](https://github.com/echasnovski/mini.icons) if you want icons next to the filetype
 
+You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if you want icons and separators.
 
 #### Default configuration
 
@@ -107,11 +101,11 @@ Optional dependencies:
 require('slimline').setup {
   bold = false, -- makes primary parts and mode bold
   verbose_mode = false, -- Mode as single letter or as a word
-  style = "bg", -- or "fg". Whether highlights should be applied to bg or fg of components
+  style = 'bg', -- or "fg". Whether highlights should be applied to bg or fg of components
   spaces = {
     components = ' ', -- string between components
     left = ' ', -- string at the start of the line
-    right = ' ' -- string at the end of the line
+    right = ' ', -- string at the end of the line
   },
   sep = {
     hide = {

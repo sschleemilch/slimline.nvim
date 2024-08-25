@@ -13,13 +13,35 @@ M.hls = {
     text = nil,
     sep = nil,
   },
+  mode = {
+    normal = {
+      text = nil,
+      sep = nil,
+    },
+    pending = {
+      text = nil,
+      sep = nil,
+    },
+    visual = {
+      text = nil,
+      sep = nil,
+    },
+    insert = {
+      text = nil,
+      sep = nil,
+    },
+    command = {
+      text = nil,
+      sep = nil,
+    },
+  },
 }
 
 function M.create()
   M.hls.base = M.get_or_create('', config.hl.base)
 
   local as_background = true
-  if config.style == "fg" then
+  if config.style == 'fg' then
     as_background = false
   end
 
@@ -29,6 +51,18 @@ function M.create()
     M.get_or_create('PrimarySepTransition', config.hl.primary, false, false, config.hl.secondary)
 
   M.hls.secondary.text = M.get_or_create('Secondary', config.hl.secondary, as_background, false)
+  M.hls.secondary.sep = M.get_or_create('SecondarySep', config.hl.secondary)
+
+  M.hls.mode.normal.text = M.get_or_create('NormalMode', config.hl.modes.normal, as_background, config.bold)
+  M.hls.mode.normal.sep = M.get_or_create('NormalModeSep', config.hl.modes.normal)
+  M.hls.mode.pending.text = M.get_or_create('PendingMode', config.hl.modes.pending, as_background, config.bold)
+  M.hls.mode.pending.sep = M.get_or_create('PendingModeSep', config.hl.modes.pending)
+  M.hls.mode.visual.text = M.get_or_create('VisualMode', config.hl.modes.visual, as_background, config.bold)
+  M.hls.mode.visual.sep = M.get_or_create('VisualModeSep', config.hl.modes.visual)
+  M.hls.mode.insert.text = M.get_or_create('InsertMode', config.hl.modes.insert, as_background, config.bold)
+  M.hls.mode.insert.sep = M.get_or_create('InsertModeSep', config.hl.modes.insert)
+  M.hls.mode.command.text = M.get_or_create('CommandMode', config.hl.modes.command, as_background, config.bold)
+  M.hls.mode.command.sep = M.get_or_create('CommandModeSep', config.hl.modes.command)
 end
 
 ---@type table<string, boolean>
@@ -45,10 +79,11 @@ function M.get_or_create(hl, base, reverse, bold, bg_from)
   end
 
   if not M.hl_cache[hl] then
+    local hl_normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
     local hl_ref = vim.api.nvim_get_hl(0, { name = base })
     local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from })
     local fg = hl_ref.fg or 'fg'
-    local bg = hl_bg_ref.fg or hl_ref.bg or 'bg'
+    local bg = hl_bg_ref.fg or hl_ref.bg or hl_normal.bg
     if reverse then
       local tmp = fg
       fg = bg
@@ -73,11 +108,11 @@ function M.highlight_content(content, hl, sep_left, sep_right)
   end
   local rendered = ''
   if sep_left ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', M.get_or_create(hl .. 'Sep', hl, true), sep_left)
+    rendered = rendered .. string.format('%%#%s#%s', hl .. 'Sep', sep_left)
   end
   rendered = rendered .. string.format('%%#%s#%s', hl, content)
   if sep_right ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', M.get_or_create(hl .. 'Sep', hl, true), sep_right)
+    rendered = rendered .. string.format('%%#%s#%s', hl .. 'Sep', sep_right)
   end
   rendered = rendered .. '%#' .. M.hls.base .. '#'
   return rendered
