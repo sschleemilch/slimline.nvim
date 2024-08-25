@@ -7,13 +7,15 @@
 <!-- panvimdoc-ignore-end -->
 
 A minimal Neovim statusline written in Lua.
+Do we need another statusline? Probably not, do we have one? Yep
 
 It started with doing my own statusline implementation.
 Therefore, configuration options are quite limited and the design is very
 opinionated at this moment.
-Reason for writing it was mainly fun and to know more about the Neovim ecosystem.
+Reason for writing it was mainly just 4 fun and having exactly what I want, function and aestetic wise.
 
-Currently only those components are available that cannot be reordered or switched off:
+Currently only those components are available that cannot be reordered or switched off.
+Configuration options are mainly about changing the style:
 - Mode
 - Filename + Path
 - Git Branch + File added, modified and removed lines
