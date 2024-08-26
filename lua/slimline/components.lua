@@ -80,7 +80,7 @@ function M.mode(config)
   if config.sep.hide.first then
     sep_left = ''
   end
-  return highlights.highlight_content(content, M.get_mode_hl(mode), sep_left, config.sep.right)
+  return highlights.highlight_content(content, M.get_mode_hl(), sep_left, config.sep.right)
 end
 
 --- Git component showing branch
@@ -241,7 +241,6 @@ end
 --- @param config table
 --- @return string
 function M.progress(config)
-  local mode = M.get_mode()
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local content = ''
@@ -257,7 +256,7 @@ function M.progress(config)
   if config.sep.hide.last then
     sep_right = ''
   end
-  return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, sep_right)
+  return highlights.highlight_content(content, M.get_mode_hl(), config.sep.left, sep_right)
 end
 
 return M

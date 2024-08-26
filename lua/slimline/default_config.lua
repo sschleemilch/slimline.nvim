@@ -21,18 +21,17 @@ local function create_M()
   }
 
   M.components = {
-    'mode',
-    M.spaces.components,
-    'path',
-    M.spaces.components,
-    'git',
-    '%=',
-    'diagnostics',
-    M.spaces.components,
-    'filetype_lsp',
-    M.spaces.components,
-    'progress',
-    M.spaces.right,
+    left = {
+      'mode',
+      'path',
+      'git',
+    },
+    center = {},
+    right = {
+      'diagnostics',
+      'filetype_lsp',
+      'progress',
+    },
   }
 
   M.hl = {
@@ -50,16 +49,16 @@ local function create_M()
 
   M.icons = {
     diagnostics = {
-      ERROR = ' ',
-      WARN = ' ',
-      HINT = ' ',
-      INFO = ' ',
+      ERROR = ' ',
+      WARN = ' ',
+      HINT = ' ',
+      INFO = ' ',
     },
     git = {
-      branch = '',
+      branch = '',
     },
-    folder = ' ',
-    lines = ' ',
+    folder = ' ',
+    lines = ' ',
   }
 
   return M

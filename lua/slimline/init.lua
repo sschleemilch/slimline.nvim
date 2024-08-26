@@ -24,24 +24,57 @@ local function resolve_component(component_name, config)
   end
 end
 
+-- Concats resolved components with given spacing
+---comment
+---@param comps table
+---@param spacing string
+---@return string
+function M.concat_components(comps, spacing)
+  local result = ''
+  local first = true
+  for _, c_fn in ipairs(comps) do
+    local space = spacing
+    if first then
+      space = ''
+      first = false
+    end
+    if type(c_fn) == 'function' then
+      result = result .. space .. c_fn()
+    elseif type(c_fn) == 'string' then
+      result = result .. space .. c_fn
+    end
+  end
+  return result
+end
+
 --- Renders the statusline.
 ---@return string
 function M.render()
   local config = vim.g.slimline_config
-  if not config or not config.resolved_components then
+  if not config or not (config.components.left or config.components.right or config.components.center) then
     return ''
   end
 
   local result = '%#Slimline#' .. config.spaces.left
-  -- call the functions in resolved_components and add them to the statusline string
-  for _, component_func in ipairs(config.resolved_components) do
-    if type(component_func) == 'function' then
-      result = result .. component_func()
-    elseif type(component_func) == 'string' then
-      result = result .. component_func
-    end
-  end
+  result = result .. M.concat_components(config.components.left, config.spaces.components)
+  result = result .. '%='
+  result = result .. M.concat_components(config.components.center, config.spaces.components)
+  result = result .. '%='
+  result = result .. M.concat_components(config.components.right, config.spaces.components)
+  result = result .. config.spaces.right
 
+  return result
+end
+
+-- Resolving components into a table
+---@param comps table
+---@param opts table
+---@return table
+local function resolve_components(comps, opts)
+  local result = {}
+  for _, component in ipairs(comps) do
+    table.insert(result, resolve_component(component, opts))
+  end
   return result
 end
 
@@ -57,12 +90,10 @@ function M.setup(opts)
     opts.sep.left = ''
     opts.sep.right = ''
   end
+
   -- Resolve component references
-  local resolved_components = {}
-  for _, component in ipairs(opts.components) do
-    table.insert(resolved_components, resolve_component(component, opts))
-  end
-  opts.resolved_components = resolved_components
+  opts.components.left = resolve_components(opts.components.left, opts)
+  opts.components.right = resolve_components(opts.components.right, opts)
 
   vim.g.slimline_config = opts
   local hl = require('slimline.highlights')
