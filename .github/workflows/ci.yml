@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup linters
+      run: |
+        sudo apt-get update
+        sudo apt-get install luarocks
+        sudo luarocks install luacheck
+    - name: luacheck
+      run: luacheck lua
