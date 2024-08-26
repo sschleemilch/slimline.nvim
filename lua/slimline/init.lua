@@ -1,28 +1,48 @@
 local M = {}
+local components = require('slimline.components')
+
+--- Returns correct component from config
+---@return function
+---@param component_name string | function
+---@param config table
+local function resolve_component(component_name, config)
+  if type(component_name) == 'function' then
+    return component_name
+  elseif type(component_name) == 'string' then
+    if components[component_name] then
+      return function(...)
+        return components[component_name](config, ...)
+      end
+    else
+      return function()
+        return component_name
+      end
+    end
+  end
+  return function()
+    return ''
+  end
+end
 
 --- Renders the statusline.
 ---@return string
 function M.render()
   local config = vim.g.slimline_config
-  local sep = config.spaces.components
-  local components = require('slimline.components')
-  local mode = components.get_mode()
-  local stl = table.concat {
-    '%#Slimline#' .. config.spaces.left,
-    components.mode(mode),
-    sep,
-    components.path(),
-    sep,
-    components.git(),
-    '%=',
-    components.diagnostics(),
-    sep,
-    components.filetype_lsp(),
-    sep,
-    components.progress(mode),
-    config.spaces.right,
-  }
-  return stl
+  if not config or not config.resolved_components then
+    return ''
+  end
+
+  local result = '%#Slimline#' .. config.spaces.left
+  -- call the functions in resolved_components and add them to the statusline string
+  for _, component_func in ipairs(config.resolved_components) do
+    if type(component_func) == 'function' then
+      result = result .. component_func()
+    elseif type(component_func) == 'string' then
+      result = result .. component_func
+    end
+  end
+
+  return result
 end
 
 ---@param opts table
@@ -37,9 +57,16 @@ function M.setup(opts)
     opts.sep.left = ''
     opts.sep.right = ''
   end
+  -- Resolve component references
+  local resolved_components = {}
+  for _, component in ipairs(opts.components) do
+    table.insert(resolved_components, resolve_component(component, opts))
+  end
+  opts.resolved_components = resolved_components
+
   vim.g.slimline_config = opts
   local hl = require('slimline.highlights')
-  hl.create()
+  hl.create(opts)
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 end
 

@@ -1,21 +1,41 @@
-local M = {
-  bold = false,
-  verbose_mode = false,
-  style = 'bg',
-  spaces = {
+local function create_M()
+  local M = {}
+
+  M.bold = false
+  M.verbose_mode = false
+  M.style = 'bg'
+
+  M.spaces = {
     components = ' ',
     left = ' ',
     right = ' ',
-  },
-  sep = {
+  }
+
+  M.sep = {
     hide = {
       first = false,
       last = false,
     },
     left = '',
     right = '',
-  },
-  hl = {
+  }
+
+  M.components = {
+    'mode',
+    M.spaces.components,
+    'path',
+    M.spaces.components,
+    'git',
+    '%=',
+    'diagnostics',
+    M.spaces.components,
+    'filetype_lsp',
+    M.spaces.components,
+    'progress',
+    M.spaces.right,
+  }
+
+  M.hl = {
     modes = {
       normal = 'Type',
       insert = 'Function',
@@ -26,20 +46,25 @@ local M = {
     base = 'Comment',
     primary = 'Normal',
     secondary = 'Comment',
-  },
-  icons = {
+  }
+
+  M.icons = {
     diagnostics = {
-      ERROR = ' ',
-      WARN = ' ',
-      HINT = ' ',
-      INFO = ' ',
+      ERROR = ' ',
+      WARN = ' ',
+      HINT = ' ',
+      INFO = ' ',
     },
     git = {
-      branch = '',
+      branch = '',
     },
-    folder = ' ',
-    lines = ' ',
-  },
-}
+    folder = ' ',
+    lines = ' ',
+  }
+
+  return M
+end
+
+local M = create_M()
 
 return M

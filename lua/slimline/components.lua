@@ -1,4 +1,3 @@
-local config = vim.g.slimline_config
 local highlights = require('slimline.highlights')
 local M = {}
 
@@ -50,9 +49,9 @@ function M.get_mode()
 end
 
 --- Function to get the highlight of a given mode
---- @param mode string
 --- @return string
-function M.get_mode_hl(mode)
+function M.get_mode_hl()
+  local mode = M.get_mode()
   if mode == 'NORMAL' then
     return highlights.hls.mode.normal.text
   elseif mode:find('PENDING') then
@@ -68,9 +67,10 @@ function M.get_mode_hl(mode)
 end
 
 --- Mode component
---- @param mode string
+--- @param config table
 --- @return string
-function M.mode(mode)
+function M.mode(config)
+  local mode = M.get_mode()
   local render = mode
   if config.verbose_mode == false then
     render = string.sub(mode, 1, 1)
@@ -86,8 +86,9 @@ end
 --- Git component showing branch
 --- as well as changed, added and removed lines
 --- Using gitsigns for it
+--- @param config table
 --- @return string
-function M.git()
+function M.git(config)
   local status = vim.b.gitsigns_status_dict
   if not status then
     return ''
@@ -127,8 +128,9 @@ end
 
 --- Path component
 --- Displays directory and file seperately
+--- @param config table
 --- @return string
-function M.path()
+function M.path(config)
   local file =
     highlights.highlight_content(' ' .. vim.fn.expand('%:t') .. ' %m%r', highlights.hls.primary.text, config.sep.left)
   file = file .. highlights.highlight_content(config.sep.right, highlights.hls.primary.sep_transition)
@@ -149,8 +151,9 @@ end
 
 local last_diagnostic_component = ''
 --- Diagnostics component
+--- @param config table
 --- @return string
-function M.diagnostics()
+function M.diagnostics(config)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -197,7 +200,8 @@ function M.diagnostics()
 end
 
 --- Filetype and attached LSPs component
-function M.filetype_lsp()
+--- @param config table
+function M.filetype_lsp(config)
   local filetype = vim.bo.filetype
   if filetype == '' then
     filetype = '[No Name]'
@@ -234,8 +238,10 @@ function M.filetype_lsp()
 end
 
 --- File progress component
+--- @param config table
 --- @return string
-function M.progress(mode)
+function M.progress(config)
+  local mode = M.get_mode()
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local content = ''

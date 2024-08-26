@@ -1,5 +1,3 @@
-local config = vim.g.slimline_config
-
 local M = {}
 
 M.hls = {
@@ -36,8 +34,8 @@ M.hls = {
     },
   },
 }
-
-function M.create()
+---@param config table
+function M.create(config)
   M.hls.base = M.get_or_create('', config.hl.base)
 
   local as_background = true
