@@ -1,17 +1,30 @@
 local M = {}
 local components = require('slimline.components')
+local components_length = 0
+local position = 0
 
 --- Returns correct component from config
 ---@return function
 ---@param component_name string | function
 ---@param config table
 local function resolve_component(component_name, config)
+  position = position + 1
   if type(component_name) == 'function' then
     return component_name
   elseif type(component_name) == 'string' then
     if components[component_name] then
+      local sep = {
+        left = config.sep.left,
+        right = config.sep.right,
+      }
+      if config.sep.hide.first and position == 1 then
+        sep.left = ''
+      end
+      if config.sep.hide.last and position == components_length then
+        sep.right = ''
+      end
       return function(...)
-        return components[component_name](config, ...)
+        return components[component_name](config, sep, ...)
       end
     else
       return function()
@@ -91,8 +104,11 @@ function M.setup(opts)
     opts.sep.right = ''
   end
 
+  components_length = #opts.components.left + #opts.components.center + #opts.components.right
+
   -- Resolve component references
   opts.components.left = resolve_components(opts.components.left, opts)
+  opts.components.center = resolve_components(opts.components.center, opts)
   opts.components.right = resolve_components(opts.components.right, opts)
 
   vim.g.slimline_config = opts
