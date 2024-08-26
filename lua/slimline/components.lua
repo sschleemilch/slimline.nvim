@@ -243,7 +243,7 @@ end
 function M.progress(config)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
-  local content = ''
+  local content
   if cur == 1 then
     content = 'Top'
   elseif cur == total then

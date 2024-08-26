@@ -23,6 +23,7 @@ Configuration options are mainly about changing the style:
 - Mode
 - Filename + Path
 - Git Branch + File added, modified and removed lines (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
+- Diagnostics
 - Filetype and attached LSPs
 - File progress and overall number of lines
 

@@ -85,8 +85,17 @@ function M.get_or_create(hl, base, reverse, bold, bg_from)
     if reverse then
       local tmp = fg
       fg = bg
+      if fg == nil then
+        local bg_style = vim.o.background
+        if bg_style == "dark" then
+          fg = "#000000"
+        else
+          fg = "#ffffff"
+        end
+      end
       bg = tmp
     end
+
     vim.api.nvim_set_hl(0, hl, { bg = bg, fg = fg, bold = hl_ref.bold or bold })
     M.hl_cache[hl] = true
   end
