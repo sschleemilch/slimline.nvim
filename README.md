@@ -152,7 +152,19 @@ require('slimline').setup {
 
 ## Recipes
 
-### Slashes
+### Calm format
+
+![s9](./doc/screenshots/s9.png)
+![s10](./doc/screenshots/s10.png)
+
+```lua
+opts = {
+    style = "fg"
+}
+```
+
+
+### Slashes format
 
 ![s11](./doc/screenshots/s11.png)
 
@@ -170,6 +182,26 @@ opts = {
         },
         left = "",
         right = "",
+    },
+}
+```
+
+### Custom component
+
+```lua
+opts = {
+    components = {
+        center = {
+            function()
+                local sep_left = vim.g.slimline_config.sep.left
+                local sep_right = vim.g.slimline_config.sep.right
+                local result = "%#SlimlinePrimarySep#" .. sep_left
+                result = result .. "%#SlimlinePrimary#" .. " FOO "
+                result = result .. "%#SlimlinePrimarySep#" .. sep_right
+                result = result .. "%#Slimline#"
+                return result
+            end,
+        },
     },
 }
 ```
