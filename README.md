@@ -45,7 +45,7 @@ You can find them e.g. by running `:hi` in your nvim session that has slimline l
 
 ## Screenshots
 
-Here are some screenshots and their options changed. See [recipes](#recipes) for config examples.
+Here are some screenshots. See [recipes](#recipes) for config examples.
 
 ![s1](./doc/screenshots/s1.png)
 ![s2](./doc/screenshots/s2.png)
