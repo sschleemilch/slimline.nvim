@@ -1,4 +1,3 @@
-local config = vim.g.slimline_config
 local highlights = require('slimline.highlights')
 local M = {}
 
@@ -50,9 +49,9 @@ function M.get_mode()
 end
 
 --- Function to get the highlight of a given mode
---- @param mode string
 --- @return string
-function M.get_mode_hl(mode)
+function M.get_mode_hl()
+  local mode = M.get_mode()
   if mode == 'NORMAL' then
     return highlights.hls.mode.normal.text
   elseif mode:find('PENDING') then
@@ -68,26 +67,26 @@ function M.get_mode_hl(mode)
 end
 
 --- Mode component
---- @param mode string
+--- @param config table
+--- @param sep {left: string, right: string}
 --- @return string
-function M.mode(mode)
+function M.mode(config, sep)
+  local mode = M.get_mode()
   local render = mode
   if config.verbose_mode == false then
     render = string.sub(mode, 1, 1)
   end
   local content = ' ' .. render .. ' '
-  local sep_left = config.sep.left
-  if config.sep.hide.first then
-    sep_left = ''
-  end
-  return highlights.highlight_content(content, M.get_mode_hl(mode), sep_left, config.sep.right)
+  return highlights.highlight_content(content, M.get_mode_hl(), sep.left, sep.right)
 end
 
 --- Git component showing branch
 --- as well as changed, added and removed lines
 --- Using gitsigns for it
+--- @param config table
+--- @param sep {left: string, right: string}
 --- @return string
-function M.git()
+function M.git(config, sep)
   local status = vim.b.gitsigns_status_dict
   if not status then
     return ''
@@ -102,12 +101,17 @@ function M.git()
   local modifications = added or removed or changed
 
   local branch = string.format(' %s %s ', config.icons.git.branch, status.head)
-  branch = highlights.highlight_content(branch, highlights.hls.primary.text, config.sep.left)
+  branch = highlights.highlight_content(branch, highlights.hls.primary.text, sep.left)
   local branch_hl_right_sep = highlights.hls.primary.sep
   if modifications then
     branch_hl_right_sep = highlights.hls.primary.sep_transition
   end
-  branch = branch .. highlights.highlight_content(config.sep.right, branch_hl_right_sep)
+  -- if there are modifications the main part of the git components should have a right side
+  -- seperator
+  if modifications then
+    sep.right = config.sep.right
+  end
+  branch = branch .. highlights.highlight_content(sep.right, branch_hl_right_sep)
 
   local mods = ''
   if modifications then
@@ -120,17 +124,19 @@ function M.git()
     if removed then
       mods = mods .. string.format(' -%s', status.removed)
     end
-    mods = highlights.highlight_content(mods .. ' ', highlights.hls.secondary.text, nil, config.sep.right)
+    mods = highlights.highlight_content(mods .. ' ', highlights.hls.secondary.text, nil, sep.right)
   end
   return branch .. mods
 end
 
 --- Path component
 --- Displays directory and file seperately
+--- @param config table
+--- @param sep {left: string, right: string}
 --- @return string
-function M.path()
+function M.path(config, sep)
   local file =
-    highlights.highlight_content(' ' .. vim.fn.expand('%:t') .. ' %m%r', highlights.hls.primary.text, config.sep.left)
+    highlights.highlight_content(' ' .. vim.fn.expand('%:t') .. ' %m%r', highlights.hls.primary.text, sep.left)
   file = file .. highlights.highlight_content(config.sep.right, highlights.hls.primary.sep_transition)
 
   local path = vim.fs.normalize(vim.fn.expand('%:.:h'))
@@ -141,7 +147,7 @@ function M.path()
     ' ' .. config.icons.folder .. path .. ' ',
     highlights.hls.secondary.text,
     nil,
-    config.sep.right
+    sep.right
   )
 
   return file .. path
@@ -149,8 +155,10 @@ end
 
 local last_diagnostic_component = ''
 --- Diagnostics component
+--- @param config table
+--- @param sep {left: string, right: string}
 --- @return string
-function M.diagnostics()
+function M.diagnostics(config, sep)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -190,14 +198,16 @@ function M.diagnostics()
   last_diagnostic_component = highlights.highlight_content(
     ' ' .. last_diagnostic_component .. ' ',
     highlights.hls.primary.text,
-    config.sep.left,
-    config.sep.right
+    sep.left,
+    sep.right
   )
   return last_diagnostic_component
 end
 
 --- Filetype and attached LSPs component
-function M.filetype_lsp()
+--- @param config table
+--- @param sep {left: string, right: string}
+function M.filetype_lsp(config, sep)
   local filetype = vim.bo.filetype
   if filetype == '' then
     filetype = '[No Name]'
@@ -207,8 +217,7 @@ function M.filetype_lsp()
   if status then
     icon = ' ' .. MiniIcons.get('filetype', filetype)
   end
-  filetype =
-    highlights.highlight_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, config.sep.right)
+  filetype = highlights.highlight_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, sep.right)
 
   local attached_clients = vim.lsp.get_clients { bufnr = 0 }
   local it = vim.iter(attached_clients)
@@ -224,7 +233,7 @@ function M.filetype_lsp()
     filetype_hl_sep_left = highlights.hls.primary.sep_transition
   end
   filetype = highlights.highlight_content(config.sep.left, filetype_hl_sep_left) .. filetype
-  lsp_clients = highlights.highlight_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, config.sep.left)
+  lsp_clients = highlights.highlight_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, sep.left)
 
   local result = filetype
   if #attached_clients > 0 then
@@ -234,8 +243,10 @@ function M.filetype_lsp()
 end
 
 --- File progress component
+--- @param config table
+--- @param sep {left: string, right: string}
 --- @return string
-function M.progress(mode)
+function M.progress(config, sep)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local content
@@ -247,11 +258,7 @@ function M.progress(mode)
     content = string.format('%2d%%%%', math.floor(cur / total * 100))
   end
   content = string.format(' %s %s / %s ', config.icons.lines, content, total)
-  local sep_right = config.sep.right
-  if config.sep.hide.last then
-    sep_right = ''
-  end
-  return highlights.highlight_content(content, M.get_mode_hl(mode), config.sep.left, sep_right)
+  return highlights.highlight_content(content, M.get_mode_hl(), sep.left, sep.right)
 end
 
 return M
