@@ -2,6 +2,7 @@
 
 <!-- panvimdoc-ignore-start -->
 
+![code size](https://img.shields.io/github/languages/code-size/sschleemilch/slimline.nvim?style=flat-square)
 ![license](https://img.shields.io/github/license/sschleemilch/slimline.nvim?style=flat-square)
 
 <!-- panvimdoc-ignore-end -->
