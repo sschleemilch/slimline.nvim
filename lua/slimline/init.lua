@@ -144,17 +144,29 @@ end
 --- To be called e.g. from autocommands
 function M.refresh()
   -- Check if we're in a valid buffer
-  if vim.fn.bufnr('%') == -1 then
+  if vim.fn.bufnr('%') == -1 or vim.fn.line('$') == 0 then
     return
   end
 
   -- Wrap the redrawstatus command in pcall to catch any errors
   local status, err = pcall(function()
-    vim.cmd.redrawstatus()
+    -- Ensure we're in a valid window
+    if vim.fn.winnr('$') > 0 then
+      local current_win = vim.api.nvim_get_current_win()
+      if vim.api.nvim_win_is_valid(current_win) then
+        vim.cmd.redrawstatus()
+      end
+    end
   end)
 
   if not status then
-    vim.api.nvim_err_writeln('Slimline refresh error: ' .. tostring(err))
+    -- Check if the error is E315
+    if type(err) == 'string' and err:match('E315:') then
+      -- Silently ignore E315 errors
+      return
+    else
+      vim.api.nvim_err_writeln('Slimline refresh error: ' .. tostring(err))
+    end
     -- Attempt to set a simple statusline as a fallback
     pcall(function()
       vim.o.statusline = '%f %h%w%m%r %=%l,%c %P'
