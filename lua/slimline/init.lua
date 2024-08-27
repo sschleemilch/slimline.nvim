@@ -143,7 +143,23 @@ end
 --- Refreshes the line
 --- To be called e.g. from autocommands
 function M.refresh()
-  vim.cmd.redrawstatus()
+  -- Check if we're in a valid buffer
+  if vim.fn.bufnr('%') == -1 then
+    return
+  end
+
+  -- Wrap the redrawstatus command in pcall to catch any errors
+  local status, err = pcall(function()
+    vim.cmd.redrawstatus()
+  end)
+
+  if not status then
+    vim.api.nvim_err_writeln('Slimline refresh error: ' .. tostring(err))
+    -- Attempt to set a simple statusline as a fallback
+    pcall(function()
+      vim.o.statusline = '%f %h%w%m%r %=%l,%c %P'
+    end)
+  end
 end
 
 return M
