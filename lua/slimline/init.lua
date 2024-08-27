@@ -43,6 +43,9 @@ end
 ---@param spacing string
 ---@return string
 function M.concat_components(comps, spacing)
+  if not comps then
+    return ''
+  end
   local result = ''
   local first = true
   for _, c_fn in ipairs(comps) do
@@ -51,11 +54,19 @@ function M.concat_components(comps, spacing)
       space = ''
       first = false
     end
+    local component_result = ''
     if type(c_fn) == 'function' then
-      result = result .. space .. c_fn()
+      local status, output = pcall(c_fn)
+      if status then
+        component_result = output
+      else
+        -- Log the error but continue with other components
+        vim.api.nvim_err_writeln('Slimline component error: ' .. tostring(output))
+      end
     elseif type(c_fn) == 'string' then
-      result = result .. space .. c_fn
+      component_result = c_fn
     end
+    result = result .. space .. component_result
   end
   return result
 end
@@ -68,15 +79,30 @@ function M.render()
     return ''
   end
 
-  local result = '%#Slimline#' .. config.spaces.left
-  result = result .. M.concat_components(config.components.left, config.spaces.components)
-  result = result .. '%='
-  result = result .. M.concat_components(config.components.center, config.spaces.components)
-  result = result .. '%='
-  result = result .. M.concat_components(config.components.right, config.spaces.components)
-  result = result .. config.spaces.right
+  -- Check if we're in a valid buffer
+  if vim.fn.bufnr('%') == -1 then
+    return ''
+  end
 
-  return result
+  -- Wrap the statusline generation in pcall to catch any errors
+  local status, result = pcall(function()
+    local line = '%#Slimline#' .. config.spaces.left
+    line = line .. M.concat_components(config.components.left, config.spaces.components)
+    line = line .. '%='
+    line = line .. M.concat_components(config.components.center, config.spaces.components)
+    line = line .. '%='
+    line = line .. M.concat_components(config.components.right, config.spaces.components)
+    line = line .. config.spaces.right
+    return line
+  end)
+
+  if status then
+    return result
+  else
+    -- If an error occurred, return a simple statusline and log the error
+    vim.api.nvim_err_writeln('Slimline error: ' .. tostring(result))
+    return '%f %h%w%m%r %=%l,%c %P'
+  end
 end
 
 -- Resolving components into a table
@@ -103,14 +129,11 @@ function M.setup(opts)
     opts.sep.left = ''
     opts.sep.right = ''
   end
-
   components_length = #opts.components.left + #opts.components.center + #opts.components.right
-
   -- Resolve component references
   opts.components.left = resolve_components(opts.components.left, opts)
   opts.components.center = resolve_components(opts.components.center, opts)
   opts.components.right = resolve_components(opts.components.right, opts)
-
   vim.g.slimline_config = opts
   local hl = require('slimline.highlights')
   hl.create(opts)
