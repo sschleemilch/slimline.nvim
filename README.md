@@ -217,21 +217,21 @@ Let's add some color. To do that we can use the `highlights` component of slimli
 function ()
     local sh = require("slimline.highlights")
     local content = "Hello World"
-    return sh.highlight_content(content, sh.hls.primary.text)
+    return sh.hl_content(content, sh.hls.primary.text)
 end
 ```
 It will now look like that:
 
 ![c2](./doc/custom_components/2.png)
 
-To add configured separators we can add them to `highlight_content`:
+To add configured separators we can add them to `hl_content`:
 
 ```lua
 function ()
     local sh = require("slimline.highlights")
     local cfg = require("slimline").config
     local content = " Hello World "
-    return sh.highlight_content(content, sh.hls.primary.text, cfg.sep.left, cfg.sep.right)
+    return sh.hl_content(content, sh.hls.primary.text, cfg.sep.left, cfg.sep.right)
 end
 ```
 
@@ -245,9 +245,9 @@ To add a secondary part we need to change it like that:
 function ()
     local sh = require("slimline.highlights")
     local cfg = require("slimline").config
-    local content = sh.highlight_content(" Hello ", sh.hls.primary.text, cfg.sep.left)
-    content = content .. sh.highlight_content(cfg.sep.right, sh.hls.primary.sep_transition)
-    content = content .. sh.highlight_content(" World ", sh.hls.secondary.text, nil, cfg.sep.right)
+    local content = sh.hl_content(" Hello ", sh.hls.primary.text, cfg.sep.left)
+    content = content .. sh.hl_content(cfg.sep.right, sh.hls.primary.sep_transition)
+    content = content .. sh.hl_content(" World ", sh.hls.secondary.text, nil, cfg.sep.right)
     return content
 end
 ```

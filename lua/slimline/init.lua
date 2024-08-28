@@ -46,7 +46,6 @@ local function resolve_component(component_name, n_components)
 end
 
 -- Concats resolved components with given spacing
----comment
 ---@param comps table
 ---@param spacing string
 ---@return string
