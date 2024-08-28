@@ -11,8 +11,6 @@ vim.api.nvim_create_autocmd('User', {
 vim.api.nvim_create_autocmd('Colorscheme', {
   group = augroup,
   callback = function()
-    local hl = require('slimline.highlights')
-    hl.hl_cache = {}
-    hl.create(vim.g.slimline_config)
+    require('slimline.highlights').create_hls()
   end,
 })

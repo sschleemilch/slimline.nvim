@@ -63,7 +63,7 @@ end
 --- Renders the statusline.
 ---@return string
 function M.render()
-  local config = vim.g.slimline_config
+  local config = M.config
   if not config or not (config.components.left or config.components.right or config.components.center) then
     return ''
   end
@@ -111,9 +111,9 @@ function M.setup(opts)
   opts.components.center = resolve_components(opts.components.center, opts)
   opts.components.right = resolve_components(opts.components.right, opts)
 
-  vim.g.slimline_config = opts
+  M.config = opts
   local hl = require('slimline.highlights')
-  hl.create(opts)
+  hl.create_hls()
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 end
 

@@ -229,7 +229,7 @@ To add configured separators we can add them to `highlight_content`:
 ```lua
 function ()
     local sh = require("slimline.highlights")
-    local cfg = vim.g.slimline_config
+    local cfg = require("slimline").config
     local content = " Hello World "
     return sh.highlight_content(content, sh.hls.primary.text, cfg.sep.left, cfg.sep.right)
 end
@@ -244,7 +244,7 @@ To add a secondary part we need to change it like that:
 ```lua
 function ()
     local sh = require("slimline.highlights")
-    local cfg = vim.g.slimline_config
+    local cfg = require("slimline").config
     local content = sh.highlight_content(" Hello ", sh.hls.primary.text, cfg.sep.left)
     content = content .. sh.highlight_content(cfg.sep.right, sh.hls.primary.sep_transition)
     content = content .. sh.highlight_content(" World ", sh.hls.secondary.text, nil, cfg.sep.right)
