@@ -158,7 +158,7 @@ or as a background color.
 ## Commands
 
 A `Slimline` command is available with the following sub commands:
-- `switch_style`: Toggles `style` between `bg` and `fg`.
+- `switch`: Accepts only one parameter until now: `style`. Will switch the style for the current session
 
 
 ## Recipes

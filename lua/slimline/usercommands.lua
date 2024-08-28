@@ -9,20 +9,35 @@ local seps = {
 
 ---@type table<string, SlimlineSubcommand>
 local subcommand_tbl = {
-  switch_style = {
-    impl = function()
-      local sl = require('slimline')
-      local cfg = sl.config
-      if cfg.style == 'bg' then
-        cfg.style = 'fg'
-        seps.left = cfg.sep.left
-        seps.right = cfg.sep.right
+  switch = {
+    impl = function(args)
+      if args[1] == 'style' then
+        local sl = require('slimline')
+        local cfg = sl.config
+        if cfg.style == 'bg' then
+          cfg.style = 'fg'
+          seps.left = cfg.sep.left
+          seps.right = cfg.sep.right
+        else
+          cfg.style = 'bg'
+          cfg.sep.left = seps.left
+          cfg.sep.right = seps.right
+        end
+        sl.setup(cfg)
       else
-        cfg.style = 'bg'
-        cfg.sep.left = seps.left
-        cfg.sep.right = seps.right
+        vim.notify('Slimline: unknown switch target: ' .. args[1], vim.log.levels.ERROR)
       end
-      sl.setup(cfg)
+    end,
+    complete = function(subcmd_arg_lead)
+      local switch_args = {
+        'style',
+      }
+      return vim
+        .iter(switch_args)
+        :filter(function(switch_arg)
+          return switch_arg:find(subcmd_arg_lead) ~= nil
+        end)
+        :totable()
     end,
   },
 }
