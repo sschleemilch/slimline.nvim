@@ -6,17 +6,13 @@ M.resolved_components = {
   right = {}
 }
 
---- Keep track of resolve component position
-local position = 0
-
 --- Returns correct component from config
 ---@return function
 ---@param component_name string | function
----@param n_components integer
-local function resolve_component(component_name, n_components)
+---@param component_position string? "last"|"first"|nil
+local function resolve_component(component_name, component_position)
   local config = M.config
   local components = require('slimline.components')
-  position = position + 1
   if type(component_name) == 'function' then
     return component_name
   elseif type(component_name) == 'string' then
@@ -25,10 +21,10 @@ local function resolve_component(component_name, n_components)
         left = config.sep.left,
         right = config.sep.right,
       }
-      if config.sep.hide.first and position == 1 then
+      if config.sep.hide.first and component_position == "first" then
         sep.left = ''
       end
-      if config.sep.hide.last and position == n_components then
+      if config.sep.hide.last and component_position == "last" then
         sep.right = ''
       end
       return function(...)
@@ -89,12 +85,19 @@ end
 
 -- Resolving components into a table
 ---@param comps table
----@param n_components integer
+---@param group_position string "left"|"center"|"right"
 ---@return table
-local function resolve_components(comps, n_components)
+local function resolve_components(comps, group_position)
   local result = {}
-  for _, component in ipairs(comps) do
-    table.insert(result, resolve_component(component, n_components))
+  for i, component in ipairs(comps) do
+    local component_position = nil
+    if i == 1 and group_position == "left" then
+      component_position = "first"
+    end
+    if i == #comps and group_position == "right" then
+      component_position = "last"
+    end
+    table.insert(result, resolve_component(component, component_position))
   end
   return result
 end
@@ -122,15 +125,15 @@ function M.setup(opts)
 
   require('slimline.highlights').create_hls()
 
-  local n_components = #opts.components.left + #opts.components.center + #opts.components.right
   -- Resolve component references
-  M.resolved_components.left = resolve_components(opts.components.left, n_components)
-  M.resolved_components.center = resolve_components(opts.components.center, n_components)
-  M.resolved_components.right = resolve_components(opts.components.right, n_components)
+  M.resolved_components.left = resolve_components(opts.components.left, "left")
+  M.resolved_components.center = resolve_components(opts.components.center, "center")
+  M.resolved_components.right = resolve_components(opts.components.right, "right")
 
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 
   require('slimline.autocommands')
+  require('slimline.usercommands')
 end
 
 return M

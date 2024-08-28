@@ -155,6 +155,11 @@ or as a background color.
 > no background color, Slimline will fall back to `#000000` for dark themes and to `#ffffff`
 > for white themes
 
+## Commands
+
+A `Slimline` command is available with the following sub commands:
+- `switch_style`: Toggles `style` between `bg` and `fg`.
+
 
 ## Recipes
 
