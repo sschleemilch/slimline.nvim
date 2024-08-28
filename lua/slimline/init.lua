@@ -13,8 +13,8 @@ local position = 0
 ---@return function
 ---@param component_name string | function
 ---@param n_components integer
----@param config table
-local function resolve_component(component_name, config, n_components)
+local function resolve_component(component_name, n_components)
+  local config = M.config
   local components = require('slimline.components')
   position = position + 1
   if type(component_name) == 'function' then
@@ -90,13 +90,12 @@ end
 
 -- Resolving components into a table
 ---@param comps table
----@param opts table
 ---@param n_components integer
 ---@return table
-local function resolve_components(comps, opts, n_components)
+local function resolve_components(comps, n_components)
   local result = {}
   for _, component in ipairs(comps) do
-    table.insert(result, resolve_component(component, opts, n_components))
+    table.insert(result, resolve_component(component, n_components))
   end
   return result
 end
@@ -126,9 +125,9 @@ function M.setup(opts)
 
   local n_components = #opts.components.left + #opts.components.center + #opts.components.right
   -- Resolve component references
-  M.resolved_components.left = resolve_components(opts.components.left, opts, n_components)
-  M.resolved_components.center = resolve_components(opts.components.center, opts, n_components)
-  M.resolved_components.right = resolve_components(opts.components.right, opts, n_components)
+  M.resolved_components.left = resolve_components(opts.components.left, n_components)
+  M.resolved_components.center = resolve_components(opts.components.center, n_components)
+  M.resolved_components.right = resolve_components(opts.components.right, n_components)
 
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 
