@@ -1,38 +1,38 @@
 local M = {}
 
-M.resolved_components = {
+---@type table<string, function[]>
+M.function_components = {
   left = {},
   center = {},
   right = {}
 }
 
---- Returns correct component from config
+--- Returns a component function
+---@param name string | function
+---@param position string? "last"|"first"|nil
 ---@return function
----@param component_name string | function
----@param component_position string? "last"|"first"|nil
-local function resolve_component(component_name, component_position)
-  local config = M.config
+local function get_function_component(name, position)
   local components = require('slimline.components')
-  if type(component_name) == 'function' then
-    return component_name
-  elseif type(component_name) == 'string' then
-    if components[component_name] then
+  if type(name) == 'function' then
+    return name
+  elseif type(name) == 'string' then
+    if components[name] then
       local sep = {
-        left = config.sep.left,
-        right = config.sep.right,
+        left = M.config.sep.left,
+        right = M.config.sep.right,
       }
-      if config.sep.hide.first and component_position == "first" then
+      if M.config.sep.hide.first and position == "first" then
         sep.left = ''
       end
-      if config.sep.hide.last and component_position == "last" then
+      if M.config.sep.hide.last and position == "last" then
         sep.right = ''
       end
       return function(...)
-        return components[component_name](config, sep, ...)
+        return components[name](M.config, sep, ...)
       end
     else
       return function()
-        return component_name
+        return name
       end
     end
   end
@@ -41,24 +41,18 @@ local function resolve_component(component_name, component_position)
   end
 end
 
--- Concats resolved components with given spacing
----@param comps table
+-- Calls function components and concatenate the output
+---@param fn_components function[]
 ---@param spacing string
 ---@return string
-function M.concat_components(comps, spacing)
+function M.concat_components(fn_components, spacing)
   local result = ''
-  local first = true
-  for _, c_fn in ipairs(comps) do
+  for i, fn in ipairs(fn_components) do
     local space = spacing
-    if first then
+    if i == 1 then
       space = ''
-      first = false
     end
-    if type(c_fn) == 'function' then
-      result = result .. space .. c_fn()
-    elseif type(c_fn) == 'string' then
-      result = result .. space .. c_fn
-    end
+    result = result .. space .. fn()
   end
   return result
 end
@@ -66,38 +60,31 @@ end
 --- Renders the statusline.
 ---@return string
 function M.render()
-  local config = M.config
-  local components = M.resolved_components
-  if not config or not (components.left or components.right or components.center) then
-    return ''
-  end
-
-  local result = '%#Slimline#' .. config.spaces.left
-  result = result .. M.concat_components(components.left, config.spaces.components)
+  local result = '%#Slimline#' .. M.config.spaces.left
+  result = result .. M.concat_components(M.function_components.left, M.config.spaces.components)
   result = result .. '%='
-  result = result .. M.concat_components(components.center, config.spaces.components)
+  result = result .. M.concat_components(M.function_components.center, M.config.spaces.components)
   result = result .. '%='
-  result = result .. M.concat_components(components.right, config.spaces.components)
-  result = result .. config.spaces.right
-
+  result = result .. M.concat_components(M.function_components.right, M.config.spaces.components)
+  result = result .. M.config.spaces.right
   return result
 end
 
--- Resolving components into a table
----@param comps table
+-- Generates function components
+---@param components table
 ---@param group_position string "left"|"center"|"right"
----@return table
-local function resolve_components(comps, group_position)
+---@return function[]
+local function get_function_components(components, group_position)
   local result = {}
-  for i, component in ipairs(comps) do
+  for i, component in ipairs(components) do
     local component_position = nil
     if i == 1 and group_position == "left" then
       component_position = "first"
     end
-    if i == #comps and group_position == "right" then
+    if i == #components and group_position == "right" then
       component_position = "last"
     end
-    table.insert(result, resolve_component(component, component_position))
+    table.insert(result, get_function_component(component, component_position))
   end
   return result
 end
@@ -125,10 +112,10 @@ function M.setup(opts)
 
   require('slimline.highlights').create_hls()
 
-  -- Resolve component references
-  M.resolved_components.left = resolve_components(opts.components.left, "left")
-  M.resolved_components.center = resolve_components(opts.components.center, "center")
-  M.resolved_components.right = resolve_components(opts.components.right, "right")
+  -- Create function components
+  M.function_components.left = get_function_components(opts.components.left, "left")
+  M.function_components.center = get_function_components(opts.components.center, "center")
+  M.function_components.right = get_function_components(opts.components.right, "right")
 
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 
