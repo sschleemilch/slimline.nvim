@@ -68,6 +68,7 @@ end
 ---@param bg_from string?
 ---@param reverse boolean?
 ---@param bold boolean?
+---@return string
 function M.create_hl(hl, base, reverse, bold, bg_from)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then
@@ -105,7 +106,7 @@ end
 --- @param sep_left string?
 --- @param sep_right string?
 --- @return string
-function M.highlight_content(content, hl, sep_left, sep_right)
+function M.hl_content(content, hl, sep_left, sep_right)
   if content == nil then
     return ''
   end

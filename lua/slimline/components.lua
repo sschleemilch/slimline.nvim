@@ -77,7 +77,7 @@ function M.mode(config, sep)
     render = string.sub(mode, 1, 1)
   end
   local content = ' ' .. render .. ' '
-  return highlights.highlight_content(content, M.get_mode_hl(), sep.left, sep.right)
+  return highlights.hl_content(content, M.get_mode_hl(), sep.left, sep.right)
 end
 
 --- Git component showing branch
@@ -101,7 +101,7 @@ function M.git(config, sep)
   local modifications = added or removed or changed
 
   local branch = string.format(' %s %s ', config.icons.git.branch, status.head)
-  branch = highlights.highlight_content(branch, highlights.hls.primary.text, sep.left)
+  branch = highlights.hl_content(branch, highlights.hls.primary.text, sep.left)
   local branch_hl_right_sep = highlights.hls.primary.sep
   if modifications then
     branch_hl_right_sep = highlights.hls.primary.sep_transition
@@ -111,7 +111,7 @@ function M.git(config, sep)
   if modifications then
     sep.right = config.sep.right
   end
-  branch = branch .. highlights.highlight_content(sep.right, branch_hl_right_sep)
+  branch = branch .. highlights.hl_content(sep.right, branch_hl_right_sep)
 
   local mods = ''
   if modifications then
@@ -124,7 +124,7 @@ function M.git(config, sep)
     if removed then
       mods = mods .. string.format(' -%s', status.removed)
     end
-    mods = highlights.highlight_content(mods .. ' ', highlights.hls.secondary.text, nil, sep.right)
+    mods = highlights.hl_content(mods .. ' ', highlights.hls.secondary.text, nil, sep.right)
   end
   return branch .. mods
 end
@@ -136,14 +136,14 @@ end
 --- @return string
 function M.path(config, sep)
   local file =
-    highlights.highlight_content(' ' .. vim.fn.expand('%:t') .. ' %m%r', highlights.hls.primary.text, sep.left)
-  file = file .. highlights.highlight_content(config.sep.right, highlights.hls.primary.sep_transition)
+    highlights.hl_content(' ' .. vim.fn.expand('%:t') .. ' %m%r', highlights.hls.primary.text, sep.left)
+  file = file .. highlights.hl_content(config.sep.right, highlights.hls.primary.sep_transition)
 
   local path = vim.fs.normalize(vim.fn.expand('%:.:h'))
   if #path == 0 then
     return ''
   end
-  path = highlights.highlight_content(
+  path = highlights.hl_content(
     ' ' .. config.icons.folder .. path .. ' ',
     highlights.hls.secondary.text,
     nil,
@@ -195,7 +195,7 @@ function M.diagnostics(config, sep)
   if last_diagnostic_component == '' then
     return ''
   end
-  last_diagnostic_component = highlights.highlight_content(
+  last_diagnostic_component = highlights.hl_content(
     ' ' .. last_diagnostic_component .. ' ',
     highlights.hls.primary.text,
     sep.left,
@@ -217,7 +217,7 @@ function M.filetype_lsp(config, sep)
   if status then
     icon = ' ' .. MiniIcons.get('filetype', filetype)
   end
-  filetype = highlights.highlight_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, sep.right)
+  filetype = highlights.hl_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, sep.right)
 
   local attached_clients = vim.lsp.get_clients { bufnr = 0 }
   local it = vim.iter(attached_clients)
@@ -232,8 +232,8 @@ function M.filetype_lsp(config, sep)
   if #attached_clients > 0 then
     filetype_hl_sep_left = highlights.hls.primary.sep_transition
   end
-  filetype = highlights.highlight_content(config.sep.left, filetype_hl_sep_left) .. filetype
-  lsp_clients = highlights.highlight_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, sep.left)
+  filetype = highlights.hl_content(config.sep.left, filetype_hl_sep_left) .. filetype
+  lsp_clients = highlights.hl_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, sep.left)
 
   local result = filetype
   if #attached_clients > 0 then
@@ -258,7 +258,7 @@ function M.progress(config, sep)
     content = string.format('%2d%%%%', math.floor(cur / total * 100))
   end
   content = string.format(' %s %s / %s ', config.icons.lines, content, total)
-  return highlights.highlight_content(content, M.get_mode_hl(), sep.left, sep.right)
+  return highlights.hl_content(content, M.get_mode_hl(), sep.left, sep.right)
 end
 
 return M
