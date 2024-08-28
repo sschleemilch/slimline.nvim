@@ -4,7 +4,7 @@ vim.api.nvim_create_autocmd('User', {
   group = augroup,
   pattern = 'GitSignsUpdate',
   callback = function()
-    require('slimline').refresh()
+    vim.cmd.redrawstatus()
   end,
 })
 

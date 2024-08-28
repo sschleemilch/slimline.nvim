@@ -1,13 +1,21 @@
 local M = {}
-local components = require('slimline.components')
-local components_length = 0
+
+M.resolved_components = {
+  left = {},
+  center = {},
+  right = {}
+}
+
+--- Keep track of resolve component position
 local position = 0
 
 --- Returns correct component from config
 ---@return function
 ---@param component_name string | function
+---@param n_components integer
 ---@param config table
-local function resolve_component(component_name, config)
+local function resolve_component(component_name, config, n_components)
+  local components = require('slimline.components')
   position = position + 1
   if type(component_name) == 'function' then
     return component_name
@@ -20,7 +28,7 @@ local function resolve_component(component_name, config)
       if config.sep.hide.first and position == 1 then
         sep.left = ''
       end
-      if config.sep.hide.last and position == components_length then
+      if config.sep.hide.last and position == n_components then
         sep.right = ''
       end
       return function(...)
@@ -64,16 +72,17 @@ end
 ---@return string
 function M.render()
   local config = M.config
-  if not config or not (config.components.left or config.components.right or config.components.center) then
+  local components = M.resolved_components
+  if not config or not (components.left or components.right or components.center) then
     return ''
   end
 
   local result = '%#Slimline#' .. config.spaces.left
-  result = result .. M.concat_components(config.components.left, config.spaces.components)
+  result = result .. M.concat_components(components.left, config.spaces.components)
   result = result .. '%='
-  result = result .. M.concat_components(config.components.center, config.spaces.components)
+  result = result .. M.concat_components(components.center, config.spaces.components)
   result = result .. '%='
-  result = result .. M.concat_components(config.components.right, config.spaces.components)
+  result = result .. M.concat_components(components.right, config.spaces.components)
   result = result .. config.spaces.right
 
   return result
@@ -82,45 +91,48 @@ end
 -- Resolving components into a table
 ---@param comps table
 ---@param opts table
+---@param n_components integer
 ---@return table
-local function resolve_components(comps, opts)
+local function resolve_components(comps, opts, n_components)
   local result = {}
   for _, component in ipairs(comps) do
-    table.insert(result, resolve_component(component, opts))
+    table.insert(result, resolve_component(component, opts, n_components))
   end
   return result
 end
 
 ---@param opts table
 function M.setup(opts)
+
   if opts == nil then
     opts = {}
   end
-  require('slimline.autocommands')
-  vim.o.showmode = false
+
+  if vim.o.showmode == true then
+    vim.o.showmode = false
+  end
+
   opts = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
+
+  -- Clear seps if we are in foreground mode
   if opts.style == 'fg' then
     opts.sep.left = ''
     opts.sep.right = ''
   end
 
-  components_length = #opts.components.left + #opts.components.center + #opts.components.right
-
-  -- Resolve component references
-  opts.components.left = resolve_components(opts.components.left, opts)
-  opts.components.center = resolve_components(opts.components.center, opts)
-  opts.components.right = resolve_components(opts.components.right, opts)
-
   M.config = opts
-  local hl = require('slimline.highlights')
-  hl.create_hls()
-  vim.o.statusline = "%!v:lua.require'slimline'.render()"
-end
 
---- Refreshes the line
---- To be called e.g. from autocommands
-function M.refresh()
-  vim.cmd.redrawstatus()
+  require('slimline.highlights').create_hls()
+
+  local n_components = #opts.components.left + #opts.components.center + #opts.components.right
+  -- Resolve component references
+  M.resolved_components.left = resolve_components(opts.components.left, opts, n_components)
+  M.resolved_components.center = resolve_components(opts.components.center, opts, n_components)
+  M.resolved_components.right = resolve_components(opts.components.right, opts, n_components)
+
+  vim.o.statusline = "%!v:lua.require'slimline'.render()"
+
+  require('slimline.autocommands')
 end
 
 return M
