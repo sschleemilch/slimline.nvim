@@ -8,12 +8,6 @@ vim.api.nvim_create_autocmd('User', {
   end,
 })
 
-vim.api.nvim_create_autocmd('DiagnosticChanged', {
-  group = augroup,
-  callback = function()
-    require('slimline').refresh()
-  end,
-})
 vim.api.nvim_create_autocmd('Colorscheme', {
   group = augroup,
   callback = function()
