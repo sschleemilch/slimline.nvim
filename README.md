@@ -202,6 +202,12 @@ opts = {
 The `components` part of the config accepts function calls.
 This opens the door extending Slimline with your own content.
 
+> [!WARNING]
+> This section uses internal APIs. Since I am not committing
+> to stable internal APIs yet, it can change!
+> Be carfeul when using it. The section will be updated accordingly
+> when interfaces change though.
+
 Let's create a center component using a function like this directly in the config:
 
 ```lua
