@@ -1,12 +1,12 @@
 local highlights = require('slimline.highlights')
+local config = require('slimline').config
 local M = {}
 
 local last_diagnostic_component = ''
 
---- @param config table
 --- @param sep {left: string, right: string}
 --- @return string
-function M.render(config, sep)
+function M.render(sep)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -44,7 +44,7 @@ function M.render(config, sep)
     return ''
   end
   last_diagnostic_component =
-    highlights.hl_content(' ' .. last_diagnostic_component .. ' ', highlights.hls.primary.text, sep.left, sep.right)
+    highlights.hl_component({primary=last_diagnostic_component}, highlights.hls, sep, 'left')
   return last_diagnostic_component
 end
 

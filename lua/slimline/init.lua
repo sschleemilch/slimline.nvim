@@ -31,7 +31,7 @@ local function get_component(component, position)
         sep.right = ''
       end
       return function(...)
-        return component_module.render(M.config, sep, ...)
+        return component_module.render(sep, ...)
       end
     else
       return function()
