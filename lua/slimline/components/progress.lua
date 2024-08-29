@@ -4,8 +4,11 @@ local utils = require('slimline.utils')
 local config = require('slimline').config
 
 --- @param sep {left: string, right: string}
+--- @param direction string
+--- |'"right"'
+--- |'"left"'
 --- @return string
-function M.render(sep)
+function M.render(sep, direction)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local content
@@ -17,7 +20,7 @@ function M.render(sep)
     content = string.format('%2d%%%%', math.floor(cur / total * 100))
   end
   content = string.format('%s %s / %s', config.icons.lines, content, total)
-  return highlights.hl_component({primary = content}, highlights.get_mode_hl(utils.get_mode()), sep, 'left')
+  return highlights.hl_component({ primary = content }, highlights.get_mode_hl(utils.get_mode()), sep, direction)
 end
 
 return M

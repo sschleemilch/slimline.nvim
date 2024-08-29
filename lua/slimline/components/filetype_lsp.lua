@@ -2,7 +2,11 @@ local M = {}
 local highlights = require('slimline.highlights')
 
 --- @param sep {left: string, right: string}
-function M.render(sep)
+--- @param direction string
+--- |'"right"'
+--- |'"left"'
+--- @return string
+function M.render(sep, direction)
   local filetype = vim.bo.filetype
   if filetype == '' then
     filetype = '[No Name]'
@@ -23,7 +27,7 @@ function M.render(sep)
   local names = it:totable()
   local lsp_clients = string.format('%s', table.concat(names, ','))
 
-  return highlights.hl_component({ primary = filetype, secondary = lsp_clients }, highlights.hls, sep, 'left')
+  return highlights.hl_component({ primary = filetype, secondary = lsp_clients }, highlights.hls, sep, direction)
 end
 
 return M

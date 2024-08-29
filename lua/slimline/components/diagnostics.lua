@@ -5,8 +5,11 @@ local M = {}
 local last_diagnostic_component = ''
 
 --- @param sep {left: string, right: string}
+--- @param direction string
+--- |'"right"'
+--- |'"left"'
 --- @return string
-function M.render(sep)
+function M.render(sep, direction)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -44,7 +47,7 @@ function M.render(sep)
     return ''
   end
   last_diagnostic_component =
-    highlights.hl_component({primary=last_diagnostic_component}, highlights.hls, sep, 'left')
+    highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls, sep, direction)
   return last_diagnostic_component
 end
 

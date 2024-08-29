@@ -13,8 +13,11 @@ M.components = {
 ---@param position string?
 ---|'"last"'
 ---|'"first"'
+---@param direction string
+---|'"right"'
+---|'"left"'
 ---@return Component
-local function get_component(component, position)
+local function get_component(component, position, direction)
   if type(component) == 'function' then
     return component
   elseif type(component) == 'string' then
@@ -31,7 +34,7 @@ local function get_component(component, position)
         sep.right = ''
       end
       return function(...)
-        return component_module.render(sep, ...)
+        return component_module.render(sep, direction, ...)
       end
     else
       return function()
@@ -86,7 +89,11 @@ local function get_components(components, group_position)
     if i == #components and group_position == 'right' then
       component_position = 'last'
     end
-    table.insert(result, get_component(component, component_position))
+    local direction = 'right'
+    if group_position == 'right' then
+      direction = 'left'
+    end
+    table.insert(result, get_component(component, component_position, direction))
   end
   return result
 end
