@@ -4,7 +4,7 @@ local M = {}
 M.function_components = {
   left = {},
   center = {},
-  right = {}
+  right = {},
 }
 
 --- Returns a component function
@@ -12,23 +12,23 @@ M.function_components = {
 ---@param position string? "last"|"first"|nil
 ---@return function
 local function get_function_component(name, position)
-  local components = require('slimline.components')
   if type(name) == 'function' then
     return name
   elseif type(name) == 'string' then
-    if components[name] then
+    local exist, component = pcall(require, string.format('slimline.components.%s', name))
+    if exist then
       local sep = {
         left = M.config.sep.left,
         right = M.config.sep.right,
       }
-      if M.config.sep.hide.first and position == "first" then
+      if M.config.sep.hide.first and position == 'first' then
         sep.left = ''
       end
-      if M.config.sep.hide.last and position == "last" then
+      if M.config.sep.hide.last and position == 'last' then
         sep.right = ''
       end
       return function(...)
-        return components[name](M.config, sep, ...)
+        return component.render(M.config, sep, ...)
       end
     else
       return function()
@@ -78,11 +78,11 @@ local function get_function_components(components, group_position)
   local result = {}
   for i, component in ipairs(components) do
     local component_position = nil
-    if i == 1 and group_position == "left" then
-      component_position = "first"
+    if i == 1 and group_position == 'left' then
+      component_position = 'first'
     end
-    if i == #components and group_position == "right" then
-      component_position = "last"
+    if i == #components and group_position == 'right' then
+      component_position = 'last'
     end
     table.insert(result, get_function_component(component, component_position))
   end
@@ -91,7 +91,6 @@ end
 
 ---@param opts table
 function M.setup(opts)
-
   if opts == nil then
     opts = {}
   end
@@ -113,9 +112,9 @@ function M.setup(opts)
   require('slimline.highlights').create_hls()
 
   -- Create function components
-  M.function_components.left = get_function_components(opts.components.left, "left")
-  M.function_components.center = get_function_components(opts.components.center, "center")
-  M.function_components.right = get_function_components(opts.components.right, "right")
+  M.function_components.left = get_function_components(opts.components.left, 'left')
+  M.function_components.center = get_function_components(opts.components.center, 'center')
+  M.function_components.right = get_function_components(opts.components.right, 'right')
 
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 
