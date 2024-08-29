@@ -228,7 +228,7 @@ If you want to use internal render functionality of a component you can do it li
 function ()
     local h = require("slimline.highlights")
     local c = require("slimline").config
-    return h.hl_component({primary = "Hello", secondary = "World"}, h.hls, config.sep)
+    return h.hl_component({primary = "Hello", secondary = "World"}, h.hls, c.sep)
 end
 ```
 
