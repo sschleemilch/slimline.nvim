@@ -1,21 +1,24 @@
 local M = {}
 
----@type table<string, function[]>
-M.function_components = {
+---@alias Component function
+
+---@type table<string, Component[]>
+M.components = {
   left = {},
   center = {},
   right = {},
 }
 
---- Returns a component function
----@param name string | function
----@param position string? "last"|"first"|nil
----@return function
-local function get_function_component(name, position)
-  if type(name) == 'function' then
-    return name
-  elseif type(name) == 'string' then
-    local exist, component = pcall(require, string.format('slimline.components.%s', name))
+---@param component string | function
+---@param position string?
+---|'"last"'
+---|'"first"'
+---@return Component
+local function get_component(component, position)
+  if type(component) == 'function' then
+    return component
+  elseif type(component) == 'string' then
+    local exist, component_module = pcall(require, string.format('slimline.components.%s', component))
     if exist then
       local sep = {
         left = M.config.sep.left,
@@ -28,11 +31,11 @@ local function get_function_component(name, position)
         sep.right = ''
       end
       return function(...)
-        return component.render(M.config, sep, ...)
+        return component_module.render(M.config, sep, ...)
       end
     else
       return function()
-        return name
+        return component
       end
     end
   end
@@ -41,40 +44,39 @@ local function get_function_component(name, position)
   end
 end
 
--- Calls function components and concatenate the output
----@param fn_components function[]
----@param spacing string
+---@param components Component[]
 ---@return string
-function M.concat_components(fn_components, spacing)
+function M.concat_components(components)
   local result = ''
-  for i, fn in ipairs(fn_components) do
-    local space = spacing
+  for i, component in ipairs(components) do
+    local space = M.config.spaces.components
     if i == 1 then
       space = ''
     end
-    result = result .. space .. fn()
+    result = result .. space .. component()
   end
   return result
 end
 
---- Renders the statusline.
 ---@return string
 function M.render()
   local result = '%#Slimline#' .. M.config.spaces.left
-  result = result .. M.concat_components(M.function_components.left, M.config.spaces.components)
+  result = result .. M.concat_components(M.components.left)
   result = result .. '%='
-  result = result .. M.concat_components(M.function_components.center, M.config.spaces.components)
+  result = result .. M.concat_components(M.components.center)
   result = result .. '%='
-  result = result .. M.concat_components(M.function_components.right, M.config.spaces.components)
+  result = result .. M.concat_components(M.components.right)
   result = result .. M.config.spaces.right
   return result
 end
 
--- Generates function components
----@param components table
----@param group_position string "left"|"center"|"right"
----@return function[]
-local function get_function_components(components, group_position)
+---@param components table<string|function>
+---@param group_position string
+---|'"left"'
+---|'"center"'
+---|'"right"'
+---@return Component[]
+local function get_components(components, group_position)
   local result = {}
   for i, component in ipairs(components) do
     local component_position = nil
@@ -84,7 +86,7 @@ local function get_function_components(components, group_position)
     if i == #components and group_position == 'right' then
       component_position = 'last'
     end
-    table.insert(result, get_function_component(component, component_position))
+    table.insert(result, get_component(component, component_position))
   end
   return result
 end
@@ -111,10 +113,9 @@ function M.setup(opts)
 
   require('slimline.highlights').create_hls()
 
-  -- Create function components
-  M.function_components.left = get_function_components(opts.components.left, 'left')
-  M.function_components.center = get_function_components(opts.components.center, 'center')
-  M.function_components.right = get_function_components(opts.components.right, 'right')
+  M.components.left = get_components(opts.components.left, 'left')
+  M.components.center = get_components(opts.components.center, 'center')
+  M.components.right = get_components(opts.components.right, 'right')
 
   vim.o.statusline = "%!v:lua.require'slimline'.render()"
 
