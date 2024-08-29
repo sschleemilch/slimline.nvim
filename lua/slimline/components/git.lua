@@ -1,10 +1,13 @@
 local M = {}
 local highlights = require('slimline.highlights')
+local config = require('slimline').config
 
---- @param config table
 --- @param sep {left: string, right: string}
+--- @param direction string
+--- |'"right"'
+--- |'"left"'
 --- @return string
-function M.render(config, sep)
+function M.render(sep, direction)
   local status = vim.b.gitsigns_status_dict
   if not status then
     return ''
@@ -13,38 +16,31 @@ function M.render(config, sep)
     return ''
   end
 
+  local branch = string.format('%s %s', config.icons.git.branch, status.head)
+
   local added = status.added and status.added > 0
   local removed = status.removed and status.removed > 0
   local changed = status.changed and status.changed > 0
   local modifications = added or removed or changed
 
-  local branch = string.format(' %s %s ', config.icons.git.branch, status.head)
-  branch = highlights.hl_content(branch, highlights.hls.primary.text, sep.left)
-  local branch_hl_right_sep = highlights.hls.primary.sep
-  if modifications then
-    branch_hl_right_sep = highlights.hls.primary.sep_transition
-  end
-  -- if there are modifications the main part of the git components should have a right side
-  -- seperator
-  if modifications then
-    sep.right = config.sep.right
-  end
-  branch = branch .. highlights.hl_content(sep.right, branch_hl_right_sep)
-
-  local mods = ''
+  local mods = {}
   if modifications then
     if added then
-      mods = mods .. string.format(' +%s', status.added)
+      table.insert(mods, string.format('+%s', status.added))
     end
     if changed then
-      mods = mods .. string.format(' ~%s', status.changed)
+      table.insert(mods, string.format('~%s', status.changed))
     end
     if removed then
-      mods = mods .. string.format(' -%s', status.removed)
+      table.insert(mods, string.format('-%s', status.removed))
     end
-    mods = highlights.hl_content(mods .. ' ', highlights.hls.secondary.text, nil, sep.right)
   end
-  return branch .. mods
+  return highlights.hl_component(
+    { primary = branch, secondary = table.concat(mods, ' ') },
+    highlights.hls,
+    sep,
+    direction
+  )
 end
 
 return M

@@ -222,47 +222,18 @@ It will render to something like this (depending on your colorscheme):
 
 ![c1](./doc/custom_components/1.png)
 
-Let's add some color. To do that we can use the `highlights` component of slimline:
 
+If you want to use internal render functionality of a component you can do it like that:
 ```lua
 function ()
-    local sh = require("slimline.highlights")
-    local content = "Hello World"
-    return sh.hl_content(content, sh.hls.primary.text)
-end
-```
-It will now look like that:
-
-![c2](./doc/custom_components/2.png)
-
-To add configured separators we can add them to `hl_content`:
-
-```lua
-function ()
-    local sh = require("slimline.highlights")
-    local cfg = require("slimline").config
-    local content = " Hello World "
-    return sh.hl_content(content, sh.hls.primary.text, cfg.sep.left, cfg.sep.right)
+    local h = require("slimline.highlights")
+    local c = require("slimline").config
+    return h.hl_component({primary = "Hello", secondary = "World"}, h.hls, config.sep)
 end
 ```
 
-Now we have a primary part of a new component:
-
-![c3](./doc/custom_components/3.png)
-
-To add a secondary part we need to change it like that:
-
-```lua
-function ()
-    local sh = require("slimline.highlights")
-    local cfg = require("slimline").config
-    local content = sh.hl_content(" Hello ", sh.hls.primary.text, cfg.sep.left)
-    content = content .. sh.hl_content(cfg.sep.right, sh.hls.primary.sep_transition)
-    content = content .. sh.hl_content(" World ", sh.hls.secondary.text, nil, cfg.sep.right)
-    return content
-end
-```
-
-And we have our final result of a custom component which respects separators and colors from the config:
+It will now render to that (depending on the config)
 
 ![c4](./doc/custom_components/4.png)
+
+Of course you can use `Slimline*` highlight groups on your own to create your own styled component

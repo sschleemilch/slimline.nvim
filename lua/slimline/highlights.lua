@@ -5,7 +5,7 @@ M.hls = {
   primary = {
     text = nil,
     sep = nil,
-    sep_transition = nil,
+    sep2sec = nil,
   },
   secondary = {
     text = nil,
@@ -13,27 +13,38 @@ M.hls = {
   },
   mode = {
     normal = {
-      text = nil,
-      sep = nil,
+      primary = {
+        text = nil,
+        sep = nil,
+      },
     },
     pending = {
-      text = nil,
-      sep = nil,
+      primary = {
+        text = nil,
+        sep = nil,
+      },
     },
     visual = {
-      text = nil,
-      sep = nil,
+      primary = {
+        text = nil,
+        sep = nil,
+      },
     },
     insert = {
-      text = nil,
-      sep = nil,
+      primary = {
+        text = nil,
+        sep = nil,
+      },
     },
     command = {
-      text = nil,
-      sep = nil,
+      primary = {
+        text = nil,
+        sep = nil,
+      },
     },
   },
 }
+
 function M.create_hls()
   local config = require('slimline').config
   M.hls.base = M.create_hl('', config.hl.base)
@@ -45,22 +56,21 @@ function M.create_hls()
 
   M.hls.primary.text = M.create_hl('Primary', config.hl.primary, as_background, config.bold)
   M.hls.primary.sep = M.create_hl('PrimarySep', config.hl.primary)
-  M.hls.primary.sep_transition =
-    M.create_hl('PrimarySepTransition', config.hl.primary, false, false, config.hl.secondary)
+  M.hls.primary.sep2sec = M.create_hl('PrimarySep2Sec', config.hl.primary, false, false, config.hl.secondary)
 
   M.hls.secondary.text = M.create_hl('Secondary', config.hl.secondary, as_background, false)
   M.hls.secondary.sep = M.create_hl('SecondarySep', config.hl.secondary)
 
-  M.hls.mode.normal.text = M.create_hl('NormalMode', config.hl.modes.normal, as_background, config.bold)
-  M.hls.mode.normal.sep = M.create_hl('NormalModeSep', config.hl.modes.normal)
-  M.hls.mode.pending.text = M.create_hl('PendingMode', config.hl.modes.pending, as_background, config.bold)
-  M.hls.mode.pending.sep = M.create_hl('PendingModeSep', config.hl.modes.pending)
-  M.hls.mode.visual.text = M.create_hl('VisualMode', config.hl.modes.visual, as_background, config.bold)
-  M.hls.mode.visual.sep = M.create_hl('VisualModeSep', config.hl.modes.visual)
-  M.hls.mode.insert.text = M.create_hl('InsertMode', config.hl.modes.insert, as_background, config.bold)
-  M.hls.mode.insert.sep = M.create_hl('InsertModeSep', config.hl.modes.insert)
-  M.hls.mode.command.text = M.create_hl('CommandMode', config.hl.modes.command, as_background, config.bold)
-  M.hls.mode.command.sep = M.create_hl('CommandModeSep', config.hl.modes.command)
+  M.hls.mode.normal.primary.text = M.create_hl('NormalMode', config.hl.modes.normal, as_background, config.bold)
+  M.hls.mode.normal.primary.sep = M.create_hl('NormalModeSep', config.hl.modes.normal)
+  M.hls.mode.pending.primary.text = M.create_hl('PendingMode', config.hl.modes.pending, as_background, config.bold)
+  M.hls.mode.pending.primary.sep = M.create_hl('PendingModeSep', config.hl.modes.pending)
+  M.hls.mode.visual.primary.text = M.create_hl('VisualMode', config.hl.modes.visual, as_background, config.bold)
+  M.hls.mode.visual.primary.sep = M.create_hl('VisualModeSep', config.hl.modes.visual)
+  M.hls.mode.insert.primary.text = M.create_hl('InsertMode', config.hl.modes.insert, as_background, config.bold)
+  M.hls.mode.insert.primary.sep = M.create_hl('InsertModeSep', config.hl.modes.insert)
+  M.hls.mode.command.primary.text = M.create_hl('CommandMode', config.hl.modes.command, as_background, config.bold)
+  M.hls.mode.command.primary.sep = M.create_hl('CommandModeSep', config.hl.modes.command)
 end
 
 ---@param hl string
@@ -101,7 +111,7 @@ end
 
 --- Helper function to highlight a given content
 --- Resets the highlight afterwards
---- @param content string
+--- @param content string?
 --- @param hl string?
 --- @param sep_left string?
 --- @param sep_right string?
@@ -118,26 +128,67 @@ function M.hl_content(content, hl, sep_left, sep_right)
   if sep_right ~= nil then
     rendered = rendered .. string.format('%%#%s#%s', hl .. 'Sep', sep_right)
   end
-  rendered = rendered .. '%#' .. M.hls.base .. '#'
   return rendered
 end
 
---- Function to get the highlight of a given mode
+---@param content string?
+---@return string?
+function M.pad(content)
+  if content == nil then
+    return nil
+  end
+  return ' ' .. content .. ' '
+end
+
+---@param content {primary: string, secondary: string?}
+---@param hl {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+---@param sep {left: string, right: string}
+---@param direction string?
+---|"'left'"
+---|"'right'"
+---@return string
+function M.hl_component(content, hl, sep, direction)
+  local result
+  if content.primary == nil then
+    return ''
+  end
+  if content.secondary == '' then
+    content.secondary = nil
+  end
+
+  if content.secondary == nil then
+    result = M.hl_content(M.pad(content.primary), hl.primary.text, sep.left, sep.right)
+  else
+    if direction == 'left' then
+      result = M.hl_content(M.pad(content.secondary), hl.secondary.text, sep.left)
+      result = result .. M.hl_content(sep.left, hl.primary.sep2sec)
+      result = result .. M.hl_content(M.pad(content.primary), hl.primary.text, nil, sep.right)
+    else
+      result = M.hl_content(M.pad(content.primary), hl.primary.text, sep.left)
+      result = result .. M.hl_content(sep.right, hl.primary.sep2sec)
+      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary.text, nil, sep.right)
+    end
+  end
+  result = result .. '%#' .. M.hls.base .. '#'
+  return result
+end
+
+--- Function to get the highlight config
 --- @param mode string
---- @return string
+--- @return table
 function M.get_mode_hl(mode)
   if mode == 'NORMAL' then
-    return M.hls.mode.normal.text
+    return M.hls.mode.normal
   elseif mode:find('PENDING') then
-    return M.hls.mode.pending.text
+    return M.hls.mode.pending
   elseif mode:find('VISUAL') then
-    return M.hls.mode.visual.text
+    return M.hls.mode.visual
   elseif mode:find('INSERT') or mode:find('SELECT') then
-    return M.hls.mode.insert.text
+    return M.hls.mode.insert
   elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
-    return M.hls.mode.command.text
+    return M.hls.mode.command
   end
-  return M.hls.secondary.text
+  return M.hls
 end
 
 return M
