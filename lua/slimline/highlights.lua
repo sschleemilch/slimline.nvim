@@ -35,7 +35,7 @@ M.hls = {
   },
 }
 function M.create_hls()
-  local config = require("slimline").config
+  local config = require('slimline').config
   M.hls.base = M.create_hl('', config.hl.base)
 
   local as_background = true
@@ -85,10 +85,10 @@ function M.create_hl(hl, base, reverse, bold, bg_from)
     fg = bg
     if fg == nil then
       local bg_style = vim.o.background
-      if bg_style == "dark" then
-        fg = "#000000"
+      if bg_style == 'dark' then
+        fg = '#000000'
       else
-        fg = "#ffffff"
+        fg = '#ffffff'
       end
     end
     bg = tmp
@@ -120,6 +120,24 @@ function M.hl_content(content, hl, sep_left, sep_right)
   end
   rendered = rendered .. '%#' .. M.hls.base .. '#'
   return rendered
+end
+
+--- Function to get the highlight of a given mode
+--- @param mode string
+--- @return string
+function M.get_mode_hl(mode)
+  if mode == 'NORMAL' then
+    return M.hls.mode.normal.text
+  elseif mode:find('PENDING') then
+    return M.hls.mode.pending.text
+  elseif mode:find('VISUAL') then
+    return M.hls.mode.visual.text
+  elseif mode:find('INSERT') or mode:find('SELECT') then
+    return M.hls.mode.insert.text
+  elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
+    return M.hls.mode.command.text
+  end
+  return M.hls.secondary.text
 end
 
 return M
