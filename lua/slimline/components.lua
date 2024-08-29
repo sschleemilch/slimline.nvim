@@ -217,7 +217,7 @@ function M.filetype_lsp(config, sep)
   if status then
     icon = ' ' .. MiniIcons.get('filetype', filetype)
   end
-  filetype = highlights.hl_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, sep.left, nil)
+  filetype = highlights.hl_content(icon .. ' ' .. filetype .. ' ', highlights.hls.primary.text, nil, sep.right)
 
   local attached_clients = vim.lsp.get_clients { bufnr = 0 }
   local it = vim.iter(attached_clients)
@@ -228,16 +228,16 @@ function M.filetype_lsp(config, sep)
   local names = it:totable()
   local lsp_clients = string.format('%s', table.concat(names, ','))
 
-  local filetype_hl_sep_right = highlights.hls.primary.sep
+  local filetype_hl_sep_left = highlights.hls.primary.sep
   if #attached_clients > 0 then
-    filetype_hl_sep_right = highlights.hls.primary.sep_transition
+    filetype_hl_sep_left = highlights.hls.primary.sep_transition
   end
-  filetype = filetype .. highlights.hl_content(config.sep.right, filetype_hl_sep_right)
-  lsp_clients = highlights.hl_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, nil, sep.right)
+  filetype = highlights.hl_content(config.sep.left, filetype_hl_sep_left) .. filetype
+  lsp_clients = highlights.hl_content(' ' .. lsp_clients .. ' ', highlights.hls.secondary.text, sep.left)
 
   local result = filetype
   if #attached_clients > 0 then
-    result = result .. lsp_clients
+    result = lsp_clients .. result
   end
   return result
 end
