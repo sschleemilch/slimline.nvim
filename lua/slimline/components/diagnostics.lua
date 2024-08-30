@@ -47,7 +47,7 @@ function M.render(sep, direction)
     return ''
   end
   last_diagnostic_component =
-    highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls, sep, direction)
+    highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls.component, sep, direction)
   return last_diagnostic_component
 end
 

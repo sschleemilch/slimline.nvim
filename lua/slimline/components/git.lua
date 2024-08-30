@@ -37,7 +37,7 @@ function M.render(sep, direction)
   end
   return highlights.hl_component(
     { primary = branch, secondary = table.concat(mods, ' ') },
-    highlights.hls,
+    highlights.hls.component,
     sep,
     direction
   )

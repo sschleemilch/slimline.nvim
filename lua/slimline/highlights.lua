@@ -2,14 +2,16 @@ local M = {}
 
 M.hls = {
   base = nil,
-  primary = {
-    text = nil,
-    sep = nil,
-    sep2sec = nil,
-  },
-  secondary = {
-    text = nil,
-    sep = nil,
+  component = {
+    primary = {
+      text = nil,
+      sep = nil,
+      sep2sec = nil,
+    },
+    secondary = {
+      text = nil,
+      sep = nil,
+    },
   },
   mode = {
     normal = {
@@ -54,12 +56,11 @@ function M.create_hls()
     as_background = false
   end
 
-  M.hls.primary.text = M.create_hl('Primary', config.hl.primary, as_background, config.bold)
-  M.hls.primary.sep = M.create_hl('PrimarySep', config.hl.primary)
-  M.hls.primary.sep2sec = M.create_hl('PrimarySep2Sec', config.hl.primary, false, false, config.hl.secondary)
-
-  M.hls.secondary.text = M.create_hl('Secondary', config.hl.secondary, as_background, false)
-  M.hls.secondary.sep = M.create_hl('SecondarySep', config.hl.secondary)
+  M.hls.component.primary.text = M.create_hl('Primary', config.hl.primary, as_background, config.bold)
+  M.hls.component.primary.sep = M.create_hl('PrimarySep', config.hl.primary)
+  M.hls.component.primary.sep2sec = M.create_hl('PrimarySep2Sec', config.hl.primary, false, false, config.hl.secondary)
+  M.hls.component.secondary.text = M.create_hl('Secondary', config.hl.secondary, as_background, false)
+  M.hls.component.secondary.sep = M.create_hl('SecondarySep', config.hl.secondary)
 
   M.hls.mode.normal.primary.text = M.create_hl('NormalMode', config.hl.modes.normal, as_background, config.bold)
   M.hls.mode.normal.primary.sep = M.create_hl('NormalModeSep', config.hl.modes.normal)

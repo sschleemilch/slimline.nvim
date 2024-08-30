@@ -27,7 +27,12 @@ function M.render(sep, direction)
   local names = it:totable()
   local lsp_clients = string.format('%s', table.concat(names, ','))
 
-  return highlights.hl_component({ primary = filetype, secondary = lsp_clients }, highlights.hls, sep, direction)
+  return highlights.hl_component(
+    { primary = filetype, secondary = lsp_clients },
+    highlights.hls.component,
+    sep,
+    direction
+  )
 end
 
 return M

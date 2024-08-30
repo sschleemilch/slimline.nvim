@@ -16,7 +16,7 @@ function M.render(sep, direction)
   end
   path = config.icons.folder .. path
 
-  return highlights.hl_component({ primary = file, secondary = path }, highlights.hls, sep, direction)
+  return highlights.hl_component({ primary = file, secondary = path }, highlights.hls.component, sep, direction)
 end
 
 return M
