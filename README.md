@@ -1,7 +1,7 @@
 # slimline.nvim
 
 <!-- panvimdoc-ignore-start -->
-
+[![neovim: v0.10.1+](https://img.shields.io/static/v1?style=flat-square&label=neovim&message=v0.10.1%2b&logo=neovim&color=414b32)](https://neovim.io/)
 ![code size](https://img.shields.io/github/languages/code-size/sschleemilch/slimline.nvim?style=flat-square)
 ![license](https://img.shields.io/github/license/sschleemilch/slimline.nvim?style=flat-square)
 
