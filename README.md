@@ -28,6 +28,7 @@ Here are some screenshots. See [recipes](#recipes) for config examples.
 ![s12](./doc/screenshots/s12.png)
 ![s13](./doc/screenshots/s13.png)
 ![s18](./doc/screenshots/s18.png)
+![s19](./doc/screenshots/s19.png)
 ![s9](./doc/screenshots/s9.png)
 ![s10](./doc/screenshots/s10.png)
 ![s14](./doc/screenshots/s14.png)
@@ -87,6 +88,7 @@ require('slimline').setup {
   bold = false, -- makes primary parts and mode bold
   verbose_mode = false, -- Mode as single letter or as a word
   style = 'bg', -- or "fg". Whether highlights should be applied to bg or fg of components
+  mode_follow_style = true, -- Whether the mode color components should follow the style option
   components = { -- Choose components and their location
     left = {
       "mode",

@@ -27,6 +27,12 @@ local function get_component(component, position, direction)
         left = M.config.sep.left,
         right = M.config.sep.right,
       }
+      if M.config.style == 'fg' then
+        if not ((component == 'mode' or component == 'progress') and not M.config.mode_follow_style) then
+          sep.left = ''
+          sep.right = ''
+        end
+      end
       if M.config.sep.hide.first and position == 'first' then
         sep.left = ''
       end
@@ -109,12 +115,6 @@ function M.setup(opts)
   end
 
   opts = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
-
-  -- Clear seps if we are in foreground mode
-  if opts.style == 'fg' then
-    opts.sep.left = ''
-    opts.sep.right = ''
-  end
 
   M.config = opts
 

@@ -62,15 +62,20 @@ function M.create_hls()
   M.hls.component.secondary.text = M.create_hl('Secondary', config.hl.secondary, as_background, false)
   M.hls.component.secondary.sep = M.create_hl('SecondarySep', config.hl.secondary)
 
-  M.hls.mode.normal.primary.text = M.create_hl('NormalMode', config.hl.modes.normal, as_background, config.bold)
+  local mode_as_background = as_background
+  if not config.mode_follow_style then
+    mode_as_background = true
+  end
+
+  M.hls.mode.normal.primary.text = M.create_hl('NormalMode', config.hl.modes.normal, mode_as_background, config.bold)
   M.hls.mode.normal.primary.sep = M.create_hl('NormalModeSep', config.hl.modes.normal)
-  M.hls.mode.pending.primary.text = M.create_hl('PendingMode', config.hl.modes.pending, as_background, config.bold)
+  M.hls.mode.pending.primary.text = M.create_hl('PendingMode', config.hl.modes.pending, mode_as_background, config.bold)
   M.hls.mode.pending.primary.sep = M.create_hl('PendingModeSep', config.hl.modes.pending)
-  M.hls.mode.visual.primary.text = M.create_hl('VisualMode', config.hl.modes.visual, as_background, config.bold)
+  M.hls.mode.visual.primary.text = M.create_hl('VisualMode', config.hl.modes.visual, mode_as_background, config.bold)
   M.hls.mode.visual.primary.sep = M.create_hl('VisualModeSep', config.hl.modes.visual)
-  M.hls.mode.insert.primary.text = M.create_hl('InsertMode', config.hl.modes.insert, as_background, config.bold)
+  M.hls.mode.insert.primary.text = M.create_hl('InsertMode', config.hl.modes.insert, mode_as_background, config.bold)
   M.hls.mode.insert.primary.sep = M.create_hl('InsertModeSep', config.hl.modes.insert)
-  M.hls.mode.command.primary.text = M.create_hl('CommandMode', config.hl.modes.command, as_background, config.bold)
+  M.hls.mode.command.primary.text = M.create_hl('CommandMode', config.hl.modes.command, mode_as_background, config.bold)
   M.hls.mode.command.primary.sep = M.create_hl('CommandModeSep', config.hl.modes.command)
 end
 

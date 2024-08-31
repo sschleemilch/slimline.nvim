@@ -2,6 +2,7 @@ local M = {
   bold = false, -- makes primary parts and mode bold
   verbose_mode = false, -- Mode as single letter or as a word
   style = 'bg', -- or "fg". Whether highlights should be applied to bg or fg of components
+  mode_follow_style = true, -- Whether the mode color components should follow the style option
   components = { -- Choose components and their location
     left = {
       'mode',
