@@ -21,13 +21,13 @@ Reason for writing it was mainly just 4 fun and having exactly what I want, func
 Here are some screenshots. See [recipes](#recipes) for config examples.
 
 ![s1](./doc/screenshots/s1.png)
-![s2](./doc/screenshots/s2.png)
 ![s3](./doc/screenshots/s3.png)
-![s4](./doc/screenshots/s4.png)
 ![s5](./doc/screenshots/s5.png)
+![s17](./doc/screenshots/s17.png)
 ![s11](./doc/screenshots/s11.png)
 ![s12](./doc/screenshots/s12.png)
 ![s13](./doc/screenshots/s13.png)
+![s18](./doc/screenshots/s18.png)
 ![s9](./doc/screenshots/s9.png)
 ![s10](./doc/screenshots/s10.png)
 ![s14](./doc/screenshots/s14.png)
@@ -196,6 +196,29 @@ opts = {
     },
 }
 ```
+
+### Bubble chain
+
+![s17](./doc/screenshots/s17.png)
+
+```lua
+opts = {
+    spaces = {
+        components = "─",
+        left = "─",
+        right = "─",
+    },
+},
+```
+
+And adding fillchars `stl` nvim setting:
+
+```lua
+vim.opt.fillchars = {
+	stl = "─",
+}
+```
+
 
 ## Custom components
 
