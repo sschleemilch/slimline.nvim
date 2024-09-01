@@ -8,8 +8,10 @@ local config = require('slimline').config
 --- |'"left"'
 --- @return string
 function M.render(sep, direction)
+  if vim.bo.buftype ~= '' then
+    return ''
+  end
   local file = vim.fn.expand('%:t') .. '%m%r'
-
   local path = vim.fs.normalize(vim.fn.expand('%:.:h'))
   if #path == 0 then
     return ''
