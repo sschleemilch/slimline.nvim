@@ -114,7 +114,7 @@ function M.setup(opts)
     vim.o.showmode = false
   end
 
-  opts = vim.tbl_deep_extend('force', require('slimline.default_config'), opts)
+  opts = require('slimline.utils').merge({}, require('slimline.default_config'), opts)
 
   M.config = opts
 
