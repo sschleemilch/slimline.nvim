@@ -4,6 +4,10 @@ local M = {}
 
 local last_diagnostic_component = ''
 
+local function capitalize(str)
+  return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2))
+end
+
 --- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
@@ -37,7 +41,10 @@ function M.render(sep, direction)
       if count == 0 then
         return nil
       end
-
+      if config.style == 'fg' then
+        local hl = 'Diagnostic' .. capitalize(severity)
+        return string.format('%%#%s#%s%%#%s#%d', hl, config.icons.diagnostics[severity], highlights.hls.base, count)
+      end
       return string.format('%s%d', config.icons.diagnostics[severity], count)
     end)
     :totable()
@@ -46,8 +53,10 @@ function M.render(sep, direction)
   if last_diagnostic_component == '' then
     return ''
   end
-  last_diagnostic_component =
-    highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls.component, sep, direction)
+  if config.style ~= 'fg' then
+    last_diagnostic_component =
+      highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls.component, sep, direction)
+  end
   return last_diagnostic_component
 end
 
