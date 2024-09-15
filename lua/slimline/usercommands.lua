@@ -14,6 +14,12 @@ local subcommand_tbl = {
       if args[1] == 'style' then
         local sl = require('slimline')
         local cfg = sl.config
+        if seps.left == nil then
+          seps.left = cfg.sep.left
+        end
+        if seps.right == nil then
+          seps.right = cfg.sep.right
+        end
         if cfg.style == 'bg' then
           cfg.style = 'fg'
           seps.left = cfg.sep.left
