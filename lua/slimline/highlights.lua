@@ -194,7 +194,7 @@ function M.get_mode_hl(mode)
   elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
     return M.hls.mode.command
   end
-  return M.hls
+  return M.hls.mode.command
 end
 
 return M
