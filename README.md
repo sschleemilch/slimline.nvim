@@ -137,6 +137,7 @@ require('slimline').setup {
     },
     folder = ' ',
     lines = ' ',
+    recording = ' ',
   },
 }
 ```
