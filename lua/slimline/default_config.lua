@@ -53,6 +53,7 @@ local M = {
     },
     folder = ' ',
     lines = ' ',
+    recording = ' ',
   },
 }
 

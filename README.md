@@ -48,6 +48,7 @@ Available components:
 - `diagnostics`, shows `vim.diagnostic` infos
 - `filetype_lsp`, shows the filetype and attached LSPs
 - `progress`, shows the file progress in % and the overall number of lines
+- `recording`, shows the register being used for recording (not enabled by default) 
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
 Components can be configured more than once if desired.
