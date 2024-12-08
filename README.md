@@ -1,6 +1,7 @@
 # slimline.nvim
 
 <!-- panvimdoc-ignore-start -->
+
 [![neovim: v0.10.1+](https://img.shields.io/static/v1?style=flat-square&label=neovim&message=v0.10.1%2b&logo=neovim&color=414b32)](https://neovim.io/)
 ![code size](https://img.shields.io/github/languages/code-size/sschleemilch/slimline.nvim?style=flat-square)
 ![license](https://img.shields.io/github/license/sschleemilch/slimline.nvim?style=flat-square)
@@ -45,14 +46,12 @@ Available components:
 - `diagnostics`, shows `vim.diagnostic` infos
 - `filetype_lsp`, shows the filetype and attached LSPs
 - `progress`, shows the file progress in % and the overall number of lines
-- `recording`, shows the register being used for recording (not enabled by default) 
+- `recording`, shows the register being used for recording (not enabled by default)
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
 Components can be configured more than once if desired.
 The components configuration accepts function calls and strings so that you can hook custom content into the line.
 See [Custom components](#custom-components) for an introduction.
-
-
 
 ## Contributing
 
@@ -138,6 +137,10 @@ require('slimline').setup {
     folder = ' ',
     lines = ' ',
     recording = ' ',
+    buffer = {
+      modified = '',
+      read_only = '',
+    },
   },
 }
 ```
@@ -149,7 +152,6 @@ The default ones should be a safe choice to work well with most colorschemes but
 them to your liking. Depending on the chosen `style` (fg or bg) the color will be used as a foreground
 or as a background color.
 
-
 > [!NOTE]
 > When using a transparent colorscheme and using `style=bg` it means that the actual
 > background will be used as a foreground color for text. Since a transparent theme has
@@ -159,8 +161,8 @@ or as a background color.
 ## Commands
 
 A `Slimline` command is available with the following sub commands:
-- `switch`: Accepts only one parameter until now: `style`. Will switch the style for the current session
 
+- `switch`: Accepts only one parameter until now: `style`. Will switch the style for the current session
 
 ## Recipes
 
@@ -174,7 +176,6 @@ opts = {
     style = "fg"
 }
 ```
-
 
 ### Slashes format
 
@@ -220,7 +221,6 @@ vim.opt.fillchars = {
 }
 ```
 
-
 ## Custom components
 
 The `components` part of the config accepts function calls.
@@ -246,8 +246,8 @@ It will render to something like this (depending on your colorscheme):
 
 ![c1](./doc/custom_components/1.png)
 
-
 If you want to use internal render functionality of a component you can do it like that:
+
 ```lua
 function ()
     local h = require("slimline.highlights")

@@ -54,6 +54,10 @@ local M = {
     folder = ' ',
     lines = ' ',
     recording = ' ',
+    buffer = {
+      modified = '',
+      read_only = '',
+    },
   },
 }
 
