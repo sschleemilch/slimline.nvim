@@ -24,7 +24,13 @@ function M.render(sep, direction)
     return last_diagnostic_component
   end
 
-  local counts = vim.iter(vim.diagnostic.get(0)):fold({
+  local buffer
+  if config.workspace_diagnostics then
+    buffer = nil
+  else
+    buffer = 0
+  end
+  local counts = vim.iter(vim.diagnostic.get(buffer)):fold({
     ERROR = 0,
     WARN = 0,
     HINT = 0,
