@@ -86,6 +86,7 @@ require('slimline').setup {
   verbose_mode = false, -- Mode as single letter or as a word
   style = 'bg', -- or "fg". Whether highlights should be applied to bg or fg of components
   mode_follow_style = true, -- Whether the mode color components should follow the style option
+  workspace_diagnostics = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
   components = { -- Choose components and their location
     left = {
       "mode",
