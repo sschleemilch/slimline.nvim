@@ -48,7 +48,7 @@ function M.render(sep, direction)
         return nil
       end
       if config.style == 'fg' then
-        local hl = 'Diagnostic' .. capitalize(severity)
+        local hl = 'SlimlineDiagnostic' .. capitalize(severity)
         return string.format('%%#%s#%s%%#%s#%d', hl, config.icons.diagnostics[severity], highlights.hls.base, count)
       end
       return string.format('%s%d', config.icons.diagnostics[severity], count)

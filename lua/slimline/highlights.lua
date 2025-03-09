@@ -77,15 +77,22 @@ function M.create_hls()
   M.hls.mode.insert.primary.sep = M.create_hl('InsertModeSep', config.hl.modes.insert)
   M.hls.mode.command.primary.text = M.create_hl('CommandMode', config.hl.modes.command, mode_as_background, config.bold)
   M.hls.mode.command.primary.sep = M.create_hl('CommandModeSep', config.hl.modes.command)
+
+  --- Make sure that Diagnostic* hl groups have base as background
+  M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
 end
 
 ---@param hl string
 ---@param base string?
----@param bg_from string?
 ---@param reverse boolean?
 ---@param bold boolean?
+---@param bg_from_fg string?
+---@param bg_from_bg string?
 ---@return string
-function M.create_hl(hl, base, reverse, bold, bg_from)
+function M.create_hl(hl, base, reverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then
     hl = basename .. hl
@@ -93,9 +100,12 @@ function M.create_hl(hl, base, reverse, bold, bg_from)
 
   local hl_normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
   local hl_ref = vim.api.nvim_get_hl(0, { name = base })
-  local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from })
+  local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from_fg })
   local fg = hl_ref.fg or 'fg'
   local bg = hl_bg_ref.fg or hl_ref.bg or hl_normal.bg
+  if bg_from_bg ~= nil then
+    bg = vim.api.nvim_get_hl(0, { name = bg_from_bg }).bg
+  end
   if reverse then
     local tmp = fg
     fg = bg
