@@ -1,5 +1,6 @@
 local highlights = require('slimline.highlights')
 local config = require('slimline').config
+local name = 'diagnostics'
 local M = {}
 
 local last_diagnostic_component = ''
@@ -12,8 +13,9 @@ end
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
+--- @param hls table
 --- @return string
-function M.render(sep, direction)
+function M.render(sep, direction, hls)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -25,7 +27,7 @@ function M.render(sep, direction)
   end
 
   local buffer
-  if config.workspace_diagnostics then
+  if config.configs.diagnostics.workspace then
     buffer = nil
   else
     buffer = 0
@@ -41,17 +43,24 @@ function M.render(sep, direction)
     return acc
   end)
 
+  local icons = config.configs[name].icons
+
+  local style = config.style
+  if config.configs[name].style ~= nil then
+    style = config.configs[name].style
+  end
+
   local parts = vim
     .iter(counts)
     :map(function(severity, count)
       if count == 0 then
         return nil
       end
-      if config.style == 'fg' then
+      if style == 'fg' then
         local hl = 'SlimlineDiagnostic' .. capitalize(severity)
-        return string.format('%%#%s#%s%%#%s#%d', hl, config.icons.diagnostics[severity], highlights.hls.base, count)
+        return string.format('%%#%s#%s%%#%s#%d', hl, icons[severity], highlights.hls.base, count)
       end
-      return string.format('%s%d', config.icons.diagnostics[severity], count)
+      return string.format('%s%d', icons[severity], count)
     end)
     :totable()
 
@@ -59,9 +68,8 @@ function M.render(sep, direction)
   if last_diagnostic_component == '' then
     return ''
   end
-  if config.style ~= 'fg' then
-    last_diagnostic_component =
-      highlights.hl_component({ primary = last_diagnostic_component }, highlights.hls.component, sep, direction)
+  if style ~= 'fg' then
+    last_diagnostic_component = highlights.hl_component({ primary = last_diagnostic_component }, hls, sep, direction)
   end
   return last_diagnostic_component
 end

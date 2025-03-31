@@ -18,6 +18,7 @@ Reason for writing it was mainly just 4 fun and having exactly what I want, func
 
 Here are some screenshots. See [recipes](#recipes) for config examples.
 
+![s22](./doc/screenshots/s22.png)
 ![s1](./doc/screenshots/s1.png)
 ![s3](./doc/screenshots/s3.png)
 ![s5](./doc/screenshots/s5.png)
@@ -26,8 +27,10 @@ Here are some screenshots. See [recipes](#recipes) for config examples.
 ![s12](./doc/screenshots/s12.png)
 ![s13](./doc/screenshots/s13.png)
 ![s18](./doc/screenshots/s18.png)
+![s20](./doc/screenshots/s20.png)
 ![s19](./doc/screenshots/s19.png)
 ![s9](./doc/screenshots/s9.png)
+![s21](./doc/screenshots/s21.png)
 ![s10](./doc/screenshots/s10.png)
 ![s14](./doc/screenshots/s14.png)
 ![s15](./doc/screenshots/s15.png)
@@ -35,6 +38,7 @@ Here are some screenshots. See [recipes](#recipes) for config examples.
 ![s6](./doc/screenshots/s6.png)
 ![s7](./doc/screenshots/s7.png)
 ![s8](./doc/screenshots/s8.png)
+![s23](./doc/screenshots/s23.png)
 
 ## Components
 
@@ -82,66 +86,98 @@ You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if yo
 
 ```lua
 require('slimline').setup {
-  bold = false, -- makes primary parts and mode bold
-  verbose_mode = false, -- Mode as single letter or as a word
-  style = 'bg', -- or "fg". Whether highlights should be applied to bg or fg of components
-  mode_follow_style = true, -- Whether the mode color components should follow the style option
-  workspace_diagnostics = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
-  components = { -- Choose components and their location
+  bold = false, -- makes primary parts bold
+
+  -- Global style. Can be overwritten using `configs.<component>.style`
+  style = 'bg', -- or "fg"
+
+  -- Component placement
+  components = {
     left = {
-      "mode",
-      "path",
-      "git"
+      'mode',
+      'path',
+      'git',
     },
     center = {},
     right = {
-      "diagnostics",
-      "filetype_lsp",
-      "progress"
-    }
+      'diagnostics',
+      'filetype_lsp',
+      'progress',
+    },
   },
+
+  -- Component configuration
+  -- `<component>.style` can be used to overwrite the global 'style'
+  -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
+  -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default)
+  configs = {
+    mode = {
+      verbose = false, -- Mode as single letter or as a word
+      hl = {
+        normal = 'Type',
+        insert = 'Function',
+        pending = 'Boolean',
+        visual = 'Keyword',
+        command = 'String',
+      },
+    },
+    path = {
+      directory = true, -- Whether to show the directory
+      icons = {
+        folder = ' ',
+        modified = '',
+        read_only = '',
+      },
+    },
+    git = {
+      icons = {
+        branch = '',
+        added = '+',
+        modified = '~',
+        removed = '-',
+      },
+    },
+    diagnostics = {
+      workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
+      icons = {
+        ERROR = ' ',
+        WARN = ' ',
+        HINT = ' ',
+        INFO = ' ',
+      },
+    },
+    filetype_lsp = {},
+    progress = {
+      follow = 'mode',
+      icon = ' ',
+    },
+    recording = {
+      icon = ' ',
+    },
+  },
+
+  -- Spacing configuration
   spaces = {
     components = ' ', -- string between components
     left = ' ', -- string at the start of the line
     right = ' ', -- string at the end of the line
   },
+
+  -- Seperator configuartion
   sep = {
     hide = {
-      first = false, -- hides the first separator
-      last = false, -- hides the last separator
+      first = false, -- hides the first separator of the line
+      last = false, -- hides the last separator of the line
     },
     left = '', -- left separator of components
     right = '', -- right separator of components
   },
+
+  -- Global highlights
   hl = {
-    modes = {
-      normal = 'Type', -- highlight base of modes
-      insert = 'Function',
-      pending = 'Boolean',
-      visual = 'Keyword',
-      command = 'String',
-    },
-    base = 'Comment', -- highlight of everything in in between components
+    base = 'Comment', -- highlight of the background
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
-  },
-  icons = {
-    diagnostics = {
-      ERROR = ' ',
-      WARN = ' ',
-      HINT = ' ',
-      INFO = ' ',
-    },
-    git = {
-      branch = '',
-    },
-    folder = ' ',
-    lines = ' ',
-    recording = ' ',
-    buffer = {
-      modified = '',
-      read_only = '',
-    },
   },
 }
 ```
@@ -163,9 +199,88 @@ or as a background color.
 
 A `Slimline` command is available with the following sub commands:
 
-- `switch`: Accepts only one parameter until now: `style`. Will switch the style for the current session
+- `switch`: Accepts only one parameter until now: `style`. Will switch the global style
 
 ## Recipes
+
+### Pure
+
+![s20](./doc/screenshots/s20.png)
+![s21](./doc/screenshots/s21.png)
+
+```lua
+opts = {
+  style = 'fg',
+  bold = true,
+  hl = {
+    secondary = 'Comment',
+  },
+  configs = {
+    mode = {
+      hl = {
+        normal = 'Comment',
+        insert = 'Normal',
+        pending = 'Normal',
+        visual = 'Normal',
+        command = 'Normal',
+      },
+    },
+    path = {
+      hl = {
+        primary = 'Label',
+      },
+    },
+    git = {
+      hl = {
+        primary = 'Function',
+      },
+    },
+    diagnostics = {
+      hl = {
+        primary = 'Statement',
+      },
+    },
+    filetype_lsp = {
+      hl = {
+        primary = 'String',
+      },
+    },
+  },
+}
+```
+
+### Rainbow
+
+![s22](./doc/screenshots/s22.png)
+![s23](./doc/screenshots/s23.png)
+
+```lua
+opts = {
+  style = 'bg',
+  configs = {
+    path = {
+      hl = {
+        primary = 'Define',
+      },
+    },
+    git = {
+      hl = {
+        primary = 'Function',
+      },
+    },
+    diagnostics = {
+      hl = {
+        primary = 'Statement',
+      },
+    },
+    filetype_lsp = {
+      hl = {
+        primary = 'String',
+      },
+    },
+  },
+}
+```
 
 ### Calm format
 
@@ -236,29 +351,52 @@ This opens the door extending Slimline with your own content.
 Let's create a center component using a function like this directly in the config:
 
 ```lua
-center = {
-    function ()
-        return "Hello World"
-    end
-},
+opts = {
+    components = {
+        center = {
+            function ()
+                return "Hello World"
+            end
+        },
+    }
+}
 ```
 
 It will render to something like this (depending on your colorscheme):
 
 ![c1](./doc/custom_components/1.png)
 
-If you want to use internal render functionality of a component you can do it like that:
+If you want to use internal render functionality of a component (here of the `path` component) you can do it like that:
 
 ```lua
-function ()
-    local h = require("slimline.highlights")
-    local c = require("slimline").config
-    return h.hl_component({primary = "Hello", secondary = "World"}, h.hls.component, c.sep)
+function()
+local h = require('slimline.highlights')
+local c = require('slimline').config
+return h.hl_component({ primary = 'Hello', secondary = 'World' }, h.hls.components['path'], c.sep)
 end
 ```
+
+> [!WARNING]
+> The component to use the highlights from needs to be configured in your `components` since slimline only creates highlights for used ones.
 
 It will now render to that (depending on the config)
 
 ![c4](./doc/custom_components/4.png)
 
 Of course you can use `Slimline*` highlight groups on your own to create your own styled component
+
+The following lua table is required to be passed if you want to use `hl_component()`:
+
+```lua
+hl = {
+    primary = {
+        text = '',
+        sep = '',
+        sep2sec = '',
+    },
+    secondary = {
+        text = '',
+        sep = '',
+    }
+}
+```
