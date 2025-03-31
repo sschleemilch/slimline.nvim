@@ -2,97 +2,115 @@ local M = {}
 
 M.hls = {
   base = nil,
-  component = {
-    primary = {
-      text = nil,
-      sep = nil,
-      sep2sec = nil,
-    },
-    secondary = {
-      text = nil,
-      sep = nil,
-    },
-  },
-  mode = {
-    normal = {
-      primary = {
-        text = nil,
-        sep = nil,
-      },
-    },
-    pending = {
-      primary = {
-        text = nil,
-        sep = nil,
-      },
-    },
-    visual = {
-      primary = {
-        text = nil,
-        sep = nil,
-      },
-    },
-    insert = {
-      primary = {
-        text = nil,
-        sep = nil,
-      },
-    },
-    command = {
-      primary = {
-        text = nil,
-        sep = nil,
-      },
-    },
-  },
+  components = {},
 }
+
+local function firstToUpper(str)
+  return (str:gsub('^%l', string.upper))
+end
 
 function M.create_hls()
   local config = require('slimline').config
+
   M.hls.base = M.create_hl('', config.hl.base)
-
-  local as_background = true
-  if config.style == 'fg' then
-    as_background = false
-  end
-
-  M.hls.component.primary.text = M.create_hl('Primary', config.hl.primary, as_background, config.bold)
-  M.hls.component.primary.sep = M.create_hl('PrimarySep', config.hl.primary)
-  M.hls.component.primary.sep2sec = M.create_hl('PrimarySep2Sec', config.hl.primary, false, false, config.hl.secondary)
-  M.hls.component.secondary.text = M.create_hl('Secondary', config.hl.secondary, as_background, false)
-  M.hls.component.secondary.sep = M.create_hl('SecondarySep', config.hl.secondary)
-
-  local mode_as_background = as_background
-  if not config.mode_follow_style then
-    mode_as_background = true
-  end
-
-  M.hls.mode.normal.primary.text = M.create_hl('NormalMode', config.hl.modes.normal, mode_as_background, config.bold)
-  M.hls.mode.normal.primary.sep = M.create_hl('NormalModeSep', config.hl.modes.normal)
-  M.hls.mode.pending.primary.text = M.create_hl('PendingMode', config.hl.modes.pending, mode_as_background, config.bold)
-  M.hls.mode.pending.primary.sep = M.create_hl('PendingModeSep', config.hl.modes.pending)
-  M.hls.mode.visual.primary.text = M.create_hl('VisualMode', config.hl.modes.visual, mode_as_background, config.bold)
-  M.hls.mode.visual.primary.sep = M.create_hl('VisualModeSep', config.hl.modes.visual)
-  M.hls.mode.insert.primary.text = M.create_hl('InsertMode', config.hl.modes.insert, mode_as_background, config.bold)
-  M.hls.mode.insert.primary.sep = M.create_hl('InsertModeSep', config.hl.modes.insert)
-  M.hls.mode.command.primary.text = M.create_hl('CommandMode', config.hl.modes.command, mode_as_background, config.bold)
-  M.hls.mode.command.primary.sep = M.create_hl('CommandModeSep', config.hl.modes.command)
 
   --- Make sure that Diagnostic* hl groups have base as background
   M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
+
+  local components = {}
+  for _, section in pairs(config.components) do
+    for _, component in ipairs(section) do
+      table.insert(components, component)
+    end
+  end
+
+  --- Create component highlights
+  for _, component in ipairs(components) do
+    local component_config = config.configs[component]
+
+    if component_config and component_config.follow == nil then
+      local inverse = false
+      local style = config.style
+      if component_config.style ~= nil then
+        style = component_config.style
+      end
+      if style == 'bg' then
+        inverse = true
+      end
+      local prefix = firstToUpper(component)
+
+      if component == 'mode' then
+        local hls = config.configs['mode'].hl
+        M.hls.components[component] = {
+          normal = {
+            primary = {
+              text = M.create_hl(prefix .. 'Normal', hls.normal, inverse, config.bold),
+              sep = M.create_hl(prefix .. 'NormalSep', hls.normal, false, false, nil, M.hls.base),
+            },
+          },
+          pending = {
+            primary = {
+              text = M.create_hl(prefix .. 'Pending', hls.pending, inverse, config.bold),
+              sep = M.create_hl(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
+            },
+          },
+          visual = {
+            primary = {
+              text = M.create_hl(prefix .. 'Visual', hls.visual, inverse, config.bold),
+              sep = M.create_hl(prefix .. 'VisualSep', hls.visual, false, false, nil, M.hls.base),
+            },
+          },
+          insert = {
+            primary = {
+              text = M.create_hl(prefix .. 'Insert', hls.insert, inverse, config.bold),
+              sep = M.create_hl(prefix .. 'InsertSep', hls.insert, false, false, nil, M.hls.base),
+            },
+          },
+          command = {
+            primary = {
+              text = M.create_hl(prefix .. 'Command', hls.command, inverse, config.bold),
+              sep = M.create_hl(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
+            },
+          },
+        }
+      else
+        local primary = config.hl.primary
+        if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
+          primary = config.configs[component].hl.primary
+        end
+
+        local secondary = config.hl.secondary
+        if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
+          secondary = config.configs[component].hl.secondary
+        end
+
+        M.hls.components[component] = {
+          primary = {
+            text = M.create_hl(prefix .. 'Primary', primary, inverse, config.bold, nil, M.hls.base),
+            sep = M.create_hl(prefix .. 'PrimarySep', primary, false, false, nil, M.hls.base),
+            sep2sec = M.create_hl(prefix .. 'PrimarySep2Sec', primary, false, false, secondary),
+          },
+          secondary = {
+            text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
+            sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
+          },
+        }
+      end
+    end
+  end
 end
 
 ---@param hl string
 ---@param base string?
----@param reverse boolean?
+---@param inverse boolean?
 ---@param bold boolean?
 ---@param bg_from_fg string?
 ---@param bg_from_bg string?
 ---@return string
-function M.create_hl(hl, base, reverse, bold, bg_from_fg, bg_from_bg)
+function M.create_hl(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then
     hl = basename .. hl
@@ -106,7 +124,7 @@ function M.create_hl(hl, base, reverse, bold, bg_from_fg, bg_from_bg)
   if bg_from_bg ~= nil then
     bg = vim.api.nvim_get_hl(0, { name = bg_from_bg }).bg
   end
-  if reverse then
+  if inverse then
     local tmp = fg
     fg = bg
     if fg == nil then
@@ -194,17 +212,17 @@ end
 --- @return table
 function M.get_mode_hl(mode)
   if mode == 'NORMAL' then
-    return M.hls.mode.normal
+    return M.hls.components['mode'].normal
   elseif mode:find('PENDING') then
-    return M.hls.mode.pending
+    return M.hls.components['mode'].pending
   elseif mode:find('VISUAL') then
-    return M.hls.mode.visual
+    return M.hls.components['mode'].visual
   elseif mode:find('INSERT') or mode:find('SELECT') then
-    return M.hls.mode.insert
+    return M.hls.components['mode'].insert
   elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
-    return M.hls.mode.command
+    return M.hls.components['mode'].command
   end
-  return M.hls.mode.command
+  return M.hls.components['mode'].command
 end
 
 return M
