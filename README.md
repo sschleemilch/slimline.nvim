@@ -371,9 +371,9 @@ If you want to use internal render functionality of a component (here of the `pa
 
 ```lua
 function()
-local h = require('slimline.highlights')
-local c = require('slimline').config
-return h.hl_component({ primary = 'Hello', secondary = 'World' }, h.hls.components['path'], c.sep)
+    local h = require('slimline.highlights')
+    local c = require('slimline').config
+    return h.hl_component({ primary = 'Hello', secondary = 'World' }, h.hls.components['path'], c.sep)
 end
 ```
 

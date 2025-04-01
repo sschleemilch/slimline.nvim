@@ -13,7 +13,7 @@ end
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
---- @param hls table
+--- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
 function M.render(sep, direction, hls)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.

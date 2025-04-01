@@ -5,7 +5,7 @@ local highlights = require('slimline.highlights')
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
---- @param hls table
+--- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
 function M.render(sep, direction, hls)
   local filetype = vim.bo.filetype
