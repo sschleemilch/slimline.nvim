@@ -31,7 +31,7 @@ function M.create_hls()
   for _, component in ipairs(components) do
     local component_config = config.configs[component]
 
-    if component_config and component_config.follow == nil then
+    if component_config and (component_config.follow == nil or component_config.follow == false) then
       local inverse = false
       local style = config.style
       if component_config.style ~= nil then
@@ -42,6 +42,11 @@ function M.create_hls()
       end
       local prefix = firstToUpper(component)
 
+      local secondary = config.hl.secondary
+      if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
+        secondary = config.configs[component].hl.secondary
+      end
+
       if component == 'mode' then
         local hls = config.configs['mode'].hl
         M.hls.components[component] = {
@@ -49,42 +54,46 @@ function M.create_hls()
             primary = {
               text = M.create_hl(prefix .. 'Normal', hls.normal, inverse, config.bold),
               sep = M.create_hl(prefix .. 'NormalSep', hls.normal, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'NormalSep2Sec', hls.normal, false, false, secondary),
             },
           },
           pending = {
             primary = {
               text = M.create_hl(prefix .. 'Pending', hls.pending, inverse, config.bold),
               sep = M.create_hl(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'PendingSep2Sec', hls.pending, false, false, secondary),
             },
           },
           visual = {
             primary = {
               text = M.create_hl(prefix .. 'Visual', hls.visual, inverse, config.bold),
               sep = M.create_hl(prefix .. 'VisualSep', hls.visual, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'VisualSep2Sec', hls.visual, false, false, secondary),
             },
           },
           insert = {
             primary = {
               text = M.create_hl(prefix .. 'Insert', hls.insert, inverse, config.bold),
               sep = M.create_hl(prefix .. 'InsertSep', hls.insert, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'InsertSep2Sec', hls.insert, false, false, secondary),
             },
           },
           command = {
             primary = {
               text = M.create_hl(prefix .. 'Command', hls.command, inverse, config.bold),
               sep = M.create_hl(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'CommandSep2Sec', hls.command, false, false, secondary),
             },
+          },
+          secondary = {
+            text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
+            sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
           },
         }
       else
         local primary = config.hl.primary
         if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
           primary = config.configs[component].hl.primary
-        end
-
-        local secondary = config.hl.secondary
-        if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
-          secondary = config.configs[component].hl.secondary
         end
 
         M.hls.components[component] = {
@@ -211,18 +220,22 @@ end
 --- @param mode string
 --- @return table
 function M.get_mode_hl(mode)
+  local hls = {
+    secondary = M.hls.components['mode'].secondary,
+    primary = M.hls.components['mode'].command.primary,
+  }
   if mode == 'NORMAL' then
-    return M.hls.components['mode'].normal
+    hls.primary = M.hls.components['mode'].normal.primary
   elseif mode:find('PENDING') then
-    return M.hls.components['mode'].pending
+    hls.primary = M.hls.components['mode'].pending.primary
   elseif mode:find('VISUAL') then
-    return M.hls.components['mode'].visual
+    hls.primary = M.hls.components['mode'].visual.primary
   elseif mode:find('INSERT') or mode:find('SELECT') then
-    return M.hls.components['mode'].insert
+    hls.primary = M.hls.components['mode'].insert.primary
   elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
-    return M.hls.components['mode'].command
+    hls.primary = M.hls.components['mode'].command.primary
   end
-  return M.hls.components['mode'].command
+  return hls
 end
 
 return M

@@ -12,17 +12,25 @@ local name = 'progress'
 function M.render(sep, direction, hls)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
-  local content
+  local primary
   if cur == 1 then
-    content = 'Top'
+    primary = 'Top'
   elseif cur == total then
-    content = 'Bot'
+    primary = 'Bot'
   else
-    content = string.format('%2d%%%%', math.floor(cur / total * 100))
+    primary = string.format('%2d%%%%', math.floor(cur / total * 100))
   end
-  content = string.format('%s %s / %s', config.configs[name].icon, content, total)
 
-  return highlights.hl_component({ primary = content }, hls, sep, direction)
+  local secondary = ''
+
+  if config.configs[name].column then
+    local col = vim.fn.col('.')
+    secondary = string.format('%2d', col)
+  end
+
+  primary = string.format('%s %s / %s', config.configs[name].icon, primary, total)
+
+  return highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction)
 end
 
 return M

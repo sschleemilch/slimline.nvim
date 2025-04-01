@@ -45,7 +45,7 @@ local function get_component(component, position, direction)
   elseif type(component) == 'string' then
     local exist, component_module = pcall(require, string.format('slimline.components.%s', component))
     if exist then
-      if M.config.configs[component].follow ~= nil then
+      if M.config.configs[component].follow then
         component = M.config.configs[component].follow
       end
       local sep = get_sep(component)
