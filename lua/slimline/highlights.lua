@@ -52,35 +52,35 @@ function M.create_hls()
         M.hls.components[component] = {
           normal = {
             primary = {
-              text = M.create_hl(prefix .. 'Normal', hls.normal, inverse, config.bold),
+              text = M.create_hl(prefix .. 'Normal', hls.normal, inverse, config.bold, nil, M.hls.base),
               sep = M.create_hl(prefix .. 'NormalSep', hls.normal, false, false, nil, M.hls.base),
               sep2sec = M.create_hl(prefix .. 'NormalSep2Sec', hls.normal, false, false, secondary),
             },
           },
           pending = {
             primary = {
-              text = M.create_hl(prefix .. 'Pending', hls.pending, inverse, config.bold),
+              text = M.create_hl(prefix .. 'Pending', hls.pending, inverse, config.bold, nil, M.hls.base),
               sep = M.create_hl(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
               sep2sec = M.create_hl(prefix .. 'PendingSep2Sec', hls.pending, false, false, secondary),
             },
           },
           visual = {
             primary = {
-              text = M.create_hl(prefix .. 'Visual', hls.visual, inverse, config.bold),
+              text = M.create_hl(prefix .. 'Visual', hls.visual, inverse, config.bold, nil, M.hls.base),
               sep = M.create_hl(prefix .. 'VisualSep', hls.visual, false, false, nil, M.hls.base),
               sep2sec = M.create_hl(prefix .. 'VisualSep2Sec', hls.visual, false, false, secondary),
             },
           },
           insert = {
             primary = {
-              text = M.create_hl(prefix .. 'Insert', hls.insert, inverse, config.bold),
+              text = M.create_hl(prefix .. 'Insert', hls.insert, inverse, config.bold, nil, M.hls.base),
               sep = M.create_hl(prefix .. 'InsertSep', hls.insert, false, false, nil, M.hls.base),
               sep2sec = M.create_hl(prefix .. 'InsertSep2Sec', hls.insert, false, false, secondary),
             },
           },
           command = {
             primary = {
-              text = M.create_hl(prefix .. 'Command', hls.command, inverse, config.bold),
+              text = M.create_hl(prefix .. 'Command', hls.command, inverse, config.bold, nil, M.hls.base),
               sep = M.create_hl(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
               sep2sec = M.create_hl(prefix .. 'CommandSep2Sec', hls.command, false, false, secondary),
             },
