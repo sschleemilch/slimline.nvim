@@ -8,7 +8,7 @@ local config = require('slimline').config
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
---- @param hls table
+--- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
 function M.render(sep, direction, hls)
   if vim.bo.buftype ~= '' then

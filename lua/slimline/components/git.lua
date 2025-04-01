@@ -7,7 +7,7 @@ local name = 'git'
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
---- @param hls table
+--- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
 function M.render(sep, direction, hls)
   local status = vim.b.gitsigns_status_dict
