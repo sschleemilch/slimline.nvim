@@ -56,10 +56,10 @@ local function get_component(component, position, direction)
         sep.right = ''
       end
       local hls = highlights.hls.components[component]
-      if component == 'mode' then
-        hls = highlights.get_mode_hl(utils.get_mode())
-      end
       return function(...)
+        if component == 'mode' then
+          hls = highlights.get_mode_hl(utils.get_mode())
+        end
         return component_module.render(sep, direction, hls, ...)
       end
     else

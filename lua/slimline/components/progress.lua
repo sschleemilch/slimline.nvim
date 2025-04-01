@@ -25,7 +25,7 @@ function M.render(sep, direction, hls)
 
   if config.configs[name].column then
     local col = vim.fn.col('.')
-    secondary = string.format('%2d', col)
+    secondary = string.format('%3d', col)
   end
 
   primary = string.format('%s %s / %s', config.configs[name].icon, primary, total)
