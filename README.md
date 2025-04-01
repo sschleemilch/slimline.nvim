@@ -109,7 +109,7 @@ require('slimline').setup {
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
   -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
-  -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default)
+  -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
   configs = {
     mode = {
       verbose = false, -- Mode as single letter or as a word
@@ -149,6 +149,7 @@ require('slimline').setup {
     filetype_lsp = {},
     progress = {
       follow = 'mode',
+      column = false, -- Enables a secondary section with the cursor column
       icon = ' ',
     },
     recording = {
