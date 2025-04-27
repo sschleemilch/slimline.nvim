@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Optimized startup time by delaying highlights generation to first `render()`
+- Changed default `base` highlight group to `Normal` since `Comment` does not define a `bg` and therefore had no effect
 
 ## [1.4.2] - 2025-04-01
 

@@ -89,7 +89,7 @@ local M = {
 
   -- Global highlights
   hl = {
-    base = 'Comment', -- highlight of the background
+    base = 'Normal', -- highlight of the background
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
