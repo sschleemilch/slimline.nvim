@@ -5,11 +5,17 @@ M.hls = {
   components = {},
 }
 
+M.hls_created = false
+
 local function firstToUpper(str)
   return (str:gsub('^%l', string.upper))
 end
 
 function M.create_hls()
+  if M.hls_created then
+    return
+  end
+
   local config = require('slimline').config
 
   M.hls.base = M.create_hl('', config.hl.base)
@@ -110,6 +116,7 @@ function M.create_hls()
       end
     end
   end
+  M.hls_created = true
 end
 
 ---@param hl string
