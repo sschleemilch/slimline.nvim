@@ -55,8 +55,8 @@ local function get_component(component, position, direction)
       if M.config.sep.hide.last and position == 'last' then
         sep.right = ''
       end
-      local hls = highlights.hls.components[component]
       return function(...)
+        local hls = highlights.hls.components[component]
         if component == 'mode' then
           hls = highlights.get_mode_hl(utils.get_mode())
         end
@@ -89,6 +89,7 @@ end
 
 ---@return string
 function M.render()
+  highlights.create_hls()
   local result = '%#Slimline#' .. M.config.spaces.left
   result = result .. M.concat_components(M.components.left)
   result = result .. '%='
@@ -207,8 +208,6 @@ function M.setup(opts)
   migrate_opts(opts)
 
   M.config = opts
-
-  highlights.create_hls()
 
   M.components.left = get_components(opts.components.left, 'left')
   M.components.center = get_components(opts.components.center, 'center')

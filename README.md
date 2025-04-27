@@ -176,7 +176,7 @@ require('slimline').setup {
 
   -- Global highlights
   hl = {
-    base = 'Comment', -- highlight of the background
+    base = 'Normal', -- highlight of the background. Change it .e.g to `StatusLine` if you do not want it to be transparent
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },

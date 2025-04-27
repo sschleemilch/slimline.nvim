@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2025-04-27
+
+### Fixed
+
+- Optimized startup time by delaying highlights generation to first `render()`
+- Changed default `base` highlight group to `Normal` since `Comment` does not define a `bg` and therefore had no effect
+
 ## [1.4.2] - 2025-04-01
 
 ### Fixed
