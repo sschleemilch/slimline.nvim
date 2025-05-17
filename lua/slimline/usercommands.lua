@@ -29,6 +29,8 @@ local subcommand_tbl = {
           cfg.sep.left = seps.left
           cfg.sep.right = seps.right
         end
+        local slh = require('slimline.highlights')
+        slh.hls_created = false
         sl.setup(cfg)
       else
         vim.notify('Slimline: unknown switch target: ' .. args[1], vim.log.levels.ERROR)

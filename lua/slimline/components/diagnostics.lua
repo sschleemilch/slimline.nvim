@@ -13,9 +13,8 @@ end
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
-function M.render(sep, direction, hls)
+function M.render(sep, direction, _)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
@@ -60,16 +59,22 @@ function M.render(sep, direction, hls)
         local hl = 'SlimlineDiagnostic' .. capitalize(severity)
         return string.format('%%#%s#%s%%#%s#%d', hl, icons[severity], highlights.hls.base, count)
       end
-      return string.format('%s%d', icons[severity], count)
+      return highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
+        primary = {
+          text = 'DiagnosticVirtualText' .. capitalize(severity),
+        },
+      }, sep, direction)
     end)
     :totable()
 
-  last_diagnostic_component = table.concat(parts, ' ')
+  local concat = ''
+  if style == 'fg' then
+    concat = ' '
+  end
+
+  last_diagnostic_component = table.concat(parts, concat)
   if last_diagnostic_component == '' then
     return ''
-  end
-  if style ~= 'fg' then
-    last_diagnostic_component = highlights.hl_component({ primary = last_diagnostic_component }, hls, sep, direction)
   end
   return last_diagnostic_component
 end

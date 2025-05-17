@@ -20,11 +20,23 @@ function M.create_hls()
 
   M.hls.base = M.create_hl('', config.hl.base)
 
-  --- Make sure that Diagnostic* hl groups have base as background
+  --- Make sure that Diagnostic* hl groups have base as background for fg mode
   M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
   M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
+
+  --- Create Diagnostics for bg mode
+  local bg = vim.api.nvim_get_hl(0, { name = M.hls.base }).bg
+  local fg = nil
+  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError' }).bg
+  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextWarn' }).bg
+  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextInfo' }).bg
+  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextHint' }).bg
+  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
 
   local components = {}
   for _, section in pairs(config.components) do

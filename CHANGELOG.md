@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-05-17
+
+### Changed
+
+- Improved `diagnostics` rendering in `style: bg` by using `DiagnosticVirtualText*` highlight groups and separating severities
+
+### Fixed
+
+- `Slimline switch style` command functionality
+
 ## [1.4.3] - 2025-04-27
 
 ### Fixed
