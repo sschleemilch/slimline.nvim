@@ -67,12 +67,7 @@ function M.render(sep, direction, _)
     end)
     :totable()
 
-  local concat = ''
-  if style == 'fg' then
-    concat = ' '
-  end
-
-  last_diagnostic_component = table.concat(parts, concat)
+  last_diagnostic_component = table.concat(parts, config.spaces.components)
   if last_diagnostic_component == '' then
     return ''
   end
