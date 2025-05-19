@@ -20,10 +20,10 @@ local function create_diagnostic_highlights()
 
   local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
   if dv_bg == nil then
-    M.create_hl('DiagnosticVirtualTextHint', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextError', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticInfo', true, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticWarn', true, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextError', 'SlimlineDiagnosticError', true, false, nil, nil)
   else
     M.create_hl('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
     M.create_hl('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
@@ -60,8 +60,6 @@ function M.create_hls()
     end
   end
 
-  local has_diagnostics_component = false
-
   --- Create component highlights
   for _, component in ipairs(components) do
     local component_config = config.configs[component]
@@ -80,10 +78,6 @@ function M.create_hls()
       local secondary = config.hl.secondary
       if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
         secondary = config.configs[component].hl.secondary
-      end
-
-      if component == 'diagnostics' then
-        has_diagnostics_component = true
       end
 
       if component == 'mode' then
@@ -130,28 +124,28 @@ function M.create_hls()
           },
         }
       else
-        local primary = config.hl.primary
-        if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
-          primary = config.configs[component].hl.primary
-        end
+        if component == 'diagnostics' then
+          create_diagnostic_highlights()
+        else
+          local primary = config.hl.primary
+          if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
+            primary = config.configs[component].hl.primary
+          end
 
-        M.hls.components[component] = {
-          primary = {
-            text = M.create_hl(prefix .. 'Primary', primary, inverse, config.bold, nil, M.hls.base),
-            sep = M.create_hl(prefix .. 'PrimarySep', primary, false, false, nil, M.hls.base),
-            sep2sec = M.create_hl(prefix .. 'PrimarySep2Sec', primary, false, false, secondary),
-          },
-          secondary = {
-            text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
-            sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
-          },
-        }
+          M.hls.components[component] = {
+            primary = {
+              text = M.create_hl(prefix .. 'Primary', primary, inverse, config.bold, nil, M.hls.base),
+              sep = M.create_hl(prefix .. 'PrimarySep', primary, false, false, nil, M.hls.base),
+              sep2sec = M.create_hl(prefix .. 'PrimarySep2Sec', primary, false, false, secondary),
+            },
+            secondary = {
+              text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
+              sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
+            },
+          }
+        end
       end
     end
-  end
-
-  if has_diagnostics_component then
-    create_diagnostic_highlights()
   end
 
   M.hls_created = true
