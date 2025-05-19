@@ -61,7 +61,7 @@ function M.render(sep, direction, _)
       end
       return highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
         primary = {
-          text = 'DiagnosticVirtualText' .. capitalize(severity),
+          text = 'SlimlineDiagnosticVirtualText' .. capitalize(severity),
         },
       }, sep, direction)
     end)

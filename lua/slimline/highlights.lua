@@ -11,6 +11,39 @@ local function firstToUpper(str)
   return (str:gsub('^%l', string.upper))
 end
 
+local function create_diagnostic_highlights()
+  --- Make sure that Diagnostic* hl groups have base as background for fg mode
+  M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
+  M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
+
+  local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
+  if dv_bg == nil then
+    M.create_hl('DiagnosticVirtualTextHint', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextError', 'SlimlineDiagnosticsPrimary', false, false, nil, nil)
+  else
+    M.create_hl('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextWarn', 'DiagnosticVirtualTextWarn', false, false, nil, nil)
+    M.create_hl('DiagnosticVirtualTextError', 'DiagnosticVirtualTextError', false, false, nil, nil)
+  end
+
+  --- Create Diagnostic Seps for bg mode
+  local bg = vim.api.nvim_get_hl(0, { name = M.hls.base, link = false }).bg
+  local fg
+  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextError', link = false }).bg
+  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextWarn', link = false }).bg
+  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextInfo', link = false }).bg
+  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
+  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextHint', link = false }).bg
+  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
+end
+
 function M.create_hls()
   if M.hls_created then
     return
@@ -20,30 +53,14 @@ function M.create_hls()
 
   M.hls.base = M.create_hl('', config.hl.base)
 
-  --- Make sure that Diagnostic* hl groups have base as background for fg mode
-  M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
-
-  --- Create Diagnostics for bg mode
-  local bg = vim.api.nvim_get_hl(0, { name = M.hls.base }).bg
-  local fg = nil
-  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError' }).bg
-  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextWarn' }).bg
-  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextInfo' }).bg
-  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextHint' }).bg
-  vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
-
   local components = {}
   for _, section in pairs(config.components) do
     for _, component in ipairs(section) do
       table.insert(components, component)
     end
   end
+
+  local has_diagnostics_component = false
 
   --- Create component highlights
   for _, component in ipairs(components) do
@@ -63,6 +80,10 @@ function M.create_hls()
       local secondary = config.hl.secondary
       if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
         secondary = config.configs[component].hl.secondary
+      end
+
+      if component == 'diagnostics' then
+        has_diagnostics_component = true
       end
 
       if component == 'mode' then
@@ -128,6 +149,11 @@ function M.create_hls()
       end
     end
   end
+
+  if has_diagnostics_component then
+    create_diagnostic_highlights()
+  end
+
   M.hls_created = true
 end
 
@@ -144,13 +170,20 @@ function M.create_hl(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
     hl = basename .. hl
   end
 
-  local hl_normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
-  local hl_ref = vim.api.nvim_get_hl(0, { name = base })
-  local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from_fg })
+  local hl_ref = vim.api.nvim_get_hl(0, { name = base, link = false })
+  local hl_ref_bold = hl_ref.bold or false
+
+  if inverse == false and bold == hl_ref_bold and bg_from_fg == nil and bg_from_bg == nil then
+    vim.api.nvim_set_hl(0, hl, { link = base })
+    return hl
+  end
+
+  local hl_normal = vim.api.nvim_get_hl(0, { name = 'Normal', link = false })
+  local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from_fg, link = false })
   local fg = hl_ref.fg or 'fg'
   local bg = hl_bg_ref.fg or hl_ref.bg or hl_normal.bg
   if bg_from_bg ~= nil then
-    bg = vim.api.nvim_get_hl(0, { name = bg_from_bg }).bg
+    bg = vim.api.nvim_get_hl(0, { name = bg_from_bg, link = false }).bg
   end
   if inverse then
     local tmp = fg
@@ -166,7 +199,7 @@ function M.create_hl(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
     bg = tmp
   end
 
-  vim.api.nvim_set_hl(0, hl, { bg = bg, fg = fg, bold = hl_ref.bold or bold })
+  vim.api.nvim_set_hl(0, hl, { bg = bg, fg = fg, bold = bold })
 
   return hl
 end
