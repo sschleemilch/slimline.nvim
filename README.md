@@ -238,11 +238,6 @@ opts = {
         primary = 'Function',
       },
     },
-    diagnostics = {
-      hl = {
-        primary = 'Statement',
-      },
-    },
     filetype_lsp = {
       hl = {
         primary = 'String',
@@ -269,11 +264,6 @@ opts = {
     git = {
       hl = {
         primary = 'Function',
-      },
-    },
-    diagnostics = {
-      hl = {
-        primary = 'Statement',
       },
     },
     filetype_lsp = {
