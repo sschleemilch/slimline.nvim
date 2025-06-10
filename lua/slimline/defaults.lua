@@ -60,6 +60,9 @@ local M = {
       },
     },
     filetype_lsp = {},
+    lsp_progress = {
+      style = 'fg',
+    },
     progress = {
       follow = 'mode',
       column = false, -- Enables a secondary section with the cursor column
