@@ -52,13 +52,15 @@ function M.render(sep, direction, _)
   local parts = vim
     .iter(counts)
     :map(function(severity, count)
+      local capsev = capitalize(severity)
       if count == 0 then
         if style == 'fg' or config.configs[name].placeholders ~= true then
           return nil
         end
         return highlights.hl_component({ primary = '' }, {
           primary = {
-            text = 'SlimlineDiagnosticVirtualText' .. capitalize(severity),
+            text = 'SlimlineDiagnosticVirtualText' .. capsev,
+            sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
           },
         }, sep, direction)
       end
@@ -68,7 +70,8 @@ function M.render(sep, direction, _)
       end
       return highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
         primary = {
-          text = 'SlimlineDiagnosticVirtualText' .. capitalize(severity),
+          text = 'SlimlineDiagnosticVirtualText' .. capsev,
+          sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
         },
       }, sep, direction)
     end)
