@@ -21,6 +21,7 @@ local M = {
 
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
+  -- `<component>.sep` can be used to overwrite the global 'sep.left' and `sep.right`
   -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
   -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
   configs = {
@@ -52,6 +53,7 @@ local M = {
     },
     diagnostics = {
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
+      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
       icons = {
         ERROR = ' ',
         WARN = ' ',
