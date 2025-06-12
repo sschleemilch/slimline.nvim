@@ -86,6 +86,7 @@ You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if yo
 
 ```lua
 require('slimline').setup {
+{
   bold = false, -- makes primary parts bold
 
   -- Global style. Can be overwritten using `configs.<component>.style`
@@ -108,7 +109,8 @@ require('slimline').setup {
 
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
-  -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones.
+  -- `<component>.sep` can be used to overwrite the global 'sep.left' and `sep.right`
+  -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
   -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
   configs = {
     mode = {
@@ -139,6 +141,7 @@ require('slimline').setup {
     },
     diagnostics = {
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
+      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
       icons = {
         ERROR = ' ',
         WARN = ' ',
@@ -175,10 +178,8 @@ require('slimline').setup {
   },
 
   -- Global highlights
-  -- Components that are not using those highlights and cannot be overwritten:
-  -- - diagnostics: Uses Diagnostic* highlights when being in "fg" style and DiagnosticVirtualText* highlights when being in "bg" style
   hl = {
-    base = 'Normal', -- highlight of the background. Change it .e.g to `StatusLine` if you do not want it to be transparent
+    base = 'Normal', -- highlight of the background
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },

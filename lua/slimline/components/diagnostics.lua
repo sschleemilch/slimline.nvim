@@ -53,7 +53,14 @@ function M.render(sep, direction, _)
     .iter(counts)
     :map(function(severity, count)
       if count == 0 then
-        return nil
+        if style == 'fg' or config.configs[name].placeholders ~= true then
+          return nil
+        end
+        return highlights.hl_component({ primary = '' }, {
+          primary = {
+            text = 'SlimlineDiagnosticVirtualText' .. capitalize(severity),
+          },
+        }, sep, direction)
       end
       if style == 'fg' then
         local hl = 'SlimlineDiagnostic' .. capitalize(severity)

@@ -223,8 +223,8 @@ end
 ---@param content string?
 ---@return string?
 function M.pad(content)
-  if content == nil then
-    return nil
+  if content == nil or content == '' then
+    return content
   end
   return ' ' .. content .. ' '
 end
@@ -240,9 +240,6 @@ function M.hl_component(content, hl, sep, direction)
   local result
   if content.primary == nil then
     return ''
-  end
-  if content.secondary == '' then
-    content.secondary = nil
   end
 
   if content.secondary == nil then

@@ -16,17 +16,24 @@ M.components = {
 ---@return table
 local function get_sep(component)
   local sep = {
-    left = M.config.sep.left,
-    right = M.config.sep.right,
+    left = nil,
+    right = nil,
   }
-  local style = M.config.style
+  local style = (M.config.configs[component] and M.config.configs[component].style) or M.config.style
 
-  if M.config.configs[component] and M.config.configs[component].style ~= nil then
-    style = M.config.configs[component].style
-  end
   if style == 'fg' then
     sep.left = ''
     sep.right = ''
+  else
+    sep = {
+      left = (M.config.configs[component] and M.config.configs[component].sep and M.config.configs[component].sep.left)
+        or M.config.sep.left,
+      right = (
+        M.config.configs[component]
+        and M.config.configs[component].sep
+        and M.config.configs[component].sep.right
+      ) or M.config.sep.right,
+    }
   end
   return sep
 end
