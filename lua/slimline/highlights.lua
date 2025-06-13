@@ -201,7 +201,7 @@ end
 --- Helper function to highlight a given content
 --- Resets the highlight afterwards
 --- @param content string?
---- @param hl string?
+--- @param hl {text: string, sep: string}
 --- @param sep_left string?
 --- @param sep_right string?
 --- @return string
@@ -211,11 +211,11 @@ function M.hl_content(content, hl, sep_left, sep_right)
   end
   local rendered = ''
   if sep_left ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', hl .. 'Sep', sep_left)
+    rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep_left)
   end
-  rendered = rendered .. string.format('%%#%s#%s', hl, content)
+  rendered = rendered .. string.format('%%#%s#%s', hl.text, content)
   if sep_right ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', hl .. 'Sep', sep_right)
+    rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep_right)
   end
   return rendered
 end
@@ -243,16 +243,16 @@ function M.hl_component(content, hl, sep, direction)
   end
 
   if content.secondary == nil then
-    result = M.hl_content(M.pad(content.primary), hl.primary.text, sep.left, sep.right)
+    result = M.hl_content(M.pad(content.primary), hl.primary, sep.left, sep.right)
   else
     if direction == 'left' then
-      result = M.hl_content(M.pad(content.secondary), hl.secondary.text, sep.left)
-      result = result .. M.hl_content(sep.left, hl.primary.sep2sec)
-      result = result .. M.hl_content(M.pad(content.primary), hl.primary.text, nil, sep.right)
+      result = M.hl_content(M.pad(content.secondary), hl.secondary, sep.left)
+      result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec })
+      result = result .. M.hl_content(M.pad(content.primary), hl.primary, nil, sep.right)
     else
-      result = M.hl_content(M.pad(content.primary), hl.primary.text, sep.left)
-      result = result .. M.hl_content(sep.right, hl.primary.sep2sec)
-      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary.text, nil, sep.right)
+      result = M.hl_content(M.pad(content.primary), hl.primary, sep.left)
+      result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec })
+      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, nil, sep.right)
     end
   end
   result = result .. '%#' .. M.hls.base .. '#'
