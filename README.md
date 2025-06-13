@@ -1,4 +1,7 @@
-# slimline.nvim
+<h2 align="center">
+ <img src="./docs/slimline.png" width="100" alt="Slimline logo"/><br/>
+ slimline.nvim
+</h2>
 
 <!-- panvimdoc-ignore-start -->
 
