@@ -53,7 +53,6 @@ local M = {
     },
     diagnostics = {
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
-      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
       icons = {
         ERROR = ' ',
         WARN = ' ',

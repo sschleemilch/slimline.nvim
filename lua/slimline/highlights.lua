@@ -5,7 +5,7 @@ M.hls = {
   components = {},
 }
 
-M.hls_created = false
+M.create = true
 
 local function firstToUpper(str)
   return (str:gsub('^%l', string.upper))
@@ -45,7 +45,7 @@ local function create_diagnostic_highlights()
 end
 
 function M.create_hls()
-  if M.hls_created then
+  if not M.create then
     return
   end
 
@@ -148,7 +148,7 @@ function M.create_hls()
     end
   end
 
-  M.hls_created = true
+  M.create = false
 end
 
 ---@param hl string

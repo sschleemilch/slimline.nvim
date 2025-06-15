@@ -1,4 +1,4 @@
-local M = {}
+local C = {}
 local highlights = require('slimline.highlights')
 local config = require('slimline').config
 local name = 'progress'
@@ -9,7 +9,7 @@ local name = 'progress'
 --- |'"left"'
 --- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
 --- @return string
-function M.render(sep, direction, hls)
+function C.render(sep, direction, hls)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local primary
@@ -33,4 +33,4 @@ function M.render(sep, direction, hls)
   return highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction)
 end
 
-return M
+return C

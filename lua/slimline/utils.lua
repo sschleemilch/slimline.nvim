@@ -1,5 +1,10 @@
 local M = {}
 
+local augroup = vim.api.nvim_create_augroup('Slimline', { clear = true })
+function M.au(event, pattern, callback, desc)
+  vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc })
+end
+
 --- Function to translate a mode into a string to show
 --- @return string
 function M.get_mode()
@@ -43,7 +48,7 @@ function M.get_mode()
     ['t'] = 'TERMINAL',
   }
 
-  local mode = mode_map[vim.api.nvim_get_mode().mode] or 'UNKNOWN'
+  local mode = mode_map[vim.fn.mode()] or 'UNKNOWN'
   return mode
 end
 

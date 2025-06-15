@@ -1,9 +1,45 @@
 local highlights = require('slimline.highlights')
+local utils = require('slimline.utils')
 local config = require('slimline').config
-local name = 'diagnostics'
-local M = {}
+local C = {}
+local content = ''
 
-local last_diagnostic_component = ''
+local icons = config.configs['diagnostics'].icons
+local style = config.configs['diagnostics'].style or config.style
+local initialized = false
+local diagnostics = {}
+
+local function get_diagnostic_count(buf_id)
+  local res = {}
+  for _, d in ipairs(vim.diagnostic.get(buf_id)) do
+    local sev = vim.diagnostic.severity[d.severity]
+    res[sev] = (res[sev] or 0) + 1
+  end
+  return res
+end
+
+local track_diagnostics = vim.schedule_wrap(function(data)
+  if not vim.api.nvim_buf_is_valid(data.buf) then
+    diagnostics[data.buf] = nil
+    return
+  end
+  local buf = nil
+  if not config.configs.diagnostics.workspace then
+    buf = data.buf
+  end
+
+  local counts = get_diagnostic_count(buf)
+  diagnostics[data.buf] = counts
+end)
+
+local function init()
+  if initialized then
+    return
+  end
+  initialized = true
+
+  utils.au({ 'DiagnosticChanged', 'BufEnter' }, '*', track_diagnostics, 'Track Diagnostics')
+end
 
 local function capitalize(str)
   return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2))
@@ -14,74 +50,54 @@ end
 --- |'"right"'
 --- |'"left"'
 --- @return string
-function M.render(sep, direction, _)
+function C.render(sep, direction, _)
   -- Lazy uses diagnostic icons, but those aren"t errors per se.
   if vim.bo.filetype == 'lazy' then
     return ''
   end
 
+  init()
+
   -- Use the last computed value if in insert mode.
   if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
-    return last_diagnostic_component
+    return content
   end
 
-  local buffer
-  if config.configs.diagnostics.workspace then
-    buffer = nil
-  else
-    buffer = 0
-  end
-  local counts = vim.iter(vim.diagnostic.get(buffer)):fold({
-    ERROR = 0,
-    WARN = 0,
-    HINT = 0,
-    INFO = 0,
-  }, function(acc, diagnostic)
-    local severity = vim.diagnostic.severity[diagnostic.severity]
-    acc[severity] = acc[severity] + 1
-    return acc
-  end)
+  local counts = diagnostics[vim.api.nvim_get_current_buf()]
+    or {
+      ERROR = 0,
+      WARN = 0,
+      HINT = 0,
+      INFO = 0,
+    }
 
-  local icons = config.configs[name].icons
+  local parts = {}
 
-  local style = config.style
-  if config.configs[name].style ~= nil then
-    style = config.configs[name].style
-  end
-
-  local parts = vim
-    .iter(counts)
-    :map(function(severity, count)
-      local capsev = capitalize(severity)
-      if count == 0 then
-        if style == 'fg' or config.configs[name].placeholders ~= true then
-          return nil
-        end
-        return highlights.hl_component({ primary = '' }, {
-          primary = {
-            text = 'SlimlineDiagnosticVirtualText' .. capsev,
-            sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-          },
-        }, sep, direction)
-      end
+  for severity, count in pairs(counts) do
+    local capsev = capitalize(severity)
+    if count > 0 then
       if style == 'fg' then
         local hl = 'SlimlineDiagnostic' .. capitalize(severity)
-        return string.format('%%#%s#%s%%#%s#%d', hl, icons[severity], highlights.hls.base, count)
+        table.insert(parts, string.format('%%#%s#%s%%#%s#%d', hl, icons[severity], highlights.hls.base, count))
+      else
+        table.insert(
+          parts,
+          highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
+            primary = {
+              text = 'SlimlineDiagnosticVirtualText' .. capsev,
+              sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
+            },
+          }, sep, direction)
+        )
       end
-      return highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
-        primary = {
-          text = 'SlimlineDiagnosticVirtualText' .. capsev,
-          sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-        },
-      }, sep, direction)
-    end)
-    :totable()
+    end
+  end
 
-  last_diagnostic_component = table.concat(parts, config.spaces.components)
-  if last_diagnostic_component == '' then
+  content = table.concat(parts, config.spaces.components)
+  if content == '' then
     return ''
   end
-  return last_diagnostic_component
+  return content
 end
 
-return M
+return C
