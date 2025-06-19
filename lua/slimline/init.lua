@@ -1,38 +1,90 @@
-local M = {}
-
-local highlights = require('slimline.highlights')
-local utils = require('slimline.utils')
+local Slimline = {}
+Slimline.highlights = require('slimline.highlights')
 
 ---@alias Component function
 
 ---@type table<string, Component[]>
-M.components = {
-  left = {},
-  center = {},
-  right = {},
-}
+Slimline.active = vim.defaulttable()
+---@type table<string, Component[]>
+Slimline.inactive = vim.defaulttable()
+
+local augroup = vim.api.nvim_create_augroup('Slimline', { clear = true })
+function Slimline.au(event, pattern, callback, desc)
+  vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc })
+end
+
+--- Function to translate a mode into a string to show
+--- @return string
+function Slimline.get_mode()
+  -- Note that: \19 = ^S and \22 = ^V.
+  local mode_map = {
+    ['n'] = 'NORMAL',
+    ['no'] = 'OP-PENDING',
+    ['nov'] = 'OP-PENDING',
+    ['noV'] = 'OP-PENDING',
+    ['no\22'] = 'OP-PENDING',
+    ['niI'] = 'NORMAL',
+    ['niR'] = 'NORMAL',
+    ['niV'] = 'NORMAL',
+    ['nt'] = 'NORMAL',
+    ['ntT'] = 'NORMAL',
+    ['v'] = 'VISUAL',
+    ['vs'] = 'VISUAL',
+    ['V'] = 'VISUAL',
+    ['Vs'] = 'VISUAL',
+    ['\22'] = 'VISUAL',
+    ['\22s'] = 'VISUAL',
+    ['s'] = 'SELECT',
+    ['S'] = 'SELECT',
+    ['\19'] = 'SELECT',
+    ['i'] = 'INSERT',
+    ['ic'] = 'INSERT',
+    ['ix'] = 'INSERT',
+    ['R'] = 'REPLACE',
+    ['Rc'] = 'REPLACE',
+    ['Rx'] = 'REPLACE',
+    ['Rv'] = 'VIRT REPLACE',
+    ['Rvc'] = 'VIRT REPLACE',
+    ['Rvx'] = 'VIRT REPLACE',
+    ['c'] = 'COMMAND',
+    ['cv'] = 'VIM EX',
+    ['ce'] = 'EX',
+    ['r'] = 'PROMPT',
+    ['rm'] = 'MORE',
+    ['r?'] = 'CONFIRM',
+    ['!'] = 'SHELL',
+    ['t'] = 'TERMINAL',
+  }
+
+  local mode = mode_map[vim.fn.mode()] or 'UNKNOWN'
+  return mode
+end
 
 ---@param component string
 ---@return table
-local function get_sep(component)
+function Slimline.get_sep(component)
   local sep = {
     left = nil,
     right = nil,
   }
-  local style = (M.config.configs[component] and M.config.configs[component].style) or M.config.style
+  local style = (Slimline.config.configs[component] and Slimline.config.configs[component].style)
+    or Slimline.config.style
 
   if style == 'fg' then
     sep.left = ''
     sep.right = ''
   else
     sep = {
-      left = (M.config.configs[component] and M.config.configs[component].sep and M.config.configs[component].sep.left)
-        or M.config.sep.left,
+      left = (
+        Slimline.config.configs[component]
+        and Slimline.config.configs[component].sep
+        and Slimline.config.configs[component].sep.left
+      ) or Slimline.config.sep.left,
       right = (
-        M.config.configs[component]
-        and M.config.configs[component].sep
-        and M.config.configs[component].sep.right
-      ) or M.config.sep.right,
+        Slimline.config.configs[component]
+        and Slimline.config.configs[component].sep
+        and Slimline.config.configs[component].sep.right
+      ) or Slimline.config.sep.right,
     }
   end
   return sep
@@ -50,24 +102,24 @@ local function get_component(component, position, direction)
   if type(component) == 'function' then
     return component
   elseif type(component) == 'string' then
-    local exist, component_module = pcall(require, string.format('slimline.components.%s', component))
-    if exist then
-      if M.config.configs[component].follow then
-        component = M.config.configs[component].follow
+    local ok, cmp = pcall(require, string.format('slimline.components.%s', component))
+    if ok then
+      if Slimline.config.configs[component].follow then
+        component = Slimline.config.configs[component].follow
       end
-      local sep = get_sep(component)
-      if M.config.sep.hide.first and position == 'first' then
+      local sep = Slimline.get_sep(component)
+      if Slimline.config.sep.hide.first and position == 'first' then
         sep.left = ''
       end
-      if M.config.sep.hide.last and position == 'last' then
+      if Slimline.config.sep.hide.last and position == 'last' then
         sep.right = ''
       end
-      return function(...)
-        local hls = highlights.hls.components[component]
+      return function(active)
+        local hls = Slimline.highlights.hls.components[component]
         if component == 'mode' then
-          hls = highlights.get_mode_hl(utils.get_mode())
+          hls = Slimline.highlights.get_mode_hl(Slimline.get_mode())
         end
-        return component_module.render(sep, direction, hls, ...)
+        return cmp.render(sep, direction, hls, active)
       end
     else
       return function()
@@ -80,30 +132,37 @@ local function get_component(component, position, direction)
   end
 end
 
+---@param active boolean
 ---@param components Component[]
 ---@return string
-function M.concat_components(components)
+function Slimline.concat_components(components, active)
   local result = ''
   for i, component in ipairs(components) do
-    local space = M.config.spaces.components
+    local space = Slimline.config.spaces.components
     if i == 1 then
       space = ''
     end
-    result = result .. space .. component()
+    result = result .. space .. component(active)
   end
   return result
 end
 
+---@param active integer
 ---@return string
-function M.render()
-  highlights.create_hls()
-  local result = '%#Slimline#' .. M.config.spaces.left
-  result = result .. M.concat_components(M.components.left)
+function Slimline.render(active)
+  Slimline.highlights.create()
+  local components = Slimline.active
+  local is_active = active == 1
+  if not is_active then
+    components = Slimline.inactive
+  end
+  local result = '%#Slimline#' .. Slimline.config.spaces.left
+  result = result .. Slimline.concat_components(components.left, is_active)
   result = result .. '%='
-  result = result .. M.concat_components(M.components.center)
+  result = result .. Slimline.concat_components(components.center, is_active)
   result = result .. '%='
-  result = result .. M.concat_components(M.components.right)
-  result = result .. M.config.spaces.right
+  result = result .. Slimline.concat_components(components.right, is_active)
+  result = result .. Slimline.config.spaces.right
   return result
 end
 
@@ -132,98 +191,40 @@ local function get_components(components, group_position)
   return result
 end
 
----Migrate options between versions and notify about deprecated options
 ---@param opts table
-local function migrate_opts(opts)
-  local warnings = {}
-
-  if opts.verbose_mode ~= nil then
-    opts.configs.mode.verbose = opts.verbose_mode
-    table.insert(warnings, '`verbose_mode` deprecated. Use `configs.mode.verbose` instead.')
-  end
-
-  if opts.mode_follow_style ~= nil then
-    if opts.mode_follow_style == true then
-      opts.configs.mode.style = opts.style
-    else
-      opts.configs.mode.style = 'bg'
-    end
-    table.insert(warnings, '`mode_follow_style` deprecated. Use `configs.mode.style` instead.')
-  end
-
-  if opts.workspace_diagnostics ~= nil then
-    opts.configs.diagnostics.workspace = opts.workspace_diagnostics
-    table.insert(warnings, '`workspace_diagnostics` deprecated. Use `configs.diagnostics.workspace` instead.')
-  end
-
-  if opts.icons ~= nil then
-    table.insert(warnings, '`icons` deprecated. Use `configs.<component>.icon(s)` instead.')
-    if opts.icons.diagnostics then
-      opts.configs.diagnostics.icons =
-        vim.tbl_deep_extend('force', opts.configs.diagnostics.icons, opts.icons.diagnostics)
-    end
-    if opts.icons.git then
-      opts.configs.git.icons = opts.icons.git
-    end
-    if opts.icons.folder then
-      opts.configs.path.icons.folder = opts.icons.folder
-    end
-    if opts.icons.lines then
-      opts.configs.progress.icon = opts.icons.lines
-    end
-    if opts.icons.recording then
-      opts.configs.recording.icon = opts.icons.recording
-    end
-    if opts.icons.buffer then
-      if opts.icons.buffer.modified then
-        opts.configs.path.icons.modified = opts.icons.buffer.modified
-      end
-      if opts.icons.buffer.read_only then
-        opts.configs.path.icons.read_only = opts.icons.buffer.read_only
-      end
-    end
-  end
-
-  if opts.hl.modes then
-    table.insert(warnings, '`hl.modes` deprecated. Use `configs.mode.hl` instead.')
-    opts.configs.mode.hl = opts.hl.modes
-  end
-
-  if #warnings > 0 then
-    table.insert(
-      warnings,
-      '\nSee [here](https://github.com/sschleemilch/slimline.nvim/blob/main/lua/slimline/defaults.lua) for reference'
-    )
-    vim.notify(table.concat(warnings, '\n'), vim.log.levels.WARN, {
-      title = 'slimline.nvim',
-    })
-  end
-end
-
----@param opts table
-function M.setup(opts)
+function Slimline.setup(opts)
   if opts == nil then
     opts = {}
   end
 
-  if vim.o.showmode == true then
-    vim.o.showmode = false
-  end
+  _G.Slimline = Slimline
 
   opts = vim.tbl_deep_extend('force', require('slimline.defaults'), opts)
 
-  migrate_opts(opts)
+  Slimline.config = opts
+  local active = opts.components
+  local inactive = vim.tbl_deep_extend('force', active, opts.components_inactive)
 
-  M.config = opts
+  Slimline.active = {
+    left = get_components(active.left, 'left'),
+    center = get_components(active.center, 'center'),
+    right = get_components(active.right, 'right'),
+  }
+  Slimline.inactive = {
+    left = get_components(inactive.left, 'left'),
+    center = get_components(inactive.center, 'center'),
+    right = get_components(inactive.right, 'right'),
+  }
 
-  M.components.left = get_components(opts.components.left, 'left')
-  M.components.center = get_components(opts.components.center, 'center')
-  M.components.right = get_components(opts.components.right, 'right')
+  vim.go.statusline =
+    '%{%(nvim_get_current_win()==#g:actual_curwin || &laststatus==3) ? v:lua.Slimline.render(1) : v:lua.Slimline.render(0)%}'
 
-  vim.o.statusline = "%!v:lua.require'slimline'.render()"
-
-  require('slimline.autocommands')
-  require('slimline.usercommands')
+  vim.api.nvim_create_autocmd('Colorscheme', {
+    group = Slimline.augroup,
+    callback = function()
+      Slimline.highlights.initialized = true
+    end,
+  })
 end
 
-return M
+return Slimline

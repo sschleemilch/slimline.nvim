@@ -12,10 +12,11 @@
 <!-- panvimdoc-ignore-end -->
 
 A minimal Neovim statusline written in Lua.
-Do we need another statusline? Probably not, do we have one? Yep
 
 It started with doing my own statusline implementation.
 Reason for writing it was mainly just 4 fun and having exactly what I want, function and aesthetic wise.
+
+In the meantime it is a quite generic visual pleasing and configurable statusline.
 
 ## Screenshots
 
@@ -47,18 +48,20 @@ Here are some screenshots. See [recipes](#recipes) for config examples.
 
 Available components:
 
-- `mode`, well, you know what it is
+- `mode`, well, you know what it is. Automatically sets `vim.opt.showmode = false`.
 - `path`, shows the filename and the relative path + modified / read-only info
 - `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
-- `diagnostics`, shows `vim.diagnostic` infos
-- `filetype_lsp`, shows the filetype and attached LSPs
+- `diagnostics`, shows `vim.diagnostic` infos. Diagnostics are computed on change only.
+- `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are computed on change only.
 - `progress`, shows the file progress in % and the overall number of lines
-- `recording`, shows the register being used for recording (not enabled by default)
+- `recording`, shows the register being used for recording
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
 Components can be configured more than once if desired.
 The components configuration accepts function calls and strings so that you can hook custom content into the line.
 See [Custom components](#custom-components) for an introduction.
+
+The line respects and is compatible with `vim.opt.laststatus` settings.
 
 ## Contributing
 
@@ -80,10 +83,17 @@ Feel free to create an issue/PR if you want to see anything else implemented.
 
 Optional dependencies:
 
-- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be shown
+- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be rendered
 - [mini.icons](https://github.com/echasnovski/mini.icons) if you want icons next to the filetype
 
 You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if you want icons and separators.
+
+> [!TIP]
+> You can decide whether you would like to have a global statusline or one for each split by setting `vim.opt.laststatus` accordingly
+> in your settings.
+
+If you decide to **not** use a global one then you can configure via `components_inactive` what will be rendered in the inactive one.
+By default, all `components` will be shown. Inactive components will use the _secondary_ highlighting for primary parts.
 
 #### Default configuration
 
@@ -109,6 +119,15 @@ require('slimline').setup {
       'progress',
     },
   },
+
+  -- Inactive components
+  -- Uses all `components` by default.
+  -- E.g. for only showing `path`:
+  -- components_inactive = {
+  --   left = { 'path' },
+  --   right = {},
+  -- },
+  components_inactive = {},
 
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
@@ -143,8 +162,7 @@ require('slimline').setup {
       },
     },
     diagnostics = {
-      workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
-      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
+      workspace = false, -- Whether diagnostics should also show the total amount of workspace diagnostics
       icons = {
         ERROR = ' ',
         WARN = ' ',
@@ -201,12 +219,6 @@ or as a background color.
 > background will be used as a foreground color for text. Since a transparent theme has
 > no background color, Slimline will fall back to `#000000` for dark themes and to `#ffffff`
 > for white themes
-
-## Commands
-
-A `Slimline` command is available with the following sub commands:
-
-- `switch`: Accepts only one parameter until now: `style`. Will switch the global style
 
 ## Recipes
 
@@ -367,14 +379,16 @@ If you want to use internal render functionality of a component (here of the `pa
 
 ```lua
 function()
-    local h = require('slimline.highlights')
-    local c = require('slimline').config
-    return h.hl_component({ primary = 'Hello', secondary = 'World' }, h.hls.components['path'], c.sep)
+    return Slimline.highlights.hl_component(
+        { primary = 'Hello', secondary = 'World' },
+        Slimline.highlights.hls.components['path'],
+        Slimline.get_sep('path')
+    )
 end
 ```
 
 > [!WARNING]
-> The component to use the highlights from needs to be configured in your `components` since slimline only creates highlights for used ones.
+> The component to use the highlights and seperator from needs to be configured in your `components` since slimline only creates highlights for used ones.
 
 It will now render to that (depending on the config)
 
@@ -397,3 +411,8 @@ hl = {
     }
 }
 ```
+
+## Similar plugins
+
+- [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
+- [echasnovski/mini.statusline](https://github.com/echasnovski/mini.statusline/blob/main/README.md)

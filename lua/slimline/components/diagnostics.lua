@@ -1,12 +1,111 @@
-local highlights = require('slimline.highlights')
-local config = require('slimline').config
-local name = 'diagnostics'
-local M = {}
+local C = {}
+local diagnostics = {}
 
-local last_diagnostic_component = ''
+local config = Slimline.config.configs.diagnostics
+local icons = config.icons
+local style = config.style or Slimline.config.style
+local direction_ = nil
+local sep_ = vim.defaulttable()
+local initialized = false
 
 local function capitalize(str)
   return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2))
+end
+
+local function get_diagnostic_count(buf_id)
+  local res = {
+    ERROR = 0,
+    WARN = 0,
+    HINT = 0,
+    INFO = 0,
+  }
+  for _, d in ipairs(vim.diagnostic.get(buf_id)) do
+    local sev = vim.diagnostic.severity[d.severity]
+    res[sev] = res[sev] + 1
+  end
+  return res
+end
+
+local function get_count_format(buffer, workspace)
+  local count = ''
+  if buffer > 0 then
+    count = string.format('%d', buffer)
+  end
+  if workspace > 0 and buffer ~= workspace then
+    count = string.format('%s(%d)', count, workspace)
+  end
+  return count
+end
+
+local function format(buffer, workspace)
+  local parts = {}
+
+  for severity, bc in pairs(buffer) do
+    local capsev = capitalize(severity)
+    local wc = workspace[severity]
+    if wc > 0 or bc > 0 then
+      local count = get_count_format(bc, wc)
+      if style == 'fg' then
+        local hl = 'SlimlineDiagnostic' .. capitalize(severity)
+        table.insert(parts, string.format('%%#%s#%s%s', hl, icons[severity], count))
+      else
+        table.insert(
+          parts,
+          Slimline.highlights.hl_component({ primary = string.format('%s%s', icons[severity], count) }, {
+            primary = {
+              text = 'SlimlineDiagnosticVirtualText' .. capsev,
+              sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
+            },
+          }, sep_, direction_, true)
+        )
+      end
+    end
+  end
+
+  if #parts > 0 then
+    table.insert(parts, string.format('%%#%s#', Slimline.highlights.hls.base))
+  end
+
+  return table.concat(parts, Slimline.config.spaces.components)
+end
+
+local track_diagnostics = vim.schedule_wrap(function(data)
+  if not vim.api.nvim_buf_is_valid(data.buf) then
+    diagnostics[data.buf] = nil
+    return
+  end
+
+  if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
+    return
+  end
+
+  local buffer_counts = get_diagnostic_count(0)
+  local workspace_counts = {
+    ERROR = 0,
+    WARN = 0,
+    HINT = 0,
+    INFO = 0,
+  }
+  if config.workspace then
+    workspace_counts = get_diagnostic_count(nil)
+  end
+  diagnostics[data.buf] = format(buffer_counts, workspace_counts)
+  vim.cmd.redrawstatus()
+end)
+
+--- @param sep {left: string, right: string}
+--- @param direction string
+local function init(sep, direction)
+  if initialized then
+    return
+  end
+
+  sep_ = sep
+  direction_ = direction
+
+  initialized = true
+
+  Slimline.au({ 'DiagnosticChanged', 'BufEnter', 'ModeChanged' }, '*', track_diagnostics, 'Track Diagnostics')
 end
 
 --- @param sep {left: string, right: string}
@@ -14,74 +113,10 @@ end
 --- |'"right"'
 --- |'"left"'
 --- @return string
-function M.render(sep, direction, _)
-  -- Lazy uses diagnostic icons, but those aren"t errors per se.
-  if vim.bo.filetype == 'lazy' then
-    return ''
-  end
+function C.render(sep, direction, _)
+  init(sep, direction)
 
-  -- Use the last computed value if in insert mode.
-  if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
-    return last_diagnostic_component
-  end
-
-  local buffer
-  if config.configs.diagnostics.workspace then
-    buffer = nil
-  else
-    buffer = 0
-  end
-  local counts = vim.iter(vim.diagnostic.get(buffer)):fold({
-    ERROR = 0,
-    WARN = 0,
-    HINT = 0,
-    INFO = 0,
-  }, function(acc, diagnostic)
-    local severity = vim.diagnostic.severity[diagnostic.severity]
-    acc[severity] = acc[severity] + 1
-    return acc
-  end)
-
-  local icons = config.configs[name].icons
-
-  local style = config.style
-  if config.configs[name].style ~= nil then
-    style = config.configs[name].style
-  end
-
-  local parts = vim
-    .iter(counts)
-    :map(function(severity, count)
-      local capsev = capitalize(severity)
-      if count == 0 then
-        if style == 'fg' or config.configs[name].placeholders ~= true then
-          return nil
-        end
-        return highlights.hl_component({ primary = '' }, {
-          primary = {
-            text = 'SlimlineDiagnosticVirtualText' .. capsev,
-            sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-          },
-        }, sep, direction)
-      end
-      if style == 'fg' then
-        local hl = 'SlimlineDiagnostic' .. capitalize(severity)
-        return string.format('%%#%s#%s%%#%s#%d', hl, icons[severity], highlights.hls.base, count)
-      end
-      return highlights.hl_component({ primary = string.format('%s%d', icons[severity], count) }, {
-        primary = {
-          text = 'SlimlineDiagnosticVirtualText' .. capsev,
-          sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-        },
-      }, sep, direction)
-    end)
-    :totable()
-
-  last_diagnostic_component = table.concat(parts, config.spaces.components)
-  if last_diagnostic_component == '' then
-    return ''
-  end
-  return last_diagnostic_component
+  return diagnostics[vim.api.nvim_get_current_buf()] or ''
 end
 
-return M
+return C

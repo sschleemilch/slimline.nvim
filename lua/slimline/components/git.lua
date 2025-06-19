@@ -1,15 +1,12 @@
-local M = {}
-local highlights = require('slimline.highlights')
-local config = require('slimline').config
-local name = 'git'
+local C = {}
 
---- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
 --- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param active boolean
 --- @return string
-function M.render(sep, direction, hls)
+function C.render(sep, direction, hls, active)
   local status = vim.b.gitsigns_status_dict
   if not status then
     return ''
@@ -18,7 +15,7 @@ function M.render(sep, direction, hls)
     return ''
   end
 
-  local icons = config.configs[name].icons
+  local icons = Slimline.config.configs['git'].icons
 
   local branch = string.format('%s %s', icons.branch, status.head)
 
@@ -39,7 +36,13 @@ function M.render(sep, direction, hls)
       table.insert(mods, string.format('%s%s', icons.removed, status.removed))
     end
   end
-  return highlights.hl_component({ primary = branch, secondary = table.concat(mods, ' ') }, hls, sep, direction)
+  return Slimline.highlights.hl_component(
+    { primary = branch, secondary = table.concat(mods, ' ') },
+    hls,
+    sep,
+    direction,
+    active
+  )
 end
 
-return M
+return C

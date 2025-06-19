@@ -1,21 +1,30 @@
-local M = {}
-local highlights = require('slimline.highlights')
-local utils = require('slimline.utils')
-local config = require('slimline').config
+local verbose = Slimline.config.configs.mode.verbose
+local initialized = false
+
+local C = {}
+
+local function init()
+  if initialized then
+    return
+  end
+  vim.opt.showmode = false
+  initialized = true
+end
 
 --- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
 --- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param active boolean
 --- @return string
-function M.render(sep, direction, hls)
-  local mode = utils.get_mode()
-  local render = mode
-  if config.configs.mode.verbose == false then
-    render = string.sub(mode, 1, 1)
+function C.render(sep, direction, hls, active)
+  init()
+  local mode = Slimline.get_mode()
+  if not verbose then
+    mode = string.sub(mode, 1, 1)
   end
-  return highlights.hl_component({ primary = render }, hls, sep, direction)
+  return Slimline.highlights.hl_component({ primary = mode }, hls, sep, direction, active)
 end
 
-return M
+return C

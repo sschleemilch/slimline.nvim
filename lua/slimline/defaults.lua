@@ -19,6 +19,8 @@ local M = {
     },
   },
 
+  components_inactive = {},
+
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
   -- `<component>.sep` can be used to overwrite the global 'sep.left' and `sep.right`
@@ -53,7 +55,6 @@ local M = {
     },
     diagnostics = {
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
-      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
       icons = {
         ERROR = ' ',
         WARN = ' ',

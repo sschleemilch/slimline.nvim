@@ -1,41 +1,43 @@
-local M = {}
+local C = {}
 
-local name = 'path'
-local highlights = require('slimline.highlights')
-local config = require('slimline').config
+local config = Slimline.config.configs.path
 
 --- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
 --- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param active boolean
 --- @return string
-function M.render(sep, direction, hls)
+function C.render(sep, direction, hls, active)
   if vim.bo.buftype ~= '' then
     return ''
   end
+
   local file = vim.fn.expand('%:t')
 
-  local icons = config.configs[name].icons
-
   if vim.bo.modified then
-    file = file .. ' ' .. icons.modified
+    file = file .. ' ' .. config.icons.modified
   end
   if vim.bo.readonly then
-    file = file .. ' ' .. icons.read_only
+    file = file .. ' ' .. config.read_only
   end
 
-  local path = nil
+  local path = ''
 
-  if config.configs.path.directory == true then
+  if config.directory == true then
     path = vim.fs.normalize(vim.fn.expand('%:.:h'))
     if #path == 0 then
       return ''
     end
-    path = icons.folder .. path
+    if path == '.' then
+      path = ''
+    else
+      path = config.icons.folder .. path
+    end
   end
 
-  return highlights.hl_component({ primary = file, secondary = path }, hls, sep, direction)
+  return Slimline.highlights.hl_component({ primary = file, secondary = path }, hls, sep, direction, active)
 end
 
-return M
+return C
