@@ -56,7 +56,8 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
 end
 
 local function create_diagnostic_highlights()
-  local style = Slimline.config.configs.diagnostics.style or Slimline.config.style
+  local slimline = require('slimline')
+  local style = slimline.config.configs.diagnostics.style or slimline.config.style
 
   if style == 'fg' then
     --- Make sure that Diagnostic* hl groups have base as background for fg mode

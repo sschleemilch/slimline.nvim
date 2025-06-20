@@ -4,6 +4,8 @@ local initialized = false
 
 local lsp_clients = {}
 
+local slimline = require('slimline')
+
 local track_lsp = vim.schedule_wrap(function(data)
   if not vim.api.nvim_buf_is_valid(data.buf) then
     lsp_clients[data.buf] = nil
@@ -33,7 +35,7 @@ local function init()
   end
   initialized = true
 
-  Slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
+  slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
 end
 
 --- @param direction string
@@ -49,13 +51,12 @@ function C.render(sep, direction, hls, active)
   if filetype == '' then
     filetype = '[No Name]'
   end
-  local icon = ''
   if with_icons then
-    icon = MiniIcons.get('filetype', filetype)
+    local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
     filetype = icon .. ' ' .. filetype
   end
 
-  return Slimline.highlights.hl_component(
+  return slimline.highlights.hl_component(
     { primary = filetype or '', secondary = lsp_clients[vim.api.nvim_get_current_buf()] or '' },
     hls,
     sep,

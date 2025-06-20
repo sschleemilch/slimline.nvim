@@ -1,5 +1,7 @@
 local C = {}
 
+local slimline = require('slimline')
+
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
@@ -15,7 +17,7 @@ function C.render(sep, direction, hls, active)
     return ''
   end
 
-  local icons = Slimline.config.configs['git'].icons
+  local icons = slimline.config.configs['git'].icons
 
   local branch = string.format('%s %s', icons.branch, status.head)
 
@@ -36,7 +38,7 @@ function C.render(sep, direction, hls, active)
       table.insert(mods, string.format('%s%s', icons.removed, status.removed))
     end
   end
-  return Slimline.highlights.hl_component(
+  return slimline.highlights.hl_component(
     { primary = branch, secondary = table.concat(mods, ' ') },
     hls,
     sep,

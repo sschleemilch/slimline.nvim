@@ -1,9 +1,11 @@
 local C = {}
 local diagnostics = {}
 
-local config = Slimline.config.configs.diagnostics
+local slimline = require('slimline')
+
+local config = slimline.config.configs.diagnostics
 local icons = config.icons
-local style = config.style or Slimline.config.style
+local style = config.style or slimline.config.style
 local direction_ = nil
 local sep_ = vim.defaulttable()
 local initialized = false
@@ -51,7 +53,7 @@ local function format(buffer, workspace)
       else
         table.insert(
           parts,
-          Slimline.highlights.hl_component({ primary = string.format('%s%s', icons[severity], count) }, {
+          slimline.highlights.hl_component({ primary = string.format('%s%s', icons[severity], count) }, {
             primary = {
               text = 'SlimlineDiagnosticVirtualText' .. capsev,
               sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
@@ -63,10 +65,10 @@ local function format(buffer, workspace)
   end
 
   if #parts > 0 then
-    table.insert(parts, string.format('%%#%s#', Slimline.highlights.hls.base))
+    table.insert(parts, string.format('%%#%s#', slimline.highlights.hls.base))
   end
 
-  return table.concat(parts, Slimline.config.spaces.components)
+  return table.concat(parts, slimline.config.spaces.components)
 end
 
 local track_diagnostics = vim.schedule_wrap(function(data)
@@ -105,7 +107,7 @@ local function init(sep, direction)
 
   initialized = true
 
-  Slimline.au({ 'DiagnosticChanged', 'BufEnter', 'ModeChanged' }, '*', track_diagnostics, 'Track Diagnostics')
+  slimline.au({ 'DiagnosticChanged', 'BufEnter', 'ModeChanged' }, '*', track_diagnostics, 'Track Diagnostics')
 end
 
 --- @param sep {left: string, right: string}

@@ -1,5 +1,6 @@
+local slimline = require('slimline')
 local C = {}
-local config = Slimline.config.configs.recording
+local config = slimline.config.configs.recording
 
 --- @param sep {left: string, right: string}
 --- @param direction string
@@ -14,7 +15,7 @@ function C.render(sep, direction, hls, active)
     return ''
   end
   local status = config.icon .. recording
-  return Slimline.highlights.hl_component({ primary = status }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = status }, hls, sep, direction, active)
 end
 
 return C

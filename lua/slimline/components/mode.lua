@@ -1,5 +1,6 @@
-local verbose = Slimline.config.configs.mode.verbose
+local slimline = require('slimline')
 local initialized = false
+local verbose = slimline.config.configs.mode.verbose
 
 local C = {}
 
@@ -20,11 +21,11 @@ end
 --- @return string
 function C.render(sep, direction, hls, active)
   init()
-  local mode = Slimline.get_mode()
+  local mode = slimline.get_mode()
   if not verbose then
     mode = string.sub(mode, 1, 1)
   end
-  return Slimline.highlights.hl_component({ primary = mode }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = mode }, hls, sep, direction, active)
 end
 
 return C

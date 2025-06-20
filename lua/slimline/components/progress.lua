@@ -1,5 +1,6 @@
+local slimline = require('slimline')
 local C = {}
-local config = Slimline.config.configs.progress
+local config = slimline.config.configs.progress
 
 --- @param sep {left: string, right: string}
 --- @param direction string
@@ -29,7 +30,7 @@ function C.render(sep, direction, hls, active)
 
   primary = string.format('%s %s / %s', config.icon, primary, total)
 
-  return Slimline.highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction, active)
 end
 
 return C

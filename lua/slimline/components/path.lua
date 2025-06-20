@@ -1,6 +1,7 @@
+local slimline = require('slimline')
 local C = {}
 
-local config = Slimline.config.configs.path
+local config = slimline.config.configs.path
 
 --- @param sep {left: string, right: string}
 --- @param direction string
@@ -37,7 +38,7 @@ function C.render(sep, direction, hls, active)
     end
   end
 
-  return Slimline.highlights.hl_component({ primary = file, secondary = path }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = file, secondary = path }, hls, sep, direction, active)
 end
 
 return C
