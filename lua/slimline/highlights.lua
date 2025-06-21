@@ -1,154 +1,11 @@
 local M = {}
 
-M.hls = {
-  base = nil,
-  components = {},
-}
+M.hls = vim.defaulttable()
 
-M.hls_created = false
+M.initialized = true
 
 local function firstToUpper(str)
   return (str:gsub('^%l', string.upper))
-end
-
-local function create_diagnostic_highlights()
-  --- Make sure that Diagnostic* hl groups have base as background for fg mode
-  M.create_hl('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
-  M.create_hl('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
-
-  local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
-  if dv_bg == nil then
-    M.create_hl('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticInfo', true, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticWarn', true, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextError', 'SlimlineDiagnosticError', true, false, nil, nil)
-  else
-    M.create_hl('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextWarn', 'DiagnosticVirtualTextWarn', false, false, nil, nil)
-    M.create_hl('DiagnosticVirtualTextError', 'DiagnosticVirtualTextError', false, false, nil, nil)
-  end
-
-  --- Create Diagnostic Seps for bg mode
-  local bg = vim.api.nvim_get_hl(0, { name = M.hls.base, link = false }).bg
-  local fg
-  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextError', link = false }).bg
-  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextWarn', link = false }).bg
-  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextInfo', link = false }).bg
-  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
-  fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextHint', link = false }).bg
-  vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
-end
-
-function M.create_hls()
-  if M.hls_created then
-    return
-  end
-
-  local config = require('slimline').config
-
-  M.hls.base = M.create_hl('', config.hl.base)
-
-  local components = {}
-  for _, section in pairs(config.components) do
-    for _, component in ipairs(section) do
-      table.insert(components, component)
-    end
-  end
-
-  --- Create component highlights
-  for _, component in ipairs(components) do
-    local component_config = config.configs[component]
-
-    if component_config and (component_config.follow == nil or component_config.follow == false) then
-      local inverse = false
-      local style = config.style
-      if component_config.style ~= nil then
-        style = component_config.style
-      end
-      if style == 'bg' then
-        inverse = true
-      end
-      local prefix = firstToUpper(component)
-
-      local secondary = config.hl.secondary
-      if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
-        secondary = config.configs[component].hl.secondary
-      end
-
-      if component == 'mode' then
-        local hls = config.configs['mode'].hl
-        M.hls.components[component] = {
-          normal = {
-            primary = {
-              text = M.create_hl(prefix .. 'Normal', hls.normal, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'NormalSep', hls.normal, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'NormalSep2Sec', hls.normal, false, false, secondary),
-            },
-          },
-          pending = {
-            primary = {
-              text = M.create_hl(prefix .. 'Pending', hls.pending, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'PendingSep2Sec', hls.pending, false, false, secondary),
-            },
-          },
-          visual = {
-            primary = {
-              text = M.create_hl(prefix .. 'Visual', hls.visual, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'VisualSep', hls.visual, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'VisualSep2Sec', hls.visual, false, false, secondary),
-            },
-          },
-          insert = {
-            primary = {
-              text = M.create_hl(prefix .. 'Insert', hls.insert, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'InsertSep', hls.insert, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'InsertSep2Sec', hls.insert, false, false, secondary),
-            },
-          },
-          command = {
-            primary = {
-              text = M.create_hl(prefix .. 'Command', hls.command, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'CommandSep2Sec', hls.command, false, false, secondary),
-            },
-          },
-          secondary = {
-            text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
-            sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
-          },
-        }
-      else
-        if component == 'diagnostics' then
-          create_diagnostic_highlights()
-        else
-          local primary = config.hl.primary
-          if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
-            primary = config.configs[component].hl.primary
-          end
-
-          M.hls.components[component] = {
-            primary = {
-              text = M.create_hl(prefix .. 'Primary', primary, inverse, config.bold, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'PrimarySep', primary, false, false, nil, M.hls.base),
-              sep2sec = M.create_hl(prefix .. 'PrimarySep2Sec', primary, false, false, secondary),
-            },
-            secondary = {
-              text = M.create_hl(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
-              sep = M.create_hl(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
-            },
-          }
-        end
-      end
-    end
-  end
-
-  M.hls_created = true
 end
 
 ---@param hl string
@@ -158,7 +15,7 @@ end
 ---@param bg_from_fg string?
 ---@param bg_from_bg string?
 ---@return string
-function M.create_hl(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
+local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then
     hl = basename .. hl
@@ -198,6 +55,156 @@ function M.create_hl(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   return hl
 end
 
+local function create_diagnostic_highlights()
+  local slimline = require('slimline')
+  local style = slimline.config.configs.diagnostics.style or slimline.config.style
+
+  if style == 'fg' then
+    --- Make sure that Diagnostic* hl groups have base as background for fg mode
+    create('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
+    create('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
+    create('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
+    create('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
+  else
+    local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
+    if dv_bg == nil then
+      create('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
+      create('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticInfo', true, false, nil, nil)
+      create('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticWarn', true, false, nil, nil)
+      create('DiagnosticVirtualTextError', 'SlimlineDiagnosticError', true, false, nil, nil)
+    else
+      create('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
+      create('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
+      create('DiagnosticVirtualTextWarn', 'DiagnosticVirtualTextWarn', false, false, nil, nil)
+      create('DiagnosticVirtualTextError', 'DiagnosticVirtualTextError', false, false, nil, nil)
+    end
+
+    --- Create Diagnostic Seps for bg mode
+    local bg = vim.api.nvim_get_hl(0, { name = M.hls.base, link = false }).bg
+    local fg
+    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextError', link = false }).bg
+    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
+    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextWarn', link = false }).bg
+    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
+    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextInfo', link = false }).bg
+    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
+    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextHint', link = false }).bg
+    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
+  end
+end
+
+function M.create()
+  if not M.initialized then
+    return
+  end
+
+  local config = require('slimline').config
+
+  M.hls.base = create('', config.hl.base)
+
+  local components = {}
+  for _, section in pairs(config.components) do
+    for _, component in ipairs(section) do
+      components[component] = {}
+    end
+  end
+  for _, section in pairs(config.components_inactive) do
+    for _, component in ipairs(section) do
+      components[component] = {}
+    end
+  end
+
+  --- Create component highlights
+  for component, _ in pairs(components) do
+    local component_config = config.configs[component]
+
+    if component_config and (component_config.follow == nil or component_config.follow == false) then
+      local inverse = false
+      local style = config.style
+      if component_config.style ~= nil then
+        style = component_config.style
+      end
+      if style == 'bg' then
+        inverse = true
+      end
+      local prefix = firstToUpper(component)
+
+      local secondary = config.hl.secondary
+      if config.configs[component] and config.configs[component].hl and config.configs[component].hl.secondary then
+        secondary = config.configs[component].hl.secondary
+      end
+
+      if component == 'mode' then
+        local hls = config.configs['mode'].hl
+        M.hls.components[component] = {
+          normal = {
+            primary = {
+              text = create(prefix .. 'Normal', hls.normal, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'NormalSep', hls.normal, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'NormalSep2Sec', hls.normal, false, false, secondary),
+            },
+          },
+          pending = {
+            primary = {
+              text = create(prefix .. 'Pending', hls.pending, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'PendingSep2Sec', hls.pending, false, false, secondary),
+            },
+          },
+          visual = {
+            primary = {
+              text = create(prefix .. 'Visual', hls.visual, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'VisualSep', hls.visual, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'VisualSep2Sec', hls.visual, false, false, secondary),
+            },
+          },
+          insert = {
+            primary = {
+              text = create(prefix .. 'Insert', hls.insert, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'InsertSep', hls.insert, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'InsertSep2Sec', hls.insert, false, false, secondary),
+            },
+          },
+          command = {
+            primary = {
+              text = create(prefix .. 'Command', hls.command, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'CommandSep2Sec', hls.command, false, false, secondary),
+            },
+          },
+          secondary = {
+            text = create(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
+            sep = create(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
+          },
+        }
+      else
+        if component == 'diagnostics' then
+          create_diagnostic_highlights()
+        else
+          local primary = config.hl.primary
+          if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
+            primary = config.configs[component].hl.primary
+          end
+
+          M.hls.components[component] = {
+            primary = {
+              text = create(prefix .. 'Primary', primary, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'PrimarySep', primary, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'PrimarySep2Sec', primary, false, false, secondary),
+            },
+            secondary = {
+              text = create(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base),
+              sep = create(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base),
+            },
+          }
+        end
+      end
+    end
+  end
+
+  M.initialized = false
+end
+
 --- Helper function to highlight a given content
 --- Resets the highlight afterwards
 --- @param content string?
@@ -235,23 +242,47 @@ end
 ---@param direction string?
 ---|"'left'"
 ---|"'right'"
+---@param active boolean
 ---@return string
-function M.hl_component(content, hl, sep, direction)
+function M.hl_component(content, hl, sep, direction, active)
+  active = active == nil or active
   local result
   if content.primary == nil then
     return ''
   end
 
   if content.secondary == nil then
-    result = M.hl_content(M.pad(content.primary), hl.primary, sep.left, sep.right)
+    if active then
+      result = M.hl_content(M.pad(content.primary), hl.primary, sep.left, sep.right)
+    else
+      result = M.hl_content(M.pad(content.primary), hl.secondary, sep.left, sep.right)
+    end
   else
     if direction == 'left' then
       result = M.hl_content(M.pad(content.secondary), hl.secondary, sep.left)
-      result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec })
-      result = result .. M.hl_content(M.pad(content.primary), hl.primary, nil, sep.right)
+      if active then
+        result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec })
+        result = result .. M.hl_content(M.pad(content.primary), hl.primary, nil, sep.right)
+      else
+        local fill = ' '
+        if sep.left == '' and sep.right == '' then
+          fill = ''
+        end
+        result = result .. M.hl_content(fill, { text = hl.secondary.text })
+        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, nil, sep.right)
+      end
     else
-      result = M.hl_content(M.pad(content.primary), hl.primary, sep.left)
-      result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec })
+      if active then
+        result = M.hl_content(M.pad(content.primary), hl.primary, sep.left)
+        result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec })
+      else
+        local fill = ' '
+        if sep.left == '' and sep.right == '' then
+          fill = ''
+        end
+        result = M.hl_content(M.pad(content.primary), hl.secondary, sep.left)
+        result = result .. M.hl_content(fill, { text = hl.secondary.text })
+      end
       result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, nil, sep.right)
     end
   end

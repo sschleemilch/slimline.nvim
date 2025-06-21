@@ -1,15 +1,15 @@
-local M = {}
-local highlights = require('slimline.highlights')
-local config = require('slimline').config
-local name = 'progress'
+local slimline = require('slimline')
+local C = {}
+local config = slimline.config.configs.progress
 
 --- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
 --- |'"left"'
 --- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param active boolean
 --- @return string
-function M.render(sep, direction, hls)
+function C.render(sep, direction, hls, active)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local primary
@@ -23,14 +23,14 @@ function M.render(sep, direction, hls)
 
   local secondary = ''
 
-  if config.configs[name].column then
+  if config.column then
     local col = vim.fn.col('.')
     secondary = string.format('%3d', col)
   end
 
-  primary = string.format('%s %s / %s', config.configs[name].icon, primary, total)
+  primary = string.format('%s %s / %s', config.icon, primary, total)
 
-  return highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction)
+  return slimline.highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction, active)
 end
 
-return M
+return C

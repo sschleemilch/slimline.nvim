@@ -11,23 +11,21 @@
 
 <!-- panvimdoc-ignore-end -->
 
-A minimal Neovim statusline written in Lua.
-Do we need another statusline? Probably not, do we have one? Yep
+Another Neovim statusline written in Lua.
 
-It started with doing my own statusline implementation.
-Reason for writing it was mainly just 4 fun and having exactly what I want, function and aesthetic wise.
+The goal is to provide a visual pleasing and efficient statusline.
+It started with writing my own statusline.
+Reason for writing was to learn more about the Neovim ecosystem and having exactly what I want, function and aesthetic wise.
 
-## Screenshots
+In the meantime it is a quite generic and configurable alternative to other popular statuslines.
 
-Here are some screenshots. See [recipes](#recipes) for config examples.
+## Impressions
 
-![s22](./doc/screenshots/s22.png)
+Here are some screenshots that might be a bit outdated. See [recipes](#recipes) for config examples.
+
 ![s1](./doc/screenshots/s1.png)
-![s3](./doc/screenshots/s3.png)
 ![s5](./doc/screenshots/s5.png)
 ![s17](./doc/screenshots/s17.png)
-![s11](./doc/screenshots/s11.png)
-![s12](./doc/screenshots/s12.png)
 ![s13](./doc/screenshots/s13.png)
 ![s18](./doc/screenshots/s18.png)
 ![s20](./doc/screenshots/s20.png)
@@ -35,30 +33,29 @@ Here are some screenshots. See [recipes](#recipes) for config examples.
 ![s9](./doc/screenshots/s9.png)
 ![s21](./doc/screenshots/s21.png)
 ![s10](./doc/screenshots/s10.png)
-![s14](./doc/screenshots/s14.png)
-![s15](./doc/screenshots/s15.png)
 ![s16](./doc/screenshots/s16.png)
 ![s6](./doc/screenshots/s6.png)
-![s7](./doc/screenshots/s7.png)
-![s8](./doc/screenshots/s8.png)
 ![s23](./doc/screenshots/s23.png)
+![split](./doc/screenshots/split.png)
 
 ## Components
 
 Available components:
 
-- `mode`, well, you know what it is
+- `mode`, well, you know what it is. Automatically sets `vim.opt.showmode = false`.
 - `path`, shows the filename and the relative path + modified / read-only info
 - `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
-- `diagnostics`, shows `vim.diagnostic` infos
-- `filetype_lsp`, shows the filetype and attached LSPs
-- `progress`, shows the file progress in % and the overall number of lines
-- `recording`, shows the register being used for recording (not enabled by default)
+- `diagnostics`, shows `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.
+- `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events.
+- `progress`, shows the file progress in % and the overall number of lines as well as the cursor column
+- `recording`, shows the register being used for macro recording
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
-Components can be configured more than once if desired.
 The components configuration accepts function calls and strings so that you can hook custom content into the line.
 See [Custom components](#custom-components) for an introduction.
+
+Components have a _flow_ direction which means that components on the left have their primary part on the left side
+and components on the right have their primary part on their right side.
 
 ## Contributing
 
@@ -80,10 +77,19 @@ Feel free to create an issue/PR if you want to see anything else implemented.
 
 Optional dependencies:
 
-- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be shown
+- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be rendered
 - [mini.icons](https://github.com/echasnovski/mini.icons) if you want icons next to the filetype
 
 You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if you want icons and separators.
+
+> [!TIP]
+> You can decide whether you would like to have a global statusline or one for each split by setting `vim.opt.laststatus` accordingly
+> in your settings.
+
+If you decide to **not** use a global one then you can configure via `components_inactive` what will be rendered in the inactive one.
+By default, all `components` will be shown. Inactive components will use the _secondary_ highlighting for primary parts.
+
+![split](./doc/screenshots/split.png) shows an example using default options.
 
 #### Default configuration
 
@@ -109,6 +115,15 @@ require('slimline').setup {
       'progress',
     },
   },
+
+  -- Inactive components
+  -- Uses all `components` by default.
+  -- E.g. for only showing `path`:
+  -- components_inactive = {
+  --   left = { 'path' },
+  --   right = {},
+  -- },
+  components_inactive = {},
 
   -- Component configuration
   -- `<component>.style` can be used to overwrite the global 'style'
@@ -143,8 +158,7 @@ require('slimline').setup {
       },
     },
     diagnostics = {
-      workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
-      placeholders = false, -- Whether to show empty boxes for zero values. Only relevant if `style==bg`
+      workspace = false, -- Whether diagnostics should also show the total amount of workspace diagnostics
       icons = {
         ERROR = ' ',
         WARN = ' ',
@@ -202,12 +216,6 @@ or as a background color.
 > no background color, Slimline will fall back to `#000000` for dark themes and to `#ffffff`
 > for white themes
 
-## Commands
-
-A `Slimline` command is available with the following sub commands:
-
-- `switch`: Accepts only one parameter until now: `style`. Will switch the global style
-
 ## Recipes
 
 ### Pure
@@ -253,7 +261,6 @@ opts = {
 
 ### Rainbow
 
-![s22](./doc/screenshots/s22.png)
 ![s23](./doc/screenshots/s23.png)
 
 ```lua
@@ -292,7 +299,7 @@ opts = {
 
 ### Slashes format
 
-![s11](./doc/screenshots/s11.png)
+![s13](./doc/screenshots/s13.png)
 
 ```lua
 opts = {
@@ -367,14 +374,16 @@ If you want to use internal render functionality of a component (here of the `pa
 
 ```lua
 function()
-    local h = require('slimline.highlights')
-    local c = require('slimline').config
-    return h.hl_component({ primary = 'Hello', secondary = 'World' }, h.hls.components['path'], c.sep)
+    return Slimline.highlights.hl_component(
+        { primary = 'Hello', secondary = 'World' },
+        Slimline.highlights.hls.components['path'],
+        Slimline.get_sep('path')
+    )
 end
 ```
 
 > [!WARNING]
-> The component to use the highlights from needs to be configured in your `components` since slimline only creates highlights for used ones.
+> The component to use the highlights and seperator from needs to be configured in your `components` since slimline only creates highlights for used ones.
 
 It will now render to that (depending on the config)
 
@@ -397,3 +406,8 @@ hl = {
     }
 }
 ```
+
+## Similar plugins
+
+- [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)
+- [echasnovski/mini.statusline](https://github.com/echasnovski/mini.statusline/blob/main/README.md)
