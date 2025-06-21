@@ -11,16 +11,17 @@
 
 <!-- panvimdoc-ignore-end -->
 
-A minimal Neovim statusline written in Lua.
+Another Neovim statusline written in Lua.
 
-It started with doing my own statusline implementation.
-Reason for writing it was mainly just 4 fun and having exactly what I want, function and aesthetic wise.
+The goal is to provide a visual pleasing and efficient statusline.
+It started with writing my own statusline.
+Reason for writing was to learn more about the Neovim ecosystem and having exactly what I want, function and aesthetic wise.
 
-In the meantime it is a quite generic visual pleasing and configurable statusline.
+In the meantime it is a quite generic and configurable alternative to other popular statuslines.
 
-## Screenshots
+## Impressions
 
-Here are some screenshots. See [recipes](#recipes) for config examples.
+Here are some screenshots that might be a bit outdated. See [recipes](#recipes) for config examples.
 
 ![s22](./doc/screenshots/s22.png)
 ![s1](./doc/screenshots/s1.png)
@@ -51,17 +52,17 @@ Available components:
 - `mode`, well, you know what it is. Automatically sets `vim.opt.showmode = false`.
 - `path`, shows the filename and the relative path + modified / read-only info
 - `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
-- `diagnostics`, shows `vim.diagnostic` infos. Diagnostics are computed on change only.
-- `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are computed on change only.
-- `progress`, shows the file progress in % and the overall number of lines
-- `recording`, shows the register being used for recording
+- `diagnostics`, shows `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.
+- `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events.
+- `progress`, shows the file progress in % and the overall number of lines as well as the cursor column
+- `recording`, shows the register being used for macro recording
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
-Components can be configured more than once if desired.
 The components configuration accepts function calls and strings so that you can hook custom content into the line.
 See [Custom components](#custom-components) for an introduction.
 
-The line respects and is compatible with `vim.opt.laststatus` settings.
+Components have a _flow_ direction which means that components on the left have their primary part on the left side
+and components on the right have their primary part on their right side.
 
 ## Contributing
 
