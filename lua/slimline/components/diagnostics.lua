@@ -67,8 +67,12 @@ local function format(buffer, workspace)
   if #parts > 0 then
     table.insert(parts, string.format('%%#%s#', slimline.highlights.hls.base))
   end
+  local sep = slimline.config.spaces.components
+  if style == 'fg' then
+    sep = ' '
+  end
 
-  return table.concat(parts, slimline.config.spaces.components)
+  return table.concat(parts, sep)
 end
 
 local track_diagnostics = vim.schedule_wrap(function(data)
