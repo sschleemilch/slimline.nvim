@@ -24,6 +24,7 @@ In the meantime it is a quite generic and configurable alternative to other popu
 Here are some screenshots that might be a bit outdated. See [recipes](#recipes) for config examples.
 
 ![s1](./doc/screenshots/s1.png)
+![s30](./doc/screenshots/s30.png)
 ![s5](./doc/screenshots/s5.png)
 ![s17](./doc/screenshots/s17.png)
 ![s13](./doc/screenshots/s13.png)
