@@ -23,13 +23,9 @@ In the meantime it is a quite generic and configurable alternative to other popu
 
 Here are some screenshots that might be a bit outdated. See [recipes](#recipes) for config examples.
 
-![s22](./doc/screenshots/s22.png)
 ![s1](./doc/screenshots/s1.png)
-![s3](./doc/screenshots/s3.png)
 ![s5](./doc/screenshots/s5.png)
 ![s17](./doc/screenshots/s17.png)
-![s11](./doc/screenshots/s11.png)
-![s12](./doc/screenshots/s12.png)
 ![s13](./doc/screenshots/s13.png)
 ![s18](./doc/screenshots/s18.png)
 ![s20](./doc/screenshots/s20.png)
@@ -37,13 +33,10 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 ![s9](./doc/screenshots/s9.png)
 ![s21](./doc/screenshots/s21.png)
 ![s10](./doc/screenshots/s10.png)
-![s14](./doc/screenshots/s14.png)
-![s15](./doc/screenshots/s15.png)
 ![s16](./doc/screenshots/s16.png)
 ![s6](./doc/screenshots/s6.png)
-![s7](./doc/screenshots/s7.png)
-![s8](./doc/screenshots/s8.png)
 ![s23](./doc/screenshots/s23.png)
+![split](./doc/screenshots/split.png)
 
 ## Components
 
@@ -95,6 +88,8 @@ You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if yo
 
 If you decide to **not** use a global one then you can configure via `components_inactive` what will be rendered in the inactive one.
 By default, all `components` will be shown. Inactive components will use the _secondary_ highlighting for primary parts.
+
+![split](./doc/screenshots/split.png) shows an example using default options.
 
 #### Default configuration
 
@@ -266,7 +261,6 @@ opts = {
 
 ### Rainbow
 
-![s22](./doc/screenshots/s22.png)
 ![s23](./doc/screenshots/s23.png)
 
 ```lua
@@ -305,7 +299,7 @@ opts = {
 
 ### Slashes format
 
-![s11](./doc/screenshots/s11.png)
+![s13](./doc/screenshots/s13.png)
 
 ```lua
 opts = {
