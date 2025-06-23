@@ -3,6 +3,7 @@ local with_icons = false
 local initialized = false
 
 local lsp_clients = {}
+local MiniIcons = {}
 
 local slimline = require('slimline')
 
@@ -29,7 +30,8 @@ local function init()
   if initialized then
     return
   end
-  local ok, _ = pcall(require, 'mini.icons')
+  local ok
+  ok, MiniIcons = pcall(require, 'mini.icons')
   if ok then
     with_icons = true
   end
