@@ -21,7 +21,7 @@ function C.render(sep, direction, hls, active)
     file = file .. ' ' .. config.icons.modified
   end
   if vim.bo.readonly then
-    file = file .. ' ' .. config.read_only
+    file = file .. ' ' .. config.icons.read_only
   end
 
   local path = ''
