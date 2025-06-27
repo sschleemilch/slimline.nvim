@@ -151,6 +151,11 @@ end
 ---@return string
 function Slimline.render(active)
   Slimline.highlights.create()
+
+  if vim.tbl_contains(Slimline.config.disabled_filetypes, vim.bo.filetype) then
+    return '%#Slimline#'
+  end
+
   local components = Slimline.active
   local is_active = active == 1
   if not is_active then

@@ -96,6 +96,9 @@ local M = {
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
+
+  -- Hide statusline on filetypes
+  disabled_filetypes = {},
 }
 
 return M
