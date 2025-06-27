@@ -31,7 +31,7 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
 
   local hl_normal = vim.api.nvim_get_hl(0, { name = 'Normal', link = false })
   local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from_fg, link = false })
-  local fg = hl_ref.fg or 'fg'
+  local fg = hl_ref.fg or hl_normal.fg
   local bg = hl_bg_ref.fg or hl_ref.bg or hl_normal.bg
   if bg_from_bg ~= nil then
     bg = vim.api.nvim_get_hl(0, { name = bg_from_bg, link = false }).bg
