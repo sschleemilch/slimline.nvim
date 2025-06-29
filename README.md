@@ -117,6 +117,9 @@ require('slimline').setup {
     },
   },
 
+  -- Hide statusline in the following filetypes
+  disabled_filetypes = {},
+
   -- Inactive components
   -- Uses all `components` by default.
   -- E.g. for only showing `path`:
