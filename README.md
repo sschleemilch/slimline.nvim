@@ -44,7 +44,7 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 Available components:
 
 - `mode`, well, you know what it is. Automatically sets `vim.opt.showmode = false`.
-- `path`, shows the filename and the relative path + modified / read-only info
+- `path`, shows the filename and the relative path + modified / read-only info. The directory path will be truncated. Can be disabled and configured.
 - `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
 - `diagnostics`, shows `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.
 - `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events.
@@ -147,6 +147,11 @@ require('slimline').setup {
     },
     path = {
       directory = true, -- Whether to show the directory
+      -- truncates the directory path. Can be disabled by setting `truncate = false`
+      truncate = {
+        chars = 1, -- number of characters for each path component
+        full_dirs = 2, -- how many path components to keep unshortened
+      },
       icons = {
         folder = ' ',
         modified = '',
