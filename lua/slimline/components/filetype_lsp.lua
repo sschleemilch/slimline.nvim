@@ -6,6 +6,7 @@ local lsp_clients = {}
 local MiniIcons = {}
 
 local slimline = require('slimline')
+local config = slimline.config.configs.filetype_lsp
 
 local track_lsp = vim.schedule_wrap(function(data)
   if not vim.api.nvim_buf_is_valid(data.buf) then
@@ -13,9 +14,13 @@ local track_lsp = vim.schedule_wrap(function(data)
     return
   end
   local attached_clients = vim.lsp.get_clients { bufnr = data.buf }
+
   local it = vim.iter(attached_clients)
   it:map(function(client)
-    local name = client.name:gsub('language.server', 'ls')
+    if config.map_lsps[client.name] == false then
+      return nil
+    end
+    local name = config.map_lsps[client.name] or client.name:gsub('language.server', 'ls')
     return name
   end)
   local names = it:totable()

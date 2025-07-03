@@ -66,7 +66,11 @@ local M = {
         INFO = ' ',
       },
     },
-    filetype_lsp = {},
+    filetype_lsp = {
+      -- Map lsp client names to custom names or ignore them by setting to `false`
+      -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
+      map_lsps = {},
+    },
     progress = {
       follow = 'mode',
       column = false, -- Enables a secondary section with the cursor column
