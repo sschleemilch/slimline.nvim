@@ -39,6 +39,10 @@ local M = {
     },
     path = {
       directory = true, -- Whether to show the directory
+      truncate = {
+        chars = 1,
+        full_dirs = 2,
+      },
       icons = {
         folder = ' ',
         modified = '',

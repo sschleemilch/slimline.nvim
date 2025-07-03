@@ -3,6 +3,32 @@ local C = {}
 
 local config = slimline.config.configs.path
 
+---@param path string
+---@param chars integer
+---@param full_dirs integer
+---@return string
+local function truncate(path, chars, full_dirs)
+  local parts = {}
+  for part in path:gmatch('[^/]+') do
+    table.insert(parts, part)
+  end
+
+  local truncated = {}
+  local n_parts = #parts
+
+  for i, component in ipairs(parts) do
+    if i > (n_parts - full_dirs) then
+      table.insert(truncated, component)
+    elseif #component > chars then
+      table.insert(truncated, component:sub(1, chars))
+    else
+      table.insert(truncated, component)
+    end
+  end
+
+  return table.concat(truncated, '/')
+end
+
 --- @param sep {left: string, right: string}
 --- @param direction string
 --- |'"right"'
@@ -34,6 +60,9 @@ function C.render(sep, direction, hls, active)
     if path == '.' then
       path = ''
     else
+      if config.truncate then
+        path = truncate(path, config.truncate.chars, config.truncate.full_dirs)
+      end
       path = config.icons.folder .. path
     end
   end
