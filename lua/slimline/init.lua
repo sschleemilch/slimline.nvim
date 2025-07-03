@@ -1,7 +1,7 @@
 local Slimline = {}
 Slimline.highlights = require('slimline.highlights')
 
----@alias Component function
+---@alias Component {name: string, render: function}
 
 ---@type table<string, Component[]>
 Slimline.active = vim.defaulttable()
@@ -100,7 +100,7 @@ end
 ---@return Component
 local function get_component(component, position, direction)
   if type(component) == 'function' then
-    return component
+    return { name = nil, render = component }
   elseif type(component) == 'string' then
     local ok, cmp = pcall(require, string.format('slimline.components.%s', component))
     if ok then
@@ -114,35 +114,59 @@ local function get_component(component, position, direction)
       if Slimline.config.sep.hide.last and position == 'last' then
         sep.right = ''
       end
-      return function(active)
-        local hls = Slimline.highlights.hls.components[component]
-        if component == 'mode' then
-          hls = Slimline.highlights.get_mode_hl(Slimline.get_mode().long)
-        end
-        return cmp.render(sep, direction, hls, active)
-      end
+      return {
+        name = component,
+        render = function(active)
+          local hls = Slimline.highlights.hls.components[component]
+          if component == 'mode' then
+            hls = Slimline.highlights.get_mode_hl(Slimline.get_mode().long)
+          end
+          return cmp.render(sep, direction, hls, active)
+        end,
+      }
     else
-      return function()
-        return component
-      end
+      return {
+        name = nil,
+        render = function()
+          return component
+        end,
+      }
     end
   end
-  return function()
-    return ''
-  end
+  return {
+    name = nil,
+    render = function()
+      return ''
+    end,
+  }
 end
 
 ---@param active boolean
 ---@param components Component[]
 ---@return string
 function Slimline.concat_components(components, active)
+  local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+  components = vim.tbl_filter(function(component)
+    if component.name == nil then
+      return true
+    end
+    local trunc_width = Slimline.config.configs[component.name].trunc_width
+    if not trunc_width or trunc_width < 0 then
+      return true
+    end
+    return trunc_width <= win_width
+  end, components)
+
   local result = ''
   for i, component in ipairs(components) do
     local space = Slimline.config.spaces.components
     if i == 1 then
       space = ''
     end
-    result = result .. space .. component(active)
+    local content = component.render(active)
+    if content ~= '' then
+      result = result .. space .. content
+    end
   end
   return result
 end

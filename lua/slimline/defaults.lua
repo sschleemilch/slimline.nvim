@@ -56,6 +56,7 @@ local M = {
         modified = '~',
         removed = '-',
       },
+      trunc_width = 120,
     },
     diagnostics = {
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
@@ -70,6 +71,7 @@ local M = {
       -- Map lsp client names to custom names or ignore them by setting to `false`
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
+      trunc_width = 120,
     },
     progress = {
       follow = 'mode',
