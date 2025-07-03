@@ -43,16 +43,16 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 
 Available components:
 
-- `mode`, well, you know what it is. Automatically sets `vim.opt.showmode = false`.
+- `mode`, vim mode. Automatically sets `vim.opt.showmode = false`.
 - `path`, shows the filename and the relative path + modified / read-only info. The directory path will be truncated. Can be disabled and configured.
 - `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
 - `diagnostics`, shows `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.
-- `filetype_lsp`, shows the filetype and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events.
+- `filetype_lsp`, shows the file type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`.
 - `progress`, shows the file progress in % and the overall number of lines as well as the cursor column
 - `recording`, shows the register being used for macro recording
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
-The components configuration accepts function calls and strings so that you can hook custom content into the line.
+The `components` entries accept function calls and strings so that you can create custom comonents.
 See [Custom components](#custom-components) for an introduction.
 
 Components have a _flow_ direction which means that components on the left have their primary part on the left side
@@ -175,7 +175,12 @@ require('slimline').setup {
         INFO = ' ',
       },
     },
-    filetype_lsp = {},
+    filetype_lsp = {
+      -- Map lsp client names to custom names or ignore them by setting to `false`
+      -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
+      map_lsps = {},
+    },
+    },
     progress = {
       follow = 'mode',
       column = false, -- Enables a secondary section with the cursor column

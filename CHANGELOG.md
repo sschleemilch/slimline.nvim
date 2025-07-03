@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `path`: fish like `truncate`. Enabled by default with `chars = 1` and `full_dirs = 2`
+- `filetype_lsp`: `map_lsps` option to disable LSPs or change their display name
 
 ## [2.1.0] - 2025-06-29
 
