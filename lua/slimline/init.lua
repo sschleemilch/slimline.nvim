@@ -14,49 +14,49 @@ function Slimline.au(event, pattern, callback, desc)
 end
 
 --- Function to translate a mode into a string to show
---- @return string
+--- @return { long: string, short: string }
 function Slimline.get_mode()
   -- Note that: \19 = ^S and \22 = ^V.
   local mode_map = {
-    ['n'] = 'NORMAL',
-    ['no'] = 'OP-PENDING',
-    ['nov'] = 'OP-PENDING',
-    ['noV'] = 'OP-PENDING',
-    ['no\22'] = 'OP-PENDING',
-    ['niI'] = 'NORMAL',
-    ['niR'] = 'NORMAL',
-    ['niV'] = 'NORMAL',
-    ['nt'] = 'NORMAL',
-    ['ntT'] = 'NORMAL',
-    ['v'] = 'VISUAL',
-    ['vs'] = 'VISUAL',
-    ['V'] = 'VISUAL',
-    ['Vs'] = 'VISUAL',
-    ['\22'] = 'VISUAL',
-    ['\22s'] = 'VISUAL',
-    ['s'] = 'SELECT',
-    ['S'] = 'SELECT',
-    ['\19'] = 'SELECT',
-    ['i'] = 'INSERT',
-    ['ic'] = 'INSERT',
-    ['ix'] = 'INSERT',
-    ['R'] = 'REPLACE',
-    ['Rc'] = 'REPLACE',
-    ['Rx'] = 'REPLACE',
-    ['Rv'] = 'VIRT REPLACE',
-    ['Rvc'] = 'VIRT REPLACE',
-    ['Rvx'] = 'VIRT REPLACE',
-    ['c'] = 'COMMAND',
-    ['cv'] = 'VIM EX',
-    ['ce'] = 'EX',
-    ['r'] = 'PROMPT',
-    ['rm'] = 'MORE',
-    ['r?'] = 'CONFIRM',
-    ['!'] = 'SHELL',
-    ['t'] = 'TERMINAL',
+    ['n'] = { long = 'NORMAL', short = 'N' },
+    ['no'] = { long = 'OP-PENDING', short = 'O-P' },
+    ['nov'] = { long = 'OP-PENDING', short = 'O-P' },
+    ['noV'] = { long = 'OP-PENDING', short = 'O-P' },
+    ['no\22'] = { long = 'OP-PENDING', short = 'O-P' },
+    ['niI'] = { long = 'NORMAL', short = 'N' },
+    ['niR'] = { long = 'NORMAL', short = 'N' },
+    ['niV'] = { long = 'NORMAL', short = 'N' },
+    ['nt'] = { long = 'NORMAL', short = 'N' },
+    ['ntT'] = { long = 'NORMAL', short = 'N' },
+    ['v'] = { long = 'VISUAL', short = 'V' },
+    ['vs'] = { long = 'VISUAL', short = 'V' },
+    ['V'] = { long = 'VISUAL LINE', short = 'V-L' },
+    ['Vs'] = { long = 'VISUAL LINE', short = 'V-L' },
+    ['\22'] = { long = 'VISUAL BLOCK', short = 'V-B' },
+    ['\22s'] = { long = 'VISUAL BLOCK', short = 'V-B' },
+    ['s'] = { long = 'SELECT', short = 'S' },
+    ['S'] = { long = 'SELECT LINE', short = 'S-L' },
+    ['\19'] = { long = 'SELECT BLOCK', short = 'S-B' },
+    ['i'] = { long = 'INSERT', short = 'I' },
+    ['ic'] = { long = 'INSERT', short = 'I' },
+    ['ix'] = { long = 'INSERT', short = 'I' },
+    ['R'] = { long = 'REPLACE', short = 'R' },
+    ['Rc'] = { long = 'REPLACE', short = 'R' },
+    ['Rx'] = { long = 'REPLACE', short = 'R' },
+    ['Rv'] = { long = 'VIRT REPLACE', short = 'V-R' },
+    ['Rvc'] = { long = 'VIRT REPLACE', short = 'V-R' },
+    ['Rvx'] = { long = 'VIRT REPLACE', short = 'V-R' },
+    ['c'] = { long = 'COMMAND', short = 'C' },
+    ['cv'] = { long = 'VIM EX', short = 'V-E' },
+    ['ce'] = { long = 'EX', short = 'E' },
+    ['r'] = { long = 'PROMPT', short = 'P' },
+    ['rm'] = { long = 'MORE', short = 'M' },
+    ['r?'] = { long = 'CONFIRM', short = 'C' },
+    ['!'] = { long = 'SHELL', short = 'S' },
+    ['t'] = { long = 'TERMINAL', short = 'T' },
   }
 
-  local mode = mode_map[vim.fn.mode()] or 'UNKNOWN'
+  local mode = mode_map[vim.fn.mode()] or { long = 'UNKNOWN', short = 'U' }
   return mode
 end
 
@@ -117,7 +117,7 @@ local function get_component(component, position, direction)
       return function(active)
         local hls = Slimline.highlights.hls.components[component]
         if component == 'mode' then
-          hls = Slimline.highlights.get_mode_hl(Slimline.get_mode())
+          hls = Slimline.highlights.get_mode_hl(Slimline.get_mode().long)
         end
         return cmp.render(sep, direction, hls, active)
       end

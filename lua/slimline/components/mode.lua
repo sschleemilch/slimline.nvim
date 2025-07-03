@@ -22,10 +22,11 @@ end
 function C.render(sep, direction, hls, active)
   init()
   local mode = slimline.get_mode()
-  if not verbose then
-    mode = string.sub(mode, 1, 1)
+  local primary = mode.short
+  if verbose then
+    primary = mode.long
   end
-  return slimline.highlights.hl_component({ primary = mode }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = primary }, hls, sep, direction, active)
 end
 
 return C
