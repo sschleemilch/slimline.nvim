@@ -13,50 +13,39 @@ function Slimline.au(event, pattern, callback, desc)
   vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc })
 end
 
---- Function to translate a mode into a string to show
---- @return { long: string, short: string }
+--- @param key string
+--- @param hl table
+--- @return { verbose: string, short: string, hls: table }
+local function get_mode_table(key, hl)
+  local entry = Slimline.config.configs.mode.format[key]
+  entry.hls = {
+    primary = hl.primary,
+    secondary = Slimline.highlights.hls.components.mode.secondary,
+  }
+  return entry
+end
+
+--- @return { verbose: string, short: string, hls: table }
 function Slimline.get_mode()
+  local hls = Slimline.highlights.hls.components.mode
   -- Note that: \19 = ^S and \22 = ^V.
   local mode_map = {
-    ['n'] = { long = 'NORMAL', short = 'N' },
-    ['no'] = { long = 'OP-PENDING', short = 'O-P' },
-    ['nov'] = { long = 'OP-PENDING', short = 'O-P' },
-    ['noV'] = { long = 'OP-PENDING', short = 'O-P' },
-    ['no\22'] = { long = 'OP-PENDING', short = 'O-P' },
-    ['niI'] = { long = 'NORMAL', short = 'N' },
-    ['niR'] = { long = 'NORMAL', short = 'N' },
-    ['niV'] = { long = 'NORMAL', short = 'N' },
-    ['nt'] = { long = 'NORMAL', short = 'N' },
-    ['ntT'] = { long = 'NORMAL', short = 'N' },
-    ['v'] = { long = 'VISUAL', short = 'V' },
-    ['vs'] = { long = 'VISUAL', short = 'V' },
-    ['V'] = { long = 'VISUAL LINE', short = 'V-L' },
-    ['Vs'] = { long = 'VISUAL LINE', short = 'V-L' },
-    ['\22'] = { long = 'VISUAL BLOCK', short = 'V-B' },
-    ['\22s'] = { long = 'VISUAL BLOCK', short = 'V-B' },
-    ['s'] = { long = 'SELECT', short = 'S' },
-    ['S'] = { long = 'SELECT LINE', short = 'S-L' },
-    ['\19'] = { long = 'SELECT BLOCK', short = 'S-B' },
-    ['i'] = { long = 'INSERT', short = 'I' },
-    ['ic'] = { long = 'INSERT', short = 'I' },
-    ['ix'] = { long = 'INSERT', short = 'I' },
-    ['R'] = { long = 'REPLACE', short = 'R' },
-    ['Rc'] = { long = 'REPLACE', short = 'R' },
-    ['Rx'] = { long = 'REPLACE', short = 'R' },
-    ['Rv'] = { long = 'VIRT REPLACE', short = 'V-R' },
-    ['Rvc'] = { long = 'VIRT REPLACE', short = 'V-R' },
-    ['Rvx'] = { long = 'VIRT REPLACE', short = 'V-R' },
-    ['c'] = { long = 'COMMAND', short = 'C' },
-    ['cv'] = { long = 'VIM EX', short = 'V-E' },
-    ['ce'] = { long = 'EX', short = 'E' },
-    ['r'] = { long = 'PROMPT', short = 'P' },
-    ['rm'] = { long = 'MORE', short = 'M' },
-    ['r?'] = { long = 'CONFIRM', short = 'C' },
-    ['!'] = { long = 'SHELL', short = 'S' },
-    ['t'] = { long = 'TERMINAL', short = 'T' },
+    ['n'] = get_mode_table('n', hls.normal),
+    ['v'] = get_mode_table('v', hls.visual),
+    ['V'] = get_mode_table('V', hls.visual),
+    ['\22'] = get_mode_table('\22', hls.visual),
+    ['s'] = get_mode_table('s', hls.visual),
+    ['S'] = get_mode_table('S', hls.visual),
+    ['\19'] = get_mode_table('\19', hls.visual),
+    ['i'] = get_mode_table('i', hls.insert),
+    ['R'] = get_mode_table('R', hls.replace),
+    ['c'] = get_mode_table('c', hls.command),
+    ['r'] = get_mode_table('r', hls.command),
+    ['!'] = get_mode_table('!', hls.command),
+    ['t'] = get_mode_table('t', hls.command),
   }
 
-  local mode = mode_map[vim.fn.mode()] or { long = 'UNKNOWN', short = 'U' }
+  local mode = mode_map[vim.fn.mode()] or get_mode_table('U', hls.other)
   return mode
 end
 
@@ -117,7 +106,7 @@ local function get_component(component, position, direction)
       return function(active)
         local hls = Slimline.highlights.hls.components[component]
         if component == 'mode' then
-          hls = Slimline.highlights.get_mode_hl(Slimline.get_mode().long)
+          hls = Slimline.get_mode().hls
         end
         return cmp.render(sep, direction, hls, active)
       end

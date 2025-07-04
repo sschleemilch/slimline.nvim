@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+- `mode`: Added `format` option to let users format the mode string (verbose and short)
+
+### Fixed
+
+- `mode`: Improved short format to distinguish visual, visual line and visual block modes
+
 ## [2.2.0] - 2025-07-03
 
 ### Added
@@ -122,6 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added component configuration table `configs` to configure style and features of components.
+
   - `verbose_mode` -> `configs.mode.verbose`
   - `mode_follow_style` -> `configs.mode.style`
   - `workspace_diagnostics` -> `configs.diagnostics.workspace`

@@ -28,13 +28,30 @@ local M = {
   -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
   configs = {
     mode = {
-      verbose = false, -- Mode as single letter or as a word
+      verbose = false, -- Selects the `verbose` format
       hl = {
         normal = 'Type',
-        insert = 'Function',
-        pending = 'Boolean',
         visual = 'Keyword',
+        insert = 'Function',
+        replace = 'Statement',
         command = 'String',
+        other = 'Function',
+      },
+      format = {
+        ['n'] = { verbose = 'NORMAL', short = 'N' },
+        ['v'] = { verbose = 'VISUAL', short = 'V' },
+        ['V'] = { verbose = 'V-LINE', short = 'V-L' },
+        ['\22'] = { verbose = 'V-BLOCK', short = 'V-B' },
+        ['s'] = { verbose = 'SELECT', short = 'S' },
+        ['S'] = { verbose = 'S-LINE', short = 'S-L' },
+        ['\19'] = { verbose = 'S-BLOCK', short = 'S-B' },
+        ['i'] = { verbose = 'INSERT', short = 'I' },
+        ['R'] = { verbose = 'REPLACE', short = 'R' },
+        ['c'] = { verbose = 'COMMAND', short = 'C' },
+        ['r'] = { verbose = 'PROMPT', short = 'P' },
+        ['!'] = { verbose = 'SHELL', short = 'S' },
+        ['t'] = { verbose = 'TERMINAL', short = 'T' },
+        ['U'] = { verbose = 'UNKNOWN', short = 'U' },
       },
     },
     path = {
