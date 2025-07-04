@@ -1,36 +1,32 @@
 local slimline = require('slimline')
 local C = {}
-local config = slimline.config.configs.progress
 
---- @param sep {left: string, right: string}
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param cfg table
 --- @param active boolean
 --- @return string
-function C.render(sep, direction, hls, active)
-  local cur = vim.fn.line('.')
-  local total = vim.fn.line('$')
-  local primary
-  if cur == 1 then
-    primary = 'Top'
-  elseif cur == total then
-    primary = 'Bot'
-  else
-    primary = string.format('%2d%%%%', math.floor(cur / total * 100))
-  end
+function C.render(cfg, active)
+    local cur = vim.fn.line('.')
+    local total = vim.fn.line('$')
+    local primary
+    if cur == 1 then
+        primary = 'Top'
+    elseif cur == total then
+        primary = 'Bot'
+    else
+        primary = string.format('%2d%%%%', math.floor(cur / total * 100))
+    end
 
-  local secondary = ''
+    local secondary = ''
 
-  if config.column then
-    local col = vim.fn.col('.')
-    secondary = string.format('%3d', col)
-  end
+    if cfg.column then
+        local col = vim.fn.col('.')
+        secondary = string.format('%3d', col)
+    end
 
-  primary = string.format('%s %s / %s', config.icon, primary, total)
+    primary = string.format('%s %s / %s', cfg.icon, primary, total)
 
-  return slimline.highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction, active)
+    return slimline.highlights.hl_component({ primary = primary, secondary = secondary }, cfg.hls, cfg.sep, cfg
+        .direction, active)
 end
 
 return C

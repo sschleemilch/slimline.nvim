@@ -1,32 +1,29 @@
 local slimline = require('slimline')
 local initialized = false
-local verbose = slimline.config.configs.mode.verbose
 
 local C = {}
 
 local function init()
-  if initialized then
-    return
-  end
-  vim.opt.showmode = false
-  initialized = true
+    if initialized then
+        return
+    end
+    vim.opt.showmode = false
+    initialized = true
 end
 
---- @param sep {left: string, right: string}
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
---- @param active boolean
+
+---@alias ModeConfig {verbose: boolean, hls: table, direction: string, sep: Sep}
+
+--- @param cfg ModeConfig
 --- @return string
-function C.render(sep, direction, hls, active)
-  init()
-  local mode = slimline.get_mode()
-  local primary = mode.short
-  if verbose then
-    primary = mode.long
-  end
-  return slimline.highlights.hl_component({ primary = primary }, hls, sep, direction, active)
+function C.render(cfg, active)
+    init()
+    local mode = slimline.get_mode()
+    local primary = mode.short
+    if cfg.verbose then
+        primary = mode.long
+    end
+    return slimline.highlights.hl_component({ primary = primary }, cfg.hls, cfg.sep, cfg.direction, active)
 end
 
 return C
