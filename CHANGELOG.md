@@ -132,6 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added component configuration table `configs` to configure style and features of components.
+
   - `verbose_mode` -> `configs.mode.verbose`
   - `mode_follow_style` -> `configs.mode.style`
   - `workspace_diagnostics` -> `configs.diagnostics.workspace`

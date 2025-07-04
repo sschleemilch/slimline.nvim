@@ -16,7 +16,7 @@ end
 --- @param key string
 --- @param hl table
 --- @return { verbose: string, short: string, hls: table }
-local function get_mode_map_entry(key, hl)
+local function get_mode_table(key, hl)
   local entry = Slimline.config.configs.mode.format[key]
   entry.hls = {
     primary = hl.primary,
@@ -30,22 +30,22 @@ function Slimline.get_mode()
   local hls = Slimline.highlights.hls.components.mode
   -- Note that: \19 = ^S and \22 = ^V.
   local mode_map = {
-    ['n'] = get_mode_map_entry('n', hls.normal),
-    ['v'] = get_mode_map_entry('v', hls.visual),
-    ['V'] = get_mode_map_entry('V', hls.visual),
-    ['\22'] = get_mode_map_entry('\22', hls.visual),
-    ['s'] = get_mode_map_entry('s', hls.visual),
-    ['S'] = get_mode_map_entry('S', hls.visual),
-    ['\19'] = get_mode_map_entry('\19', hls.visual),
-    ['i'] = get_mode_map_entry('i', hls.insert),
-    ['R'] = get_mode_map_entry('R', hls.replace),
-    ['c'] = get_mode_map_entry('c', hls.command),
-    ['r'] = get_mode_map_entry('r', hls.command),
-    ['!'] = get_mode_map_entry('!', hls.command),
-    ['t'] = get_mode_map_entry('t', hls.command),
+    ['n'] = get_mode_table('n', hls.normal),
+    ['v'] = get_mode_table('v', hls.visual),
+    ['V'] = get_mode_table('V', hls.visual),
+    ['\22'] = get_mode_table('\22', hls.visual),
+    ['s'] = get_mode_table('s', hls.visual),
+    ['S'] = get_mode_table('S', hls.visual),
+    ['\19'] = get_mode_table('\19', hls.visual),
+    ['i'] = get_mode_table('i', hls.insert),
+    ['R'] = get_mode_table('R', hls.replace),
+    ['c'] = get_mode_table('c', hls.command),
+    ['r'] = get_mode_table('r', hls.command),
+    ['!'] = get_mode_table('!', hls.command),
+    ['t'] = get_mode_table('t', hls.command),
   }
 
-  local mode = mode_map[vim.fn.mode()] or get_mode_map_entry('U', hls.other)
+  local mode = mode_map[vim.fn.mode()] or get_mode_table('U', hls.other)
   return mode
 end
 

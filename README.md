@@ -405,13 +405,15 @@ It will render to something like this (depending on your colorscheme):
 If you want to use internal render functionality of a component (here of the `path` component) you can do it like that:
 
 ```lua
-function()
+function(active)
     return Slimline.highlights.hl_component(
         { primary = 'Hello', secondary = 'World' },
         Slimline.highlights.hls.components['path'],
-        Slimline.get_sep('path')
+        Slimline.get_sep('path'),
+        'right', -- flow direction (on which side the secondary part will be rendered)
+        active -- whether the component is active or not
     )
-end
+end,
 ```
 
 > [!WARNING]
