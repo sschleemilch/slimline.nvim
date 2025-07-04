@@ -144,13 +144,6 @@ function M.create()
               sep2sec = create(prefix .. 'NormalSep2Sec', hls.normal, false, false, secondary),
             },
           },
-          pending = {
-            primary = {
-              text = create(prefix .. 'Pending', hls.pending, inverse, config.bold, nil, M.hls.base),
-              sep = create(prefix .. 'PendingSep', hls.pending, false, false, nil, M.hls.base),
-              sep2sec = create(prefix .. 'PendingSep2Sec', hls.pending, false, false, secondary),
-            },
-          },
           visual = {
             primary = {
               text = create(prefix .. 'Visual', hls.visual, inverse, config.bold, nil, M.hls.base),
@@ -165,11 +158,25 @@ function M.create()
               sep2sec = create(prefix .. 'InsertSep2Sec', hls.insert, false, false, secondary),
             },
           },
+          replace = {
+            primary = {
+              text = create(prefix .. 'Replace', hls.replace, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'ReplaceSep', hls.replace, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'ReplaceSep2Sec', hls.replace, false, false, secondary),
+            },
+          },
           command = {
             primary = {
               text = create(prefix .. 'Command', hls.command, inverse, config.bold, nil, M.hls.base),
               sep = create(prefix .. 'CommandSep', hls.command, false, false, nil, M.hls.base),
               sep2sec = create(prefix .. 'CommandSep2Sec', hls.command, false, false, secondary),
+            },
+          },
+          other = {
+            primary = {
+              text = create(prefix .. 'Other', hls.other, inverse, config.bold, nil, M.hls.base),
+              sep = create(prefix .. 'OtherSep', hls.other, false, false, nil, M.hls.base),
+              sep2sec = create(prefix .. 'OtherSep2Sec', hls.other, false, false, secondary),
             },
           },
           secondary = {
@@ -288,28 +295,6 @@ function M.hl_component(content, hl, sep, direction, active)
   end
   result = result .. '%#' .. M.hls.base .. '#'
   return result
-end
-
---- Function to get the highlight config
---- @param mode string
---- @return table
-function M.get_mode_hl(mode)
-  local hls = {
-    secondary = M.hls.components['mode'].secondary,
-    primary = M.hls.components['mode'].command.primary,
-  }
-  if mode == 'NORMAL' then
-    hls.primary = M.hls.components['mode'].normal.primary
-  elseif mode:find('PENDING') then
-    hls.primary = M.hls.components['mode'].pending.primary
-  elseif mode:find('VISUAL') then
-    hls.primary = M.hls.components['mode'].visual.primary
-  elseif mode:find('INSERT') or mode:find('SELECT') then
-    hls.primary = M.hls.components['mode'].insert.primary
-  elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
-    hls.primary = M.hls.components['mode'].command.primary
-  end
-  return hls
 end
 
 return M

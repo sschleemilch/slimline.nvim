@@ -24,7 +24,7 @@ function C.render(sep, direction, hls, active)
   local mode = slimline.get_mode()
   local primary = mode.short
   if verbose then
-    primary = mode.long
+    primary = mode.verbose
   end
   return slimline.highlights.hl_component({ primary = primary }, hls, sep, direction, active)
 end
