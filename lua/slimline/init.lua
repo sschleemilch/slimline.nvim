@@ -1,11 +1,39 @@
 local Slimline = {}
 Slimline.highlights = require('slimline.highlights')
 
----@alias Component function
+---@class sep
+---@field left? string
+---@field right? string
 
----@type table<string, Component[]>
+---@class component
+---@field render function
+
+---@alias component.direction string
+---|'"right"'
+---|'"left"'
+
+---@alias component.position string
+---|'"first"'
+---|'"last"'
+
+---@alias group_position string
+---|'"left"'
+---|'"center"'
+---|'"right"'
+
+---@class mode
+---@field verbose string
+---@field short string
+---@field hls component.highlights
+
+---@class components
+---@field left component[]
+---@field center component[]
+---@field right component[]
+
+---@type components
 Slimline.active = vim.defaulttable()
----@type table<string, Component[]>
+---@type components
 Slimline.inactive = vim.defaulttable()
 
 local augroup = vim.api.nvim_create_augroup('Slimline', { clear = true })
@@ -14,18 +42,18 @@ function Slimline.au(event, pattern, callback, desc)
 end
 
 --- @param key string
---- @param hl table
---- @return { verbose: string, short: string, hls: table }
-local function get_mode_table(key, hl)
+--- @param hls component.highlights
+--- @return mode
+local function get_mode_table(key, hls)
   local entry = Slimline.config.configs.mode.format[key]
   entry.hls = {
-    primary = hl.primary,
+    primary = hls.primary,
     secondary = Slimline.highlights.hls.components.mode.secondary,
   }
   return entry
 end
 
---- @return { verbose: string, short: string, hls: table }
+--- @return mode
 function Slimline.get_mode()
   local hls = Slimline.highlights.hls.components.mode
   -- Note that: \19 = ^S and \22 = ^V.
@@ -50,88 +78,65 @@ function Slimline.get_mode()
 end
 
 ---@param component string
----@return table
+---@return sep
 function Slimline.get_sep(component)
-  local sep = {
-    left = nil,
-    right = nil,
-  }
-  local style = (Slimline.config.configs[component] and Slimline.config.configs[component].style)
-    or Slimline.config.style
+  local sep = vim.defaulttable()
+
+  local cfg = Slimline.config.configs[component]
+
+  local style = (cfg and cfg.style) or Slimline.config.style
 
   if style == 'fg' then
     sep.left = ''
     sep.right = ''
   else
     sep = {
-      left = (
-        Slimline.config.configs[component]
-        and Slimline.config.configs[component].sep
-        and Slimline.config.configs[component].sep.left
-      ) or Slimline.config.sep.left,
-      right = (
-        Slimline.config.configs[component]
-        and Slimline.config.configs[component].sep
-        and Slimline.config.configs[component].sep.right
-      ) or Slimline.config.sep.right,
+      left = (cfg and cfg.sep and cfg.sep.left) or Slimline.config.sep.left,
+      right = (cfg and cfg.sep and cfg.sep.right) or Slimline.config.sep.right,
     }
   end
   return sep
 end
 
----@param component string | function
----@param position string?
----|'"last"'
----|'"first"'
----@param direction string
----|'"right"'
----|'"left"'
----@return Component
-local function get_component(component, position, direction)
-  if type(component) == 'function' then
-    return component
-  elseif type(component) == 'string' then
-    local ok, cmp = pcall(require, string.format('slimline.components.%s', component))
+---@param component_ref string | function
+---@param position component.position?
+---@param direction component.direction
+---@return component
+local function get_component(component_ref, position, direction)
+  if type(component_ref) == 'function' then
+    return { render = component_ref }
+  elseif type(component_ref) == 'string' then
+    local ok, cmp = pcall(require, string.format('slimline.components.%s', component_ref))
     if ok then
-      if Slimline.config.configs[component].follow then
-        component = Slimline.config.configs[component].follow
+      if Slimline.config.configs[component_ref].follow then
+        component_ref = Slimline.config.configs[component_ref].follow
       end
-      local sep = Slimline.get_sep(component)
-      if Slimline.config.sep.hide.first and position == 'first' then
-        sep.left = ''
-      end
-      if Slimline.config.sep.hide.last and position == 'last' then
-        sep.right = ''
-      end
-      return function(active)
-        local hls = Slimline.highlights.hls.components[component]
-        if component == 'mode' then
-          hls = Slimline.get_mode().hls
-        end
-        return cmp.render(sep, direction, hls, active)
-      end
+      local sep = Slimline.get_sep(component_ref)
+      if Slimline.config.sep.hide.first and position == 'first' then sep.left = '' end
+      if Slimline.config.sep.hide.last and position == 'last' then sep.right = '' end
+      return {
+        render = function(active)
+          local hls = Slimline.highlights.hls.components[component_ref]
+          if component_ref == 'mode' then hls = Slimline.get_mode().hls end
+          return cmp.render(sep, direction, hls, active)
+        end,
+      }
     else
-      return function()
-        return component
-      end
+      return { render = function() return component_ref end }
     end
   end
-  return function()
-    return ''
-  end
+  return { render = function() return '' end }
 end
 
 ---@param active boolean
----@param components Component[]
+---@param components component[]
 ---@return string
 function Slimline.concat_components(components, active)
   local result = ''
   for i, component in ipairs(components) do
     local space = Slimline.config.spaces.components
-    if i == 1 then
-      space = ''
-    end
-    result = result .. space .. component(active)
+    if i == 1 then space = '' end
+    result = result .. space .. component.render(active)
   end
   return result
 end
@@ -141,15 +146,11 @@ end
 function Slimline.render(active)
   Slimline.highlights.create()
 
-  if vim.tbl_contains(Slimline.config.disabled_filetypes, vim.bo.filetype) then
-    return '%#Slimline#'
-  end
+  if vim.tbl_contains(Slimline.config.disabled_filetypes, vim.bo.filetype) then return '%#Slimline#' end
 
   local components = Slimline.active
   local is_active = active == 1
-  if not is_active then
-    components = Slimline.inactive
-  end
+  if not is_active then components = Slimline.inactive end
   local result = '%#Slimline#' .. Slimline.config.spaces.left
   result = result .. Slimline.concat_components(components.left, is_active)
   result = result .. '%='
@@ -161,25 +162,16 @@ function Slimline.render(active)
 end
 
 ---@param components table<string|function>
----@param group_position string
----|'"left"'
----|'"center"'
----|'"right"'
----@return Component[]
-local function get_components(components, group_position)
+---@param position group_position
+---@return component[]
+local function get_components(components, position)
   local result = {}
   for i, component in ipairs(components) do
     local component_position = nil
-    if i == 1 and group_position == 'left' then
-      component_position = 'first'
-    end
-    if i == #components and group_position == 'right' then
-      component_position = 'last'
-    end
+    if i == 1 and position == 'left' then component_position = 'first' end
+    if i == #components and position == 'right' then component_position = 'last' end
     local direction = 'right'
-    if group_position == 'right' then
-      direction = 'left'
-    end
+    if position == 'right' then direction = 'left' end
     table.insert(result, get_component(component, component_position, direction))
   end
   return result
@@ -187,9 +179,7 @@ end
 
 ---@param opts table
 function Slimline.setup(opts)
-  if opts == nil then
-    opts = {}
-  end
+  if opts == nil then opts = {} end
 
   _G.Slimline = Slimline
 
@@ -215,9 +205,7 @@ function Slimline.setup(opts)
 
   vim.api.nvim_create_autocmd('Colorscheme', {
     group = Slimline.augroup,
-    callback = function()
-      Slimline.highlights.initialized = true
-    end,
+    callback = function() Slimline.highlights.initialized = true end,
   })
 end
 

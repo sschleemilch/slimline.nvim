@@ -2,11 +2,9 @@ local slimline = require('slimline')
 local C = {}
 local config = slimline.config.configs.progress
 
---- @param sep {left: string, right: string}
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param sep sep
+--- @param direction component.direction
+--- @param hls component.highlights
 --- @param active boolean
 --- @return string
 function C.render(sep, direction, hls, active)

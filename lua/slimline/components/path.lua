@@ -29,40 +29,28 @@ local function truncate(path, chars, full_dirs)
   return table.concat(truncated, '/')
 end
 
---- @param sep {left: string, right: string}
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param sep sep
+--- @param direction component.direction
+--- @param hls component.highlights
 --- @param active boolean
 --- @return string
 function C.render(sep, direction, hls, active)
-  if vim.bo.buftype ~= '' then
-    return ''
-  end
+  if vim.bo.buftype ~= '' then return '' end
 
   local file = vim.fn.expand('%:t')
 
-  if vim.bo.modified then
-    file = file .. ' ' .. config.icons.modified
-  end
-  if vim.bo.readonly then
-    file = file .. ' ' .. config.icons.read_only
-  end
+  if vim.bo.modified then file = file .. ' ' .. config.icons.modified end
+  if vim.bo.readonly then file = file .. ' ' .. config.icons.read_only end
 
   local path = ''
 
   if config.directory == true then
     path = vim.fs.normalize(vim.fn.expand('%:.:h'))
-    if #path == 0 then
-      return ''
-    end
+    if #path == 0 then return '' end
     if path == '.' then
       path = ''
     else
-      if config.truncate then
-        path = truncate(path, config.truncate.chars, config.truncate.full_dirs)
-      end
+      if config.truncate then path = truncate(path, config.truncate.chars, config.truncate.full_dirs) end
       path = config.icons.folder .. path
     end
   end

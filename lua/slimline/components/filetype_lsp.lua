@@ -13,13 +13,11 @@ local track_lsp = vim.schedule_wrap(function(data)
     lsp_clients[data.buf] = nil
     return
   end
-  local attached_clients = vim.lsp.get_clients { bufnr = data.buf }
+  local attached_clients = vim.lsp.get_clients({ bufnr = data.buf })
 
   local it = vim.iter(attached_clients)
   it:map(function(client)
-    if config.map_lsps[client.name] == false then
-      return nil
-    end
+    if config.map_lsps[client.name] == false then return nil end
     local name = config.map_lsps[client.name] or client.name:gsub('language.server', 'ls')
     return name
   end)
@@ -32,32 +30,24 @@ local track_lsp = vim.schedule_wrap(function(data)
 end)
 
 local function init()
-  if initialized then
-    return
-  end
+  if initialized then return end
   local ok
   ok, MiniIcons = pcall(require, 'mini.icons')
-  if ok then
-    with_icons = true
-  end
+  if ok then with_icons = true end
   initialized = true
 
   slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
 end
 
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
+--- @param direction component.direction
+--- @param hls component.highlights
 --- @param active boolean
 --- @return string
 function C.render(sep, direction, hls, active)
   init()
 
   local filetype = vim.bo.filetype
-  if filetype == '' then
-    filetype = '[No Name]'
-  end
+  if filetype == '' then filetype = '[No Name]' end
   if with_icons then
     local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
     filetype = icon .. ' ' .. filetype
