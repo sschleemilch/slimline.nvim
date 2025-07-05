@@ -97,8 +97,8 @@ local track_diagnostics = vim.schedule_wrap(function(data)
   vim.cmd.redrawstatus()
 end)
 
---- @param sep sep
---- @param direction component.direction
+---@param sep sep
+---@param direction component.direction
 local function init(sep, direction)
   if initialized then return end
 
@@ -110,11 +110,10 @@ local function init(sep, direction)
   slimline.au({ 'DiagnosticChanged', 'BufEnter', 'ModeChanged' }, '*', track_diagnostics, 'Track Diagnostics')
 end
 
---- @param sep sep
---- @param direction component.direction
---- @return string
-function C.render(sep, direction, _)
-  init(sep, direction)
+---@param opts render.options
+---@return string
+function C.render(opts)
+  init(opts.sep, opts.direction)
 
   return diagnostics[vim.api.nvim_get_current_buf()] or ''
 end

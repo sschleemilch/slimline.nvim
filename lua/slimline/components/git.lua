@@ -2,11 +2,9 @@ local C = {}
 
 local slimline = require('slimline')
 
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   local status = vim.b.gitsigns_status_dict
   if not status then return '' end
   if not status.head or status.head == '' then return '' end
@@ -28,10 +26,10 @@ function C.render(sep, direction, hls, active)
   end
   return slimline.highlights.hl_component(
     { primary = branch, secondary = table.concat(mods, ' ') },
-    hls,
-    sep,
-    direction,
-    active
+    opts.hls,
+    opts.sep,
+    opts.direction,
+    opts.active
   )
 end
 

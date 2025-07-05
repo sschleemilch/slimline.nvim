@@ -31,6 +31,12 @@ Slimline.highlights = require('slimline.highlights')
 ---@field center component[]
 ---@field right component[]
 
+---@class render.options
+---@field active boolean
+---@field direction component.direction
+---@field sep sep
+---@field hls component.highlights
+
 ---@type components
 Slimline.active = vim.defaulttable()
 ---@type components
@@ -108,17 +114,15 @@ local function get_component(component_ref, position, direction)
   elseif type(component_ref) == 'string' then
     local ok, cmp = pcall(require, string.format('slimline.components.%s', component_ref))
     if ok then
-      if Slimline.config.configs[component_ref].follow then
-        component_ref = Slimline.config.configs[component_ref].follow
-      end
-      local sep = Slimline.get_sep(component_ref)
+      local follow = Slimline.config.configs[component_ref].follow
+      local sep = Slimline.get_sep(follow or component_ref)
       if Slimline.config.sep.hide.first and position == 'first' then sep.left = '' end
       if Slimline.config.sep.hide.last and position == 'last' then sep.right = '' end
       return {
         render = function(active)
-          local hls = Slimline.highlights.hls.components[component_ref]
-          if component_ref == 'mode' then hls = Slimline.get_mode().hls end
-          return cmp.render(sep, direction, hls, active)
+          local hls = Slimline.highlights.hls.components[follow or component_ref]
+          if component_ref == 'mode' or follow == 'mode' then hls = Slimline.get_mode().hls end
+          return cmp.render({ sep = sep, direction = direction, hls = hls, active = active })
         end,
       }
     else

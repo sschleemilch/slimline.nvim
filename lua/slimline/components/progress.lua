@@ -2,12 +2,9 @@ local slimline = require('slimline')
 local C = {}
 local config = slimline.config.configs.progress
 
---- @param sep sep
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   local cur = vim.fn.line('.')
   local total = vim.fn.line('$')
   local primary
@@ -28,7 +25,13 @@ function C.render(sep, direction, hls, active)
 
   primary = string.format('%s %s / %s', config.icon, primary, total)
 
-  return slimline.highlights.hl_component({ primary = primary, secondary = secondary }, hls, sep, direction, active)
+  return slimline.highlights.hl_component(
+    { primary = primary, secondary = secondary },
+    opts.hls,
+    opts.sep,
+    opts.direction,
+    opts.active
+  )
 end
 
 return C

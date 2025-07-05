@@ -10,17 +10,14 @@ local function init()
   initialized = true
 end
 
---- @param sep sep
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   init()
   local mode = slimline.get_mode()
   local primary = mode.short
   if verbose then primary = mode.verbose end
-  return slimline.highlights.hl_component({ primary = primary }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = primary }, opts.hls, opts.sep, opts.direction, opts.active)
 end
 
 return C

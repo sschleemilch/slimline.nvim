@@ -2,16 +2,13 @@ local slimline = require('slimline')
 local C = {}
 local config = slimline.config.configs.recording
 
---- @param sep sep
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   local recording = vim.fn.reg_recording()
   if recording == '' then return '' end
   local status = config.icon .. recording
-  return slimline.highlights.hl_component({ primary = status }, hls, sep, direction, active)
+  return slimline.highlights.hl_component({ primary = status }, opts.hls, opts.sep, opts.direction, opts.active)
 end
 
 return C

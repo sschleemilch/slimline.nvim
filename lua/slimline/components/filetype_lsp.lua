@@ -39,11 +39,9 @@ local function init()
   slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
 end
 
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   init()
 
   local filetype = vim.bo.filetype
@@ -55,10 +53,10 @@ function C.render(sep, direction, hls, active)
 
   return slimline.highlights.hl_component(
     { primary = filetype or '', secondary = lsp_clients[vim.api.nvim_get_current_buf()] or '' },
-    hls,
-    sep,
-    direction,
-    active
+    opts.hls,
+    opts.sep,
+    opts.direction,
+    opts.active
   )
 end
 

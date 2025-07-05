@@ -29,12 +29,9 @@ local function truncate(path, chars, full_dirs)
   return table.concat(truncated, '/')
 end
 
---- @param sep sep
---- @param direction component.direction
---- @param hls component.highlights
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   if vim.bo.buftype ~= '' then return '' end
 
   local file = vim.fn.expand('%:t')
@@ -55,7 +52,13 @@ function C.render(sep, direction, hls, active)
     end
   end
 
-  return slimline.highlights.hl_component({ primary = file, secondary = path }, hls, sep, direction, active)
+  return slimline.highlights.hl_component(
+    { primary = file, secondary = path },
+    opts.hls,
+    opts.sep,
+    opts.direction,
+    opts.active
+  )
 end
 
 return C
