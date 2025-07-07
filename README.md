@@ -1,5 +1,5 @@
 <h2 align="center">
- <img src="./docs/slimline.png" width="100" alt="Slimline logo"/><br/>
+ <img src="./doc/slimline.png" width="100" alt="Slimline logo"/><br/>
  slimline.nvim
 </h2>
 
