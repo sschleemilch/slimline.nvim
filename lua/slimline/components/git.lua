@@ -2,20 +2,12 @@ local C = {}
 
 local slimline = require('slimline')
 
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @param hls {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
---- @param active boolean
---- @return string
-function C.render(sep, direction, hls, active)
+---@param opts render.options
+---@return string
+function C.render(opts)
   local status = vim.b.gitsigns_status_dict
-  if not status then
-    return ''
-  end
-  if not status.head or status.head == '' then
-    return ''
-  end
+  if not status then return '' end
+  if not status.head or status.head == '' then return '' end
 
   local icons = slimline.config.configs['git'].icons
 
@@ -28,22 +20,16 @@ function C.render(sep, direction, hls, active)
 
   local mods = {}
   if modifications then
-    if added then
-      table.insert(mods, string.format('%s%s', icons.added, status.added))
-    end
-    if changed then
-      table.insert(mods, string.format('%s%s', icons.modified, status.changed))
-    end
-    if removed then
-      table.insert(mods, string.format('%s%s', icons.removed, status.removed))
-    end
+    if added then table.insert(mods, string.format('%s%s', icons.added, status.added)) end
+    if changed then table.insert(mods, string.format('%s%s', icons.modified, status.changed)) end
+    if removed then table.insert(mods, string.format('%s%s', icons.removed, status.removed)) end
   end
   return slimline.highlights.hl_component(
     { primary = branch, secondary = table.concat(mods, ' ') },
-    hls,
-    sep,
-    direction,
-    active
+    opts.hls,
+    opts.sep,
+    opts.direction,
+    opts.active
   )
 end
 

@@ -10,10 +10,14 @@ local direction_ = nil
 local sep_ = vim.defaulttable()
 local initialized = false
 
-local function capitalize(str)
-  return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2))
-end
+---@alias diagnostics {ERROR: integer, WARN: integer, HINT: integer, INFO: integer}
 
+---@param str string
+---@return string
+local function capitalize(str) return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2)) end
+
+---@param buf_id integer|nil
+---@return diagnostics
 local function get_diagnostic_count(buf_id)
   local res = {
     ERROR = 0,
@@ -28,17 +32,19 @@ local function get_diagnostic_count(buf_id)
   return res
 end
 
+---@param buffer integer
+---@param workspace integer
+---@return string
 local function get_count_format(buffer, workspace)
   local count = ''
-  if buffer > 0 then
-    count = string.format('%d', buffer)
-  end
-  if workspace > 0 and buffer ~= workspace then
-    count = string.format('%s(%d)', count, workspace)
-  end
+  if buffer > 0 then count = string.format('%d', buffer) end
+  if workspace > 0 and buffer ~= workspace then count = string.format('%s(%d)', count, workspace) end
   return count
 end
 
+---@param buffer diagnostics
+---@param workspace diagnostics
+---@return string
 local function format(buffer, workspace)
   local parts = {}
 
@@ -64,13 +70,9 @@ local function format(buffer, workspace)
     end
   end
 
-  if #parts > 0 then
-    table.insert(parts, string.format('%%#%s#', slimline.highlights.hls.base))
-  end
+  if #parts > 0 then table.insert(parts, string.format('%%#%s#', slimline.highlights.hls.base)) end
   local sep = slimline.config.spaces.components
-  if style == 'fg' then
-    sep = ' '
-  end
+  if style == 'fg' then sep = ' ' end
 
   return table.concat(parts, sep)
 end
@@ -81,9 +83,7 @@ local track_diagnostics = vim.schedule_wrap(function(data)
     return
   end
 
-  if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
-    return
-  end
+  if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then return end
 
   local buffer_counts = get_diagnostic_count(0)
   local workspace_counts = {
@@ -92,19 +92,15 @@ local track_diagnostics = vim.schedule_wrap(function(data)
     HINT = 0,
     INFO = 0,
   }
-  if config.workspace then
-    workspace_counts = get_diagnostic_count(nil)
-  end
+  if config.workspace then workspace_counts = get_diagnostic_count(nil) end
   diagnostics[data.buf] = format(buffer_counts, workspace_counts)
   vim.cmd.redrawstatus()
 end)
 
---- @param sep {left: string, right: string}
---- @param direction string
+---@param sep sep
+---@param direction component.direction
 local function init(sep, direction)
-  if initialized then
-    return
-  end
+  if initialized then return end
 
   sep_ = sep
   direction_ = direction
@@ -114,13 +110,10 @@ local function init(sep, direction)
   slimline.au({ 'DiagnosticChanged', 'BufEnter', 'ModeChanged' }, '*', track_diagnostics, 'Track Diagnostics')
 end
 
---- @param sep {left: string, right: string}
---- @param direction string
---- |'"right"'
---- |'"left"'
---- @return string
-function C.render(sep, direction, _)
-  init(sep, direction)
+---@param opts render.options
+---@return string
+function C.render(opts)
+  init(opts.sep, opts.direction)
 
   return diagnostics[vim.api.nvim_get_current_buf()] or ''
 end

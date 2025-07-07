@@ -1,12 +1,35 @@
 local M = {}
 
+---@class highlights
+---@field base string
+---@field components table<string, component.highlights|mode.highlights>
+
+---@class highlight
+---@field text string
+---@field sep? string
+---@field sep2sec? string
+
+---@class mode.highlights
+---@field normal component.highlights
+---@field visual component.highlights
+---@field insert component.highlights
+---@field replace component.highlights
+---@field command component.highlights
+---@field other component.highlights
+---@field secondary highlight
+
+---@class component.highlights
+---@field primary highlight
+---@field secondary? highlight
+
+---@type highlights
 M.hls = vim.defaulttable()
 
 M.initialized = true
 
-local function firstToUpper(str)
-  return (str:gsub('^%l', string.upper))
-end
+---@param str string
+---@return string
+local function firstToUpper(str) return (str:gsub('^%l', string.upper)) end
 
 ---@param hl string
 ---@param base string?
@@ -17,9 +40,7 @@ end
 ---@return string
 local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
-  if hl:sub(1, #basename) ~= basename then
-    hl = basename .. hl
-  end
+  if hl:sub(1, #basename) ~= basename then hl = basename .. hl end
 
   local hl_ref = vim.api.nvim_get_hl(0, { name = base, link = false })
   local hl_ref_bold = hl_ref.bold or false
@@ -33,9 +54,7 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local hl_bg_ref = vim.api.nvim_get_hl(0, { name = bg_from_fg, link = false })
   local fg = hl_ref.fg or hl_normal.fg
   local bg = hl_bg_ref.fg or hl_ref.bg or hl_normal.bg
-  if bg_from_bg ~= nil then
-    bg = vim.api.nvim_get_hl(0, { name = bg_from_bg, link = false }).bg
-  end
+  if bg_from_bg ~= nil then bg = vim.api.nvim_get_hl(0, { name = bg_from_bg, link = false }).bg end
   if inverse then
     local tmp = fg
     fg = bg
@@ -94,9 +113,7 @@ local function create_diagnostic_highlights()
 end
 
 function M.create()
-  if not M.initialized then
-    return
-  end
+  if not M.initialized then return end
 
   local config = require('slimline').config
 
@@ -121,12 +138,8 @@ function M.create()
     if component_config and (component_config.follow == nil or component_config.follow == false) then
       local inverse = false
       local style = config.style
-      if component_config.style ~= nil then
-        style = component_config.style
-      end
-      if style == 'bg' then
-        inverse = true
-      end
+      if component_config.style ~= nil then style = component_config.style end
+      if style == 'bg' then inverse = true end
       local prefix = firstToUpper(component)
 
       local secondary = config.hl.secondary
@@ -215,82 +228,65 @@ end
 --- Helper function to highlight a given content
 --- Resets the highlight afterwards
 --- @param content string?
---- @param hl {text: string, sep: string}
---- @param sep_left string?
---- @param sep_right string?
+--- @param hl highlight
+--- @param sep sep
 --- @return string
-function M.hl_content(content, hl, sep_left, sep_right)
-  if content == nil then
-    return ''
-  end
+function M.hl_content(content, hl, sep)
+  if content == nil then return '' end
   local rendered = ''
-  if sep_left ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep_left)
-  end
+  if sep.left ~= nil then rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep.left) end
   rendered = rendered .. string.format('%%#%s#%s', hl.text, content)
-  if sep_right ~= nil then
-    rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep_right)
-  end
+  if sep.right ~= nil then rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep.right) end
   return rendered
 end
 
 ---@param content string?
 ---@return string?
 function M.pad(content)
-  if content == nil or content == '' then
-    return content
-  end
+  if content == nil or content == '' then return content end
   return ' ' .. content .. ' '
 end
 
 ---@param content {primary: string, secondary: string?}
----@param hl {primary: {text: string, sep: string, sep2sec?: string}, secondary?: {text: string, sep: string} }
----@param sep {left: string, right: string}
----@param direction string?
----|"'left'"
----|"'right'"
+---@param hl component.highlights
+---@param sep sep
+---@param direction component.direction?
 ---@param active boolean
 ---@return string
 function M.hl_component(content, hl, sep, direction, active)
   active = active == nil or active
   local result
-  if content.primary == nil then
-    return ''
-  end
+  if content.primary == nil then return '' end
 
   if content.secondary == nil then
     if active then
-      result = M.hl_content(M.pad(content.primary), hl.primary, sep.left, sep.right)
+      result = M.hl_content(M.pad(content.primary), hl.primary, sep)
     else
-      result = M.hl_content(M.pad(content.primary), hl.secondary, sep.left, sep.right)
+      result = M.hl_content(M.pad(content.primary), hl.secondary, sep)
     end
   else
     if direction == 'left' then
-      result = M.hl_content(M.pad(content.secondary), hl.secondary, sep.left)
+      result = M.hl_content(M.pad(content.secondary), hl.secondary, { left = sep.left })
       if active then
-        result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec })
-        result = result .. M.hl_content(M.pad(content.primary), hl.primary, nil, sep.right)
+        result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec }, {})
+        result = result .. M.hl_content(M.pad(content.primary), hl.primary, { right = sep.right })
       else
         local fill = ' '
-        if sep.left == '' and sep.right == '' then
-          fill = ''
-        end
-        result = result .. M.hl_content(fill, { text = hl.secondary.text })
-        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, nil, sep.right)
+        if sep.left == '' and sep.right == '' then fill = '' end
+        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
+        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, { right = sep.right })
       end
     else
       if active then
-        result = M.hl_content(M.pad(content.primary), hl.primary, sep.left)
-        result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec })
+        result = M.hl_content(M.pad(content.primary), hl.primary, { left = sep.left })
+        result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec }, {})
       else
         local fill = ' '
-        if sep.left == '' and sep.right == '' then
-          fill = ''
-        end
-        result = M.hl_content(M.pad(content.primary), hl.secondary, sep.left)
-        result = result .. M.hl_content(fill, { text = hl.secondary.text })
+        if sep.left == '' and sep.right == '' then fill = '' end
+        result = M.hl_content(M.pad(content.primary), hl.secondary, { left = sep.left })
+        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
       end
-      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, nil, sep.right)
+      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, { right = sep.right })
     end
   end
   result = result .. '%#' .. M.hls.base .. '#'
