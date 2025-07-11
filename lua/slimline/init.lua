@@ -7,6 +7,7 @@ Slimline.highlights = require('slimline.highlights')
 
 ---@class component
 ---@field render function
+---@field trunc_width integer|nil
 
 ---@alias component.direction string
 ---|'"right"'
@@ -119,6 +120,7 @@ local function get_component(component_ref, position, direction)
       if Slimline.config.sep.hide.first and position == 'first' then sep.left = '' end
       if Slimline.config.sep.hide.last and position == 'last' then sep.right = '' end
       return {
+        trunc_width = Slimline.config.configs[component_ref].trunc_width,
         render = function(active)
           local hls = Slimline.highlights.hls.components[follow or component_ref]
           if component_ref == 'mode' or follow == 'mode' then hls = Slimline.get_mode().hls end
@@ -137,6 +139,10 @@ end
 ---@return string
 function Slimline.concat_components(components, active)
   local result = ''
+
+  local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+  components = vim.tbl_filter(function(c) return win_width >= (c.trunc_width or -1) end, components)
+
   for i, component in ipairs(components) do
     local space = Slimline.config.spaces.components
     if i == 1 then space = '' end
@@ -157,7 +163,7 @@ function Slimline.render(active)
   if not is_active then components = Slimline.inactive end
   local result = '%#Slimline#' .. Slimline.config.spaces.left
   result = result .. Slimline.concat_components(components.left, is_active)
-  result = result .. '%='
+  result = result .. '%=%<'
   result = result .. Slimline.concat_components(components.center, is_active)
   result = result .. '%='
   result = result .. Slimline.concat_components(components.right, is_active)
