@@ -134,6 +134,7 @@ require('slimline').setup {
   -- `<component>.sep` can be used to overwrite the global 'sep.left' and `sep.right`
   -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
   -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
+  -- `<component>.trunc_width` can be used to hide a component completely once the window width drops below that value
   configs = {
     mode = {
       verbose = false, -- Selects the `verbose` format
@@ -163,6 +164,7 @@ require('slimline').setup {
       },
     }
     path = {
+      trunc_width = 60,
       directory = true, -- Whether to show the directory
       -- truncates the directory path. Can be disabled by setting `truncate = false`
       truncate = {
@@ -176,6 +178,7 @@ require('slimline').setup {
       },
     },
     git = {
+      trunc_width = 120,
       icons = {
         branch = '',
         added = '+',
@@ -184,6 +187,7 @@ require('slimline').setup {
       },
     },
     diagnostics = {
+      trunc_width = 75,
       workspace = false, -- Whether diagnostics should also show the total amount of workspace diagnostics
       icons = {
         ERROR = ' ',
@@ -193,6 +197,7 @@ require('slimline').setup {
       },
     },
     filetype_lsp = {
+      trunc_width = 95,
       -- Map lsp client names to custom names or ignore them by setting to `false`
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},

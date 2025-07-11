@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `mode`: Added `format` option to let users format the mode string (verbose and short)
+- `trunc_width` option for components. Will be hidden once the window width drops below that value
+- Defined statusline overflow truncation point after left components
 
 ### Fixed
 
@@ -132,7 +134,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Added component configuration table `configs` to configure style and features of components.
-
   - `verbose_mode` -> `configs.mode.verbose`
   - `mode_follow_style` -> `configs.mode.style`
   - `workspace_diagnostics` -> `configs.diagnostics.workspace`

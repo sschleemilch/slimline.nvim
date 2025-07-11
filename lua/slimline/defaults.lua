@@ -55,6 +55,7 @@ local M = {
       },
     },
     path = {
+      trunc_width = 60,
       directory = true, -- Whether to show the directory
       truncate = {
         chars = 1,
@@ -67,6 +68,7 @@ local M = {
       },
     },
     git = {
+      trunc_width = 120,
       icons = {
         branch = '',
         added = '+',
@@ -75,6 +77,7 @@ local M = {
       },
     },
     diagnostics = {
+      trunc_width = 75,
       workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
       icons = {
         ERROR = ' ',
@@ -84,6 +87,7 @@ local M = {
       },
     },
     filetype_lsp = {
+      trunc_width = 95,
       -- Map lsp client names to custom names or ignore them by setting to `false`
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
