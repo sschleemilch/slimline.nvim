@@ -78,13 +78,13 @@ local function create_diagnostic_highlights()
   local slimline = require('slimline')
   local style = slimline.config.configs.diagnostics.style or slimline.config.style
 
-  if style == 'fg' then
-    --- Make sure that Diagnostic* hl groups have base as background for fg mode
-    create('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
-    create('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
-    create('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
-    create('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
-  else
+  --- Make sure that Diagnostic* hl groups have base as background
+  create('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
+  create('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
+  create('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
+  create('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
+
+  if style == 'bg' then
     local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
     if dv_bg == nil then
       create('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
