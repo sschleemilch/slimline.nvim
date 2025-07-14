@@ -252,6 +252,70 @@ or as a background color.
 > no background color, Slimline will fall back to `#000000` for dark themes and to `#ffffff`
 > for white themes
 
+Instead of specifying the base highlight group in the config you can also tweak target highlight groups directly.
+Make sure to do that **before** slimline's `setup()`.
+
+<details>
+<summary>Internal highlight groups</summary>
+
+| Highlight Group                    | Description                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Slimline                           | Background of the line                                                                           |
+| SlimlineModeSecondary              | Secondary mode content (mode has no secondary content but progress has, which is following mode) |
+| SlimlineModeNormal                 | Normal mode                                                                                      |
+| SlimlineModeNormalSep              | Normal mode separator                                                                            |
+| SlimlineModeNormalSep2Sec          | Normal mode separator to secondary                                                               |
+| SlimlineModeVisual                 | Visual mode                                                                                      |
+| SlimlineModeVisualSep              | Visual mode separator                                                                            |
+| SlimlineModeVisualSep2Sec          | Visual mode separator to secondary                                                               |
+| SlimlineModeInsert                 | Insert mode                                                                                      |
+| SlimlineModeInsertSep              | Insert mode separator                                                                            |
+| SlimlineModeInsertSep2Sec          | Insert mode separator to secondary                                                               |
+| SlimlineModeReplace                | Replace mode                                                                                     |
+| SlimlineModeReplaceSep             | Replace mode separator                                                                           |
+| SlimlineModeReplaceSep2Sec         | Replace mode separator to secondary                                                              |
+| SlimlineModeCommand                | Command mode                                                                                     |
+| SlimlineModeCommandSep             | Command mode separator                                                                           |
+| SlimlineModeCommandSep2Sec         | Command mode separator to secondary                                                              |
+| SlimlineModeOther                  | Other mode                                                                                       |
+| SlimlineModeOtherSep               | Other mode separator                                                                             |
+| SlimlineModeOtherSep2Sec           | Other mode separator to secondary                                                                |
+| SlimlinePathPrimary                | Path primary                                                                                     |
+| SlimlinePathPrimarySep             | Path primary separator                                                                           |
+| SlimlinePathPrimarySep2Sec         | Path primary separator to secondary                                                              |
+| SlimlinePathSecondary              | Path secondary                                                                                   |
+| SlimlinePathSecondarySep           | Path secondary separator                                                                         |
+| SlimlineGitPrimary                 | Git primary                                                                                      |
+| SlimlineGitPrimarySep              | Git primary separator                                                                            |
+| SlimlineGitPrimarySep2Sec          | Git primary separator to secondary                                                               |
+| SlimlineGitSecondary               | Git secondary                                                                                    |
+| SlimlineGitSecondarySep            | Git secondary separator                                                                          |
+| SlimlineFiletype_lspPrimary        | Filetype lsp primary                                                                             |
+| SlimlineFiletype_lspPrimarySep     | Filetype lsp primary separator                                                                   |
+| SlimlineFiletype_lspPrimarySep2Sec | Filetype lsp primary separator to secondary                                                      |
+| SlimlineFiletype_lspSecondary      | Filetype lsp secondary                                                                           |
+| SlimlineFiletype_lspSecondarySep   | Filetype lsp secondary separator                                                                 |
+| SlimlineProgressPrimary            | Progress primary                                                                                 |
+| SlimlineProgressPrimarySep         | Progress primary separator                                                                       |
+| SlimlineProgressPrimarySep2Sec     | Progress primary separator to secondary                                                          |
+| SlimlineProgressSecondary          | Progress secondary                                                                               |
+| SlimlineProgressSecondarySep       | Progress secondary separator                                                                     |
+| SlimlineRecordingPrimary           | Recording primary                                                                                |
+| SlimlineRecordingPrimarySep        | Recording primary separator                                                                      |
+| SlimlineRecordingPrimarySep2Sec    | Recording primary separator to secondary                                                         |
+| SlimlineRecordingSecondary         | Recording secondary                                                                              |
+| SlimlineRecordingSecondarySep      | Recording secondary separator                                                                    |
+| SlimlineDiagnosticHint             | Diagnostic hints                                                                                 |
+| SlimlineDiagnosticInfo             | Diagnostic infos                                                                                 |
+| SlimlineDiagnosticWarn             | Diagnostic warnings                                                                              |
+| SlimlineDiagnosticError            | Diagnostic errors                                                                                |
+| SlimlineDiagnosticVirtualTextHint  | Diagnostic hints (for `style = bg` only)                                                         |
+| SlimlineDiagnosticVirtualTextInfo  | Diagnostic infos (for `style = bg` only)                                                         |
+| SlimlineDiagnosticVirtualTextWarn  | Diagnostic warnings (for `style = bg` only)                                                      |
+| SlimlineDiagnosticVirtualTextError | Diagnostic errors (for `style = bg` only)                                                        |
+
+</details>
+
 ## Recipes
 
 ### Pure

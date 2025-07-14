@@ -42,6 +42,8 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then hl = basename .. hl end
 
+  if next(vim.api.nvim_get_hl(0, { name = hl })) ~= nil then return hl end
+
   local hl_ref = vim.api.nvim_get_hl(0, { name = base, link = false })
   local hl_ref_bold = hl_ref.bold or false
 
