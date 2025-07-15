@@ -41,15 +41,15 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 
 ## Components
 
-Available components:
-
-- `mode`, vim mode. Automatically sets `vim.opt.showmode = false`.
-- `path`, shows the filename and the relative path + modified / read-only info. The directory path will be truncated. Can be disabled and configured.
-- `git`, shows the git branch + file diff infos (added, modified and removed lines) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))
-- `diagnostics`, shows `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.
-- `filetype_lsp`, shows the file type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`.
-- `progress`, shows the file progress in % and the overall number of lines as well as the cursor column
-- `recording`, shows the register being used for macro recording
+| Component    | Description                                                                                                                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mode         | Current mode. Automatically sets `vim.opt.showmode = false`                                                                                                                                     |
+| path         | Filename and the relative path as well as modified / read-only info. The directory path will be truncated. Can be disabled and configured                                                       |
+| git          | Git branch and Diff infos (added, modified and removed) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))                                                                       |
+| diagnostics  | `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.                                                                              |
+| filetype_lsp | File type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`. |
+| progress     | File progress in %, overall number of lines as well as the cursor column                                                                                                                        |
+| recording    | Register being used when recording a macro                                                                                                                                                      |
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
 The `components` entries accept function calls and strings so that you can create custom comonents.
@@ -76,12 +76,21 @@ Feel free to create an issue/PR if you want to see anything else implemented.
 },
 ```
 
+### [mini.deps](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-deps.md)
+
+```lua
+MiniDeps.now(function()
+    MiniDeps.add('sschleemilch/slimline.nvim')
+    require('slimline').setup({})
+end)
+```
+
 Optional dependencies:
 
-- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise it will just not be rendered
-- [mini.icons](https://github.com/echasnovski/mini.icons) if you want icons next to the filetype
+- [gitsigns](https://github.com/lewis6991/gitsigns.nvim) if you want the `git` component. Otherwise, it will just not be rendered
+- [mini.icons](https://github.com/echasnovski/mini.icons) if you want filetype icons
 
-You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) if you want icons and separators.
+You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) for icons and separators.
 
 > [!TIP]
 > You can decide whether you would like to have a global statusline or one for each split by setting `vim.opt.laststatus` accordingly
@@ -92,7 +101,10 @@ By default, all `components` will be shown. Inactive components will use the _se
 
 ![split](./doc/screenshots/split.png) shows an example using default options.
 
-#### Default configuration
+## Configuration
+
+<details>
+<summary>Default Options</summary>
 
 ```lua
 require('slimline').setup {
@@ -238,6 +250,8 @@ require('slimline').setup {
   },
 }
 ```
+
+</details>
 
 ## Highlights
 
