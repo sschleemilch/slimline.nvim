@@ -92,6 +92,9 @@ local M = {
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
     },
+    searchount = {
+      args = {},
+    },
     progress = {
       follow = 'mode',
       column = false, -- Enables a secondary section with the cursor column
