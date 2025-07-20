@@ -41,15 +41,17 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 
 ## Components
 
-| Component    | Description                                                                                                                                                                                     |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mode         | Current mode. Automatically sets `vim.opt.showmode = false`                                                                                                                                     |
-| path         | Filename and the relative path as well as modified / read-only info. The directory path will be truncated. Can be disabled and configured                                                       |
-| git          | Git branch and Diff infos (added, modified and removed) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))                                                                       |
-| diagnostics  | `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.                                                                              |
-| filetype_lsp | File type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`. |
-| progress     | File progress in %, overall number of lines as well as the cursor column                                                                                                                        |
-| recording    | Register being used when recording a macro                                                                                                                                                      |
+| Component      | Description                                                                                                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mode           | Current mode. Automatically sets `vim.opt.showmode = false`                                                                                                                                     |
+| path           | Filename and the relative path as well as modified / read-only info. The directory path will be truncated. Can be disabled and configured                                                       |
+| git            | Git branch and Diff infos (added, modified and removed) (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim))                                                                       |
+| diagnostics    | `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.                                                                              |
+| filetype_lsp   | File type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`. |
+| progress       | File progress in %, overall number of lines as well as the cursor column                                                                                                                        |
+| recording      | Register being used when recording a macro                                                                                                                                                      |
+| searchcount    | Search result occurences                                                                                                                                                                        |
+| selectioncount | Visually selected characters/lines or matrix                                                                                                                                                    |
 
 Which components to show in which section (`left`, `right`, `center`) can be configured.
 The `components` entries accept function calls and strings so that you can create custom comonents.
@@ -107,7 +109,6 @@ By default, all `components` will be shown. Inactive components will use the _se
 <summary>Default Options</summary>
 
 ```lua
-require('slimline').setup {
 {
   bold = false, -- makes primary parts bold
 
@@ -128,9 +129,6 @@ require('slimline').setup {
       'progress',
     },
   },
-
-  -- Hide statusline in the following filetypes
-  disabled_filetypes = {},
 
   -- Inactive components
   -- Uses all `components` by default.
@@ -174,7 +172,7 @@ require('slimline').setup {
         ['t'] = { verbose = 'TERMINAL', short = 'T' },
         ['U'] = { verbose = 'UNKNOWN', short = 'U' },
       },
-    }
+    },
     path = {
       trunc_width = 60,
       directory = true, -- Whether to show the directory
@@ -200,7 +198,7 @@ require('slimline').setup {
     },
     diagnostics = {
       trunc_width = 75,
-      workspace = false, -- Whether diagnostics should also show the total amount of workspace diagnostics
+      workspace = false, -- Whether diagnostics should show workspace diagnostics instead of current buffer
       icons = {
         ERROR = ' ',
         WARN = ' ',
@@ -214,6 +212,21 @@ require('slimline').setup {
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
     },
+    selectioncount = {
+      hl = {
+        primary = 'Special',
+      },
+      icon = '󰈈 ',
+    },
+    searchcount = {
+      hl = {
+        primary = 'Special',
+      },
+      icon = ' ',
+      -- Options to be passed to vim.fn.searchcount, see :h searchcount
+      options = {
+        recompute = true,
+      },
     },
     progress = {
       follow = 'mode',
@@ -222,6 +235,9 @@ require('slimline').setup {
     },
     recording = {
       icon = ' ',
+      hl = {
+        primary = 'Special',
+      },
     },
   },
 
@@ -248,6 +264,9 @@ require('slimline').setup {
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
+
+  -- Hide statusline on filetypes
+  disabled_filetypes = {},
 }
 ```
 
@@ -272,61 +291,71 @@ Make sure to do that **before** slimline's `setup()`.
 <details>
 <summary>Internal highlight groups</summary>
 
-| Highlight Group                    | Description                                                                                      |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Slimline                           | Background of the line                                                                           |
-| SlimlineModeSecondary              | Secondary mode content (mode has no secondary content but progress has, which is following mode) |
-| SlimlineModeNormal                 | Normal mode                                                                                      |
-| SlimlineModeNormalSep              | Normal mode separator                                                                            |
-| SlimlineModeNormalSep2Sec          | Normal mode separator to secondary                                                               |
-| SlimlineModeVisual                 | Visual mode                                                                                      |
-| SlimlineModeVisualSep              | Visual mode separator                                                                            |
-| SlimlineModeVisualSep2Sec          | Visual mode separator to secondary                                                               |
-| SlimlineModeInsert                 | Insert mode                                                                                      |
-| SlimlineModeInsertSep              | Insert mode separator                                                                            |
-| SlimlineModeInsertSep2Sec          | Insert mode separator to secondary                                                               |
-| SlimlineModeReplace                | Replace mode                                                                                     |
-| SlimlineModeReplaceSep             | Replace mode separator                                                                           |
-| SlimlineModeReplaceSep2Sec         | Replace mode separator to secondary                                                              |
-| SlimlineModeCommand                | Command mode                                                                                     |
-| SlimlineModeCommandSep             | Command mode separator                                                                           |
-| SlimlineModeCommandSep2Sec         | Command mode separator to secondary                                                              |
-| SlimlineModeOther                  | Other mode                                                                                       |
-| SlimlineModeOtherSep               | Other mode separator                                                                             |
-| SlimlineModeOtherSep2Sec           | Other mode separator to secondary                                                                |
-| SlimlinePathPrimary                | Path primary                                                                                     |
-| SlimlinePathPrimarySep             | Path primary separator                                                                           |
-| SlimlinePathPrimarySep2Sec         | Path primary separator to secondary                                                              |
-| SlimlinePathSecondary              | Path secondary                                                                                   |
-| SlimlinePathSecondarySep           | Path secondary separator                                                                         |
-| SlimlineGitPrimary                 | Git primary                                                                                      |
-| SlimlineGitPrimarySep              | Git primary separator                                                                            |
-| SlimlineGitPrimarySep2Sec          | Git primary separator to secondary                                                               |
-| SlimlineGitSecondary               | Git secondary                                                                                    |
-| SlimlineGitSecondarySep            | Git secondary separator                                                                          |
-| SlimlineFiletype_lspPrimary        | Filetype lsp primary                                                                             |
-| SlimlineFiletype_lspPrimarySep     | Filetype lsp primary separator                                                                   |
-| SlimlineFiletype_lspPrimarySep2Sec | Filetype lsp primary separator to secondary                                                      |
-| SlimlineFiletype_lspSecondary      | Filetype lsp secondary                                                                           |
-| SlimlineFiletype_lspSecondarySep   | Filetype lsp secondary separator                                                                 |
-| SlimlineProgressPrimary            | Progress primary                                                                                 |
-| SlimlineProgressPrimarySep         | Progress primary separator                                                                       |
-| SlimlineProgressPrimarySep2Sec     | Progress primary separator to secondary                                                          |
-| SlimlineProgressSecondary          | Progress secondary                                                                               |
-| SlimlineProgressSecondarySep       | Progress secondary separator                                                                     |
-| SlimlineRecordingPrimary           | Recording primary                                                                                |
-| SlimlineRecordingPrimarySep        | Recording primary separator                                                                      |
-| SlimlineRecordingPrimarySep2Sec    | Recording primary separator to secondary                                                         |
-| SlimlineRecordingSecondary         | Recording secondary                                                                              |
-| SlimlineRecordingSecondarySep      | Recording secondary separator                                                                    |
-| SlimlineDiagnosticHint             | Diagnostic hints                                                                                 |
-| SlimlineDiagnosticInfo             | Diagnostic infos                                                                                 |
-| SlimlineDiagnosticWarn             | Diagnostic warnings                                                                              |
-| SlimlineDiagnosticError            | Diagnostic errors                                                                                |
-| SlimlineDiagnosticVirtualTextHint  | Diagnostic hints (for `style = bg` only)                                                         |
-| SlimlineDiagnosticVirtualTextInfo  | Diagnostic infos (for `style = bg` only)                                                         |
-| SlimlineDiagnosticVirtualTextWarn  | Diagnostic warnings (for `style = bg` only)                                                      |
-| SlimlineDiagnosticVirtualTextError | Diagnostic errors (for `style = bg` only)                                                        |
+| Highlight Group                      | Description                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Slimline                             | Background of the line                                                                           |
+| SlimlineModeSecondary                | Secondary mode content (mode has no secondary content but progress has, which is following mode) |
+| SlimlineModeNormal                   | Normal mode                                                                                      |
+| SlimlineModeNormalSep                | Normal mode separator                                                                            |
+| SlimlineModeNormalSep2Sec            | Normal mode separator to secondary                                                               |
+| SlimlineModeVisual                   | Visual mode                                                                                      |
+| SlimlineModeVisualSep                | Visual mode separator                                                                            |
+| SlimlineModeVisualSep2Sec            | Visual mode separator to secondary                                                               |
+| SlimlineModeInsert                   | Insert mode                                                                                      |
+| SlimlineModeInsertSep                | Insert mode separator                                                                            |
+| SlimlineModeInsertSep2Sec            | Insert mode separator to secondary                                                               |
+| SlimlineModeReplace                  | Replace mode                                                                                     |
+| SlimlineModeReplaceSep               | Replace mode separator                                                                           |
+| SlimlineModeReplaceSep2Sec           | Replace mode separator to secondary                                                              |
+| SlimlineModeCommand                  | Command mode                                                                                     |
+| SlimlineModeCommandSep               | Command mode separator                                                                           |
+| SlimlineModeCommandSep2Sec           | Command mode separator to secondary                                                              |
+| SlimlineModeOther                    | Other mode                                                                                       |
+| SlimlineModeOtherSep                 | Other mode separator                                                                             |
+| SlimlineModeOtherSep2Sec             | Other mode separator to secondary                                                                |
+| SlimlinePathPrimary                  | Path primary                                                                                     |
+| SlimlinePathPrimarySep               | Path primary separator                                                                           |
+| SlimlinePathPrimarySep2Sec           | Path primary separator to secondary                                                              |
+| SlimlinePathSecondary                | Path secondary                                                                                   |
+| SlimlinePathSecondarySep             | Path secondary separator                                                                         |
+| SlimlineGitPrimary                   | Git primary                                                                                      |
+| SlimlineGitPrimarySep                | Git primary separator                                                                            |
+| SlimlineGitPrimarySep2Sec            | Git primary separator to secondary                                                               |
+| SlimlineGitSecondary                 | Git secondary                                                                                    |
+| SlimlineGitSecondarySep              | Git secondary separator                                                                          |
+| SlimlineFiletype_lspPrimary          | Filetype lsp primary                                                                             |
+| SlimlineFiletype_lspPrimarySep       | Filetype lsp primary separator                                                                   |
+| SlimlineFiletype_lspPrimarySep2Sec   | Filetype lsp primary separator to secondary                                                      |
+| SlimlineFiletype_lspSecondary        | Filetype lsp secondary                                                                           |
+| SlimlineFiletype_lspSecondarySep     | Filetype lsp secondary separator                                                                 |
+| SlimlineProgressPrimary              | Progress primary                                                                                 |
+| SlimlineProgressPrimarySep           | Progress primary separator                                                                       |
+| SlimlineProgressPrimarySep2Sec       | Progress primary separator to secondary                                                          |
+| SlimlineProgressSecondary            | Progress secondary                                                                               |
+| SlimlineProgressSecondarySep         | Progress secondary separator                                                                     |
+| SlimlineRecordingPrimary             | Recording primary                                                                                |
+| SlimlineRecordingPrimarySep          | Recording primary separator                                                                      |
+| SlimlineRecordingPrimarySep2Sec      | Recording primary separator to secondary                                                         |
+| SlimlineRecordingSecondary           | Recording secondary                                                                              |
+| SlimlineRecordingSecondarySep        | Recording secondary separator                                                                    |
+| SlimlineSearchcountPrimary           | Searchcount primary                                                                              |
+| SlimlineSearchcountPrimarySep        | Searchcount primary separator                                                                    |
+| SlimlineSearchcountPrimarySep2Sec    | Searchcount primary separator to secondary                                                       |
+| SlimlineSearchcountSecondary         | Searchcount secondary                                                                            |
+| SlimlineSearchcountSecondarySep      | Searchcount secondary separator                                                                  |
+| SlimlineSelectioncountPrimary        | Selectioncount primary                                                                           |
+| SlimlineSelectioncountPrimarySep     | Selectioncount primary separator                                                                 |
+| SlimlineSelectioncountPrimarySep2Sec | Selectioncount primary separator to secondary                                                    |
+| SlimlineSelectioncountSecondary      | Selectioncount secondary                                                                         |
+| SlimlineSelectioncountSecondarySep   | Selectioncount secondary separator                                                               |
+| SlimlineDiagnosticHint               | Diagnostic hints                                                                                 |
+| SlimlineDiagnosticInfo               | Diagnostic infos                                                                                 |
+| SlimlineDiagnosticWarn               | Diagnostic warnings                                                                              |
+| SlimlineDiagnosticError              | Diagnostic errors                                                                                |
+| SlimlineDiagnosticVirtualTextHint    | Diagnostic hints (for `style = bg` only)                                                         |
+| SlimlineDiagnosticVirtualTextInfo    | Diagnostic infos (for `style = bg` only)                                                         |
+| SlimlineDiagnosticVirtualTextWarn    | Diagnostic warnings (for `style = bg` only)                                                      |
+| SlimlineDiagnosticVirtualTextError   | Diagnostic errors (for `style = bg` only)                                                        |
 
 </details>
 
