@@ -19,6 +19,8 @@ function C.render(opts)
   local branch = ''
   if gitsigns and gitsigns.head and gitsigns.head ~= '' then
     branch = gitsigns.head
+  elseif vim.fn.exists('*FugitiveHead') == 1 then
+    branch = vim.fn['FugitiveHead']()
   else
     branch = get_branch_from_git()
   end
