@@ -16,7 +16,7 @@ function C.render(opts)
   local gitsigns = vim.b.gitsigns_status_dict
   local minidiff = vim.b.minidiff_summary
 
-  local branch = ''
+  local branch
   if gitsigns and gitsigns.head and gitsigns.head ~= '' then
     branch = gitsigns.head
   elseif vim.fn.exists('*FugitiveHead') == 1 then
