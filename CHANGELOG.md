@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `searchcount` component
 - `selectioncount` component
+- [mini.diff](https://github.com/echasnovski/mini.diff) and [vim-fugitive](https://github.com/tpope/vim-fugitive) as `git` sources and the `git` CLI as fallback
 
 ### Changed
 
