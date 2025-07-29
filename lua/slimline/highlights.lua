@@ -202,6 +202,8 @@ function M.create()
       else
         if component == 'diagnostics' then
           create_diagnostic_highlights()
+          create(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base)
+          create(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base)
         else
           local primary = config.hl.primary
           if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
