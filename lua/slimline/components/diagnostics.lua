@@ -65,8 +65,8 @@ local function format(buffer, workspace)
             sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
           },
           secondary = {
-            text = 'SlimlineDiagnosticSecondary',
-            sep = 'SlimlineDiagnosticSecondarySep',
+            text = 'SlimlineDiagnosticsSecondary',
+            sep = 'SlimlineDiagnosticsSecondarySep',
           },
         }
         table.insert(
