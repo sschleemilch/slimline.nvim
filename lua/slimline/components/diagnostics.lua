@@ -80,7 +80,7 @@ local function format(buffer, workspace)
           )
         )
         table.insert(
-          parts_active,
+          parts_inactive,
           slimline.highlights.hl_component(
             { primary = string.format('%s%s', icons[severity], count) },
             hls,
