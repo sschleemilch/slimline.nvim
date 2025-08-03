@@ -87,6 +87,10 @@ local M = {
         HINT = ' ',
         INFO = ' ',
       },
+      severity = {
+        -- vim.diagnostic.SeverityFilter options
+        min = vim.diagnostic.severity.HINT,
+      },
       hl = {
         error = 'DiagnosticError',
         warn = 'DiagnosticWarn',

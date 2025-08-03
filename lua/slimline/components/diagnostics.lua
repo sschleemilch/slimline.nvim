@@ -25,7 +25,7 @@ local function get_diagnostic_count(buf_id)
     HINT = 0,
     INFO = 0,
   }
-  for _, d in ipairs(vim.diagnostic.get(buf_id)) do
+  for _, d in ipairs(vim.diagnostic.get(buf_id, { severity = config.severity })) do
     local sev = vim.diagnostic.severity[d.severity]
     res[sev] = res[sev] + 1
   end
