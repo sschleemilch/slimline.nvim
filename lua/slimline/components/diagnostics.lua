@@ -54,52 +54,41 @@ local function format(buffer, workspace)
     local wc = workspace[severity]
     if wc > 0 or bc > 0 then
       local count = get_count_format(bc, wc)
-      if style == 'fg' then
-        local hl = 'SlimlineDiagnostic' .. capitalize(severity)
-        table.insert(parts_active, string.format('%%#%s#%s%s', hl, icons[severity], count))
-        table.insert(parts_inactive, string.format('%%#%s#%s%s', 'SlimlineDiagnosticSecondary', icons[severity], count))
-      else
-        local hls = {
-          primary = {
-            text = 'SlimlineDiagnosticVirtualText' .. capsev,
-            sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-          },
-          secondary = {
-            text = 'SlimlineDiagnosticsSecondary',
-            sep = 'SlimlineDiagnosticsSecondarySep',
-          },
-        }
-        table.insert(
-          parts_active,
-          slimline.highlights.hl_component(
-            { primary = string.format('%s%s', icons[severity], count) },
-            hls,
-            sep_,
-            direction_,
-            true
-          )
+      local hls = {
+        primary = {
+          text = 'SlimlineDiagnostics' .. capsev,
+          sep = 'SlimlineDiagnostics' .. capsev .. 'Sep',
+        },
+        secondary = {
+          text = 'SlimlineDiagnosticsSecondary',
+          sep = 'SlimlineDiagnosticsSecondarySep',
+        },
+      }
+      table.insert(
+        parts_active,
+        slimline.highlights.hl_component(
+          { primary = string.format('%s%s', icons[severity], count) },
+          hls,
+          sep_,
+          direction_,
+          true
         )
-        table.insert(
-          parts_inactive,
-          slimline.highlights.hl_component(
-            { primary = string.format('%s%s', icons[severity], count) },
-            hls,
-            sep_,
-            direction_,
-            false
-          )
+      )
+      table.insert(
+        parts_inactive,
+        slimline.highlights.hl_component(
+          { primary = string.format('%s%s', icons[severity], count) },
+          hls,
+          sep_,
+          direction_,
+          false
         )
-      end
+      )
     end
   end
 
-  local hl_reset = string.format('%%#%s#', slimline.highlights.hls.base)
-
-  if #parts_active > 0 then table.insert(parts_active, hl_reset) end
-  if #parts_inactive > 0 then table.insert(parts_inactive, hl_reset) end
-
   local sep = slimline.config.spaces.components
-  if style == 'fg' then sep = ' ' end
+  if style == 'fg' then sep = '' end
 
   return { active = table.concat(parts_active, sep), inactive = table.concat(parts_inactive, sep) }
 end
