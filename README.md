@@ -205,6 +205,12 @@ By default, all `components` will be shown. Inactive components will use the _se
         HINT = ' ',
         INFO = ' ',
       },
+      hl = {
+        error = 'DiagnosticError',
+        warn = 'DiagnosticWarn',
+        hint = 'DiagnosticHint',
+        info = 'DiagnosticInfo',
+      },
     },
     filetype_lsp = {
       trunc_width = 95,
@@ -348,14 +354,14 @@ Make sure to do that **before** slimline's `setup()`.
 | SlimlineSelectioncountPrimarySep2Sec | Selectioncount primary separator to secondary                                                    |
 | SlimlineSelectioncountSecondary      | Selectioncount secondary                                                                         |
 | SlimlineSelectioncountSecondarySep   | Selectioncount secondary separator                                                               |
-| SlimlineDiagnosticHint               | Diagnostic hints                                                                                 |
-| SlimlineDiagnosticInfo               | Diagnostic infos                                                                                 |
-| SlimlineDiagnosticWarn               | Diagnostic warnings                                                                              |
-| SlimlineDiagnosticError              | Diagnostic errors                                                                                |
-| SlimlineDiagnosticVirtualTextHint    | Diagnostic hints (for `style = bg` only)                                                         |
-| SlimlineDiagnosticVirtualTextInfo    | Diagnostic infos (for `style = bg` only)                                                         |
-| SlimlineDiagnosticVirtualTextWarn    | Diagnostic warnings (for `style = bg` only)                                                      |
-| SlimlineDiagnosticVirtualTextError   | Diagnostic errors (for `style = bg` only)                                                        |
+| SlimlineDiagnosticsHint              | Diagnostic hints                                                                                 |
+| SlimlineDiagnosticsHintSep           | Diagnostic hints sep                                                                             |
+| SlimlineDiagnosticsInfo              | Diagnostic infos                                                                                 |
+| SlimlineDiagnosticsInfoSep           | Diagnostic infos sep                                                                             |
+| SlimlineDiagnosticsWarn              | Diagnostic warnings                                                                              |
+| SlimlineDiagnosticsWarnSep           | Diagnostic warnings sep                                                                          |
+| SlimlineDiagnosticsError             | Diagnostic errors                                                                                |
+| SlimlineDiagnosticsErrorSep          | Diagnostic errors sep                                                                            |
 
 </details>
 

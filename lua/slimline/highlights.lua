@@ -76,44 +76,6 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   return hl
 end
 
-local function create_diagnostic_highlights()
-  local slimline = require('slimline')
-  local style = slimline.config.configs.diagnostics.style or slimline.config.style
-
-  --- Make sure that Diagnostic* hl groups have base as background
-  create('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
-  create('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
-  create('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
-  create('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
-
-  if style == 'bg' then
-    local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
-    if dv_bg == nil then
-      create('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
-      create('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticInfo', true, false, nil, nil)
-      create('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticWarn', true, false, nil, nil)
-      create('DiagnosticVirtualTextError', 'SlimlineDiagnosticError', true, false, nil, nil)
-    else
-      create('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
-      create('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
-      create('DiagnosticVirtualTextWarn', 'DiagnosticVirtualTextWarn', false, false, nil, nil)
-      create('DiagnosticVirtualTextError', 'DiagnosticVirtualTextError', false, false, nil, nil)
-    end
-
-    --- Create Diagnostic Seps for bg mode
-    local bg = vim.api.nvim_get_hl(0, { name = M.hls.base, link = false }).bg
-    local fg
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextError', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextWarn', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextInfo', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextHint', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
-  end
-end
-
 function M.create()
   if not M.initialized then return end
 
@@ -201,7 +163,14 @@ function M.create()
         }
       else
         if component == 'diagnostics' then
-          create_diagnostic_highlights()
+          create(prefix .. 'Error', component_config.hl.error, inverse, false, nil, M.hls.base)
+          create(prefix .. 'ErrorSep', component_config.hl.error, false, false, nil, M.hls.base)
+          create(prefix .. 'Warn', component_config.hl.warn, inverse, false, nil, M.hls.base)
+          create(prefix .. 'WarnSep', component_config.hl.warn, false, false, nil, M.hls.base)
+          create(prefix .. 'Info', component_config.hl.info, inverse, false, nil, M.hls.base)
+          create(prefix .. 'InfoSep', component_config.hl.infoo, false, false, nil, M.hls.base)
+          create(prefix .. 'Hint', component_config.hl.hint, inverse, false, nil, M.hls.base)
+          create(prefix .. 'HintSep', component_config.hl.hint, false, false, nil, M.hls.base)
           create(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base)
           create(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base)
         else

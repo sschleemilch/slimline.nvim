@@ -87,6 +87,12 @@ local M = {
         HINT = ' ',
         INFO = ' ',
       },
+      hl = {
+        error = 'DiagnosticError',
+        warn = 'DiagnosticWarn',
+        hint = 'DiagnosticHint',
+        info = 'DiagnosticInfo',
+      },
     },
     filetype_lsp = {
       trunc_width = 95,
