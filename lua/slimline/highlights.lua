@@ -214,10 +214,13 @@ function M.hl_content(content, hl, sep)
 end
 
 ---@param content string?
+---@param sep sep
 ---@return string?
-function M.pad(content)
+function M.pad(content, sep)
   if content == nil or content == '' then return content end
-  return ' ' .. content .. ' '
+  if sep.left ~= nil then content = ' ' + content end
+  if sep.right ~= nil then content = content + ' ' end
+  return content
 end
 
 ---@param content {primary: string, secondary: string?}
