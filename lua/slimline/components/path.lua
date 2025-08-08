@@ -57,7 +57,8 @@ function C.render(opts)
     opts.hls,
     opts.sep,
     opts.direction,
-    opts.active
+    opts.active,
+    opts.style
   )
 end
 

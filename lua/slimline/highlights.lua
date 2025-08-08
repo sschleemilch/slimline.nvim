@@ -220,46 +220,58 @@ function M.pad(content)
   return ' ' .. content .. ' '
 end
 
----@param content {primary: string, secondary: string?}
+---@param content {primary: string?, secondary: string?}
 ---@param hl component.highlights
 ---@param sep sep
 ---@param direction component.direction?
 ---@param active boolean
+---@param style string?
 ---@return string
-function M.hl_component(content, hl, sep, direction, active)
+function M.hl_component(content, hl, sep, direction, active, style)
   active = active == nil or active
   local result
   if content.primary == nil then return '' end
 
+  local fg = style == 'fg'
+
+  if not fg then
+    content.primary = M.pad(content.primary)
+    content.secondary = M.pad(content.secondary)
+  end
+
   if content.secondary == nil then
     if active then
-      result = M.hl_content(M.pad(content.primary), hl.primary, sep)
+      result = M.hl_content(content.primary, hl.primary, sep)
     else
-      result = M.hl_content(M.pad(content.primary), hl.secondary, sep)
+      result = M.hl_content(content.primary, hl.secondary, sep)
     end
   else
     if direction == 'left' then
-      result = M.hl_content(M.pad(content.secondary), hl.secondary, { left = sep.left })
+      result = M.hl_content(content.secondary, hl.secondary, { left = sep.left })
       if active then
-        result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.primary, { right = sep.right })
+        if fg then
+          result = result .. ' '
+        else
+          result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec }, {})
+        end
+        result = result .. M.hl_content(content.primary, hl.primary, { right = sep.right })
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, { right = sep.right })
+        if fg or sep.left ~= '' then result = result .. ' ' end
+        result = result .. M.hl_content(content.primary, hl.secondary, { right = sep.right })
       end
     else
       if active then
-        result = M.hl_content(M.pad(content.primary), hl.primary, { left = sep.left })
-        result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec }, {})
+        result = M.hl_content(content.primary, hl.primary, { left = sep.left })
+        if fg then
+          result = result .. ' '
+        else
+          result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec }, {})
+        end
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = M.hl_content(M.pad(content.primary), hl.secondary, { left = sep.left })
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
+        result = M.hl_content(content.primary, hl.secondary, { left = sep.left })
+        if fg or sep.right ~= '' then result = result .. ' ' end
       end
-      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, { right = sep.right })
+      result = result .. M.hl_content(content.secondary, hl.secondary, { right = sep.right })
     end
   end
   result = result .. '%#' .. M.hls.base .. '#'

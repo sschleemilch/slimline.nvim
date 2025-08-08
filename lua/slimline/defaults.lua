@@ -138,6 +138,9 @@ local M = {
     components = ' ', -- string between components
     left = ' ', -- string at the start of the line
     right = ' ', -- string at the end of the line
+    -- Auto-adjust component spacing for better visual separation
+    -- when fg style components would create ambiguous spacing
+    auto = true,
   },
 
   -- Seperator configuartion

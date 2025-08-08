@@ -124,7 +124,9 @@ local function get_component(component_ref, position, direction)
         render = function(active)
           local hls = Slimline.highlights.hls.components[follow or component_ref]
           if component_ref == 'mode' or follow == 'mode' then hls = Slimline.get_mode().hls end
-          return cmp.render({ sep = sep, direction = direction, hls = hls, active = active })
+          local cfg = Slimline.config.configs[component_ref]
+          local style = (cfg and cfg.style) or Slimline.config.style
+          return cmp.render({ sep = sep, direction = direction, hls = hls, active = active, style = style })
         end,
       }
     else
@@ -145,6 +147,10 @@ function Slimline.concat_components(components, active)
 
   for i, component in ipairs(components) do
     local space = Slimline.config.spaces.components
+    -- Auto-adjust component spacing for better visual separation when using fg style
+    if Slimline.config.spaces.auto and Slimline.config.style == 'fg' and space == ' ' then
+      space = '  ' -- Use 2 spaces instead of 1 when global style is fg
+    end
     if i == 1 then space = '' end
     result = result .. space .. component.render(active)
   end

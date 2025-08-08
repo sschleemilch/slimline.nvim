@@ -256,6 +256,10 @@ By default, all `components` will be shown. Inactive components will use the _se
     components = ' ', -- string between components
     left = ' ', -- string at the start of the line
     right = ' ', -- string at the end of the line
+    -- Auto-adjust component spacing for better visual separation
+    -- when fg style components would create ambiguous spacing.
+    -- Only when `spaces.components` is on default
+    auto = true,
   },
 
   -- Seperator configuartion
@@ -533,7 +537,8 @@ function(active)
         Slimline.highlights.hls.components['path'],
         Slimline.get_sep('path'),
         'right', -- flow direction (on which side the secondary part will be rendered)
-        active -- whether the component is active or not
+        active, -- whether the component is active or not
+        'fg' -- style to use
     )
 end,
 ```
