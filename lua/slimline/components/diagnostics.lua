@@ -71,7 +71,8 @@ local function format(buffer, workspace)
           hls,
           sep_,
           direction_,
-          true
+          true,
+          style
         )
       )
       table.insert(
@@ -81,7 +82,8 @@ local function format(buffer, workspace)
           hls,
           sep_,
           direction_,
-          false
+          false,
+          style
         )
       )
     end

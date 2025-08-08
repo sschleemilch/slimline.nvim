@@ -533,7 +533,8 @@ function(active)
         Slimline.highlights.hls.components['path'],
         Slimline.get_sep('path'),
         'right', -- flow direction (on which side the secondary part will be rendered)
-        active -- whether the component is active or not
+        active, -- whether the component is active or not
+        'fg' -- style to use
     )
 end,
 ```
