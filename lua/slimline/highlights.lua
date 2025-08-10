@@ -213,53 +213,67 @@ function M.hl_content(content, hl, sep)
   return rendered
 end
 
----@param content string?
----@return string?
-function M.pad(content)
-  if content == nil or content == '' then return content end
-  return ' ' .. content .. ' '
+---@param content {primary: string?, secondary: string?}
+---@param style component.style
+---@param direction component.direction?
+---@return {primary: string?, secondary: string?}
+function M.pad(content, style, direction)
+  content.primary = ' ' .. content.primary .. ' '
+
+  if content.secondary and content.secondary ~= '' then
+    if style == 'bg' then
+      content.secondary = ' ' .. content.secondary .. ' '
+    else
+      if direction == 'right' then
+        content.secondary = content.secondary .. ' '
+      else
+        content.secondary = ' ' .. content.secondary
+      end
+    end
+  end
+
+  return content
 end
 
----@param content {primary: string, secondary: string?}
+---@param content {primary: string?, secondary: string?}
 ---@param hl component.highlights
 ---@param sep sep
 ---@param direction component.direction?
 ---@param active boolean
+---@param style component.style
 ---@return string
-function M.hl_component(content, hl, sep, direction, active)
+function M.hl_component(content, hl, sep, direction, active, style)
   active = active == nil or active
   local result
-  if content.primary == nil then return '' end
+  if content.primary == nil or content.primary == '' then return '' end
+
+  content = M.pad(content, style, direction)
 
   if content.secondary == nil then
     if active then
-      result = M.hl_content(M.pad(content.primary), hl.primary, sep)
+      result = M.hl_content(content.primary, hl.primary, sep)
     else
-      result = M.hl_content(M.pad(content.primary), hl.secondary, sep)
+      result = M.hl_content(content.primary, hl.secondary, sep)
     end
   else
     if direction == 'left' then
-      result = M.hl_content(M.pad(content.secondary), hl.secondary, { left = sep.left })
+      result = M.hl_content(content.secondary, hl.secondary, { left = sep.left })
       if active then
         result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.primary, { right = sep.right })
+        result = result .. M.hl_content(content.primary, hl.primary, { right = sep.right })
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, { right = sep.right })
+        if sep.left ~= '' then content.primary = ' ' .. content.primary end
+        result = result .. M.hl_content(content.primary, hl.secondary, { right = sep.right })
       end
     else
       if active then
-        result = M.hl_content(M.pad(content.primary), hl.primary, { left = sep.left })
+        result = M.hl_content(content.primary, hl.primary, { left = sep.left })
         result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec }, {})
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = M.hl_content(M.pad(content.primary), hl.secondary, { left = sep.left })
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
+        if sep.right ~= '' then content.primary = content.primary .. ' ' end
+        result = M.hl_content(content.primary, hl.secondary, { left = sep.left })
       end
-      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, { right = sep.right })
+      result = result .. M.hl_content(content.secondary, hl.secondary, { right = sep.right })
     end
   end
   result = result .. '%#' .. M.hls.base .. '#'
