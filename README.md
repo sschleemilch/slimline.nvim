@@ -87,6 +87,15 @@ MiniDeps.now(function()
 end)
 ```
 
+### Neovim's 0.12+ built in plugin manager `vim.pack`
+
+```lua
+vim.pack.add({
+  "https://github.com/sschleemilch/slimline.nvim",
+})
+require("slimline").setup({})
+```
+
 Optional dependencies:
 
 - [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only) if you want the `git` component. Otherwise, it will not be rendered
@@ -378,7 +387,7 @@ Make sure to do that **before** slimline's `setup()`.
 ![s21](./doc/screenshots/s21.png)
 
 ```lua
-opts = {
+{
   style = 'fg',
   bold = true,
   hl = {
@@ -419,7 +428,7 @@ opts = {
 ![s23](./doc/screenshots/s23.png)
 
 ```lua
-opts = {
+{
   style = 'bg',
   configs = {
     path = {
@@ -441,23 +450,23 @@ opts = {
 }
 ```
 
-### Calm format
+### Calm
 
 ![s9](./doc/screenshots/s9.png)
 ![s10](./doc/screenshots/s10.png)
 
 ```lua
-opts = {
+{
     style = "fg"
 }
 ```
 
-### Slashes format
+### Slashes
 
 ![s13](./doc/screenshots/s13.png)
 
 ```lua
-opts = {
+{
     spaces = {
         components = "",
         left = "",
@@ -479,13 +488,40 @@ opts = {
 ![s17](./doc/screenshots/s17.png)
 
 ```lua
-opts = {
+{
     spaces = {
         components = "─",
         left = "─",
         right = "─",
     },
 },
+```
+
+### 3 letter non-shifting mode
+
+```lua
+{
+    configs = {
+        mode = {
+            format = {
+                ['n'] = { short = 'NOR' },
+                ['v'] = { short = 'VIS' },
+                ['V'] = { short = 'V-L' },
+                ['\22'] = { short = 'V-B' },
+                ['s'] = { short = 'SEL' },
+                ['S'] = { short = 'S-L' },
+                ['\19'] = { short = 'S-B' },
+                ['i'] = { short = 'INS' },
+                ['R'] = { short = 'REP' },
+                ['c'] = { short = 'CMD' },
+                ['r'] = { short = 'PRO' },
+                ['!'] = { short = 'SHE' },
+                ['t'] = { short = 'TER' },
+                ['U'] = { short = 'UNK' },
+            },
+        },
+    }
+}
 ```
 
 And adding fillchars `stl` nvim setting:
