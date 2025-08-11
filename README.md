@@ -497,6 +497,14 @@ Make sure to do that **before** slimline's `setup()`.
 },
 ```
 
+And adding fill chars `stl` Neovim option:
+
+```lua
+vim.opt.fillchars = {
+	stl = "─",
+}
+```
+
 ### 3 letter non-shifting mode
 
 ```lua
@@ -521,14 +529,6 @@ Make sure to do that **before** slimline's `setup()`.
             },
         },
     }
-}
-```
-
-And adding fillchars `stl` nvim setting:
-
-```lua
-vim.opt.fillchars = {
-	stl = "─",
 }
 ```
 
