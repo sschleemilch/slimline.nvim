@@ -221,6 +221,7 @@ By default, all `components` will be shown. Inactive components will use the _se
       -- Map lsp client names to custom names or ignore them by setting to `false`
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
+      lsp_sep = ',', -- separator between attached LSPs
     },
     selectioncount = {
       hl = {

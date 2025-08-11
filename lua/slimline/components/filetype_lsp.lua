@@ -23,7 +23,7 @@ local track_lsp = vim.schedule_wrap(function(data)
   end)
   local names = it:totable()
   if #names > 0 then
-    lsp_clients[data.buf] = string.format('%s', table.concat(names, ','))
+    lsp_clients[data.buf] = string.format('%s', table.concat(names, config.lsp_sep))
   else
     lsp_clients[data.buf] = nil
   end
