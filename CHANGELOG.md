@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `filetype_lsp`: Added configuration option for separator between attached LSPs `lsp_sep`
 
+### Fixed
+
+- `progress`: Spacing when `icon` configured to be empty
+
 ## [2.5.4] - 2025-08-10
 
 ### Fixed
