@@ -220,7 +220,7 @@ function Slimline.setup(opts)
   vim.go.statusline =
     '%{%(nvim_get_current_win()==#g:actual_curwin || &laststatus==3) ? v:lua.Slimline.render(1) : v:lua.Slimline.render(0)%}'
 
-  vim.api.nvim_create_autocmd('Colorscheme', {
+  vim.api.nvim_create_autocmd('ColorScheme', {
     group = Slimline.augroup,
     callback = function() Slimline.highlights.initialized = true end,
   })
