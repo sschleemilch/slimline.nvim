@@ -23,7 +23,9 @@ function C.render(opts)
     secondary = string.format('%3d', col)
   end
 
-  primary = string.format('%s %s / %s', config.icon, primary, total)
+  primary = string.format('%s / %s', primary, total)
+
+  if config.icon ~= '' then primary = config.icon .. ' ' .. primary end
 
   return slimline.highlights.hl_component(
     { primary = primary, secondary = secondary },
