@@ -390,20 +390,7 @@ Make sure to do that **before** slimline's `setup()`.
 {
   style = 'fg',
   bold = true,
-  hl = {
-    secondary = 'Comment',
-  },
   configs = {
-    mode = {
-      hl = {
-        normal = 'Type',
-        visual = 'Keyword',
-        insert = 'Function',
-        replace = 'Statement',
-        command = 'String',
-        other = 'Function',
-      },
-    },
     path = {
       hl = {
         primary = 'Label',
@@ -429,7 +416,6 @@ Make sure to do that **before** slimline's `setup()`.
 
 ```lua
 {
-  style = 'bg',
   configs = {
     path = {
       hl = {
@@ -450,18 +436,23 @@ Make sure to do that **before** slimline's `setup()`.
 }
 ```
 
-### Calm
+### Minimal
 
 ![s9](./doc/screenshots/s9.png)
 ![s10](./doc/screenshots/s10.png)
 
 ```lua
 {
-    style = "fg"
+    style = "fg",
+    spaces = {
+        components = '',
+        left = '',
+        right = ''
+    }
 }
 ```
 
-### Slashes
+### Slashed
 
 ![s13](./doc/screenshots/s13.png)
 
