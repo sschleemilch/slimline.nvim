@@ -18,10 +18,7 @@ function C.render(opts)
 
   local secondary = ''
 
-  if config.column then
-    local col = vim.fn.col('.')
-    secondary = string.format('%3d', col)
-  end
+  if config.column then secondary = '%3.(%c%V%)' end
 
   primary = string.format('%s / %s', primary, total)
 
