@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `filetype_lsp`: Added configuration option for separator between attached LSPs `lsp_sep`
+- `progress`: Added virtual column, using default statusline format `%c%V`
 
 ### Fixed
 
