@@ -132,6 +132,7 @@ local M = {
         primary = 'Special',
       },
     },
+    lsp_progress = {}
   },
 
   -- Spacing configuration
