@@ -8,7 +8,7 @@ function C.render(opts)
   local recording = vim.fn.reg_recording()
   if recording == '' then return '' end
   local status = config.icon .. recording
-  return slimline.highlights.hl_component({ primary = status }, opts.hls, opts.sep, opts.direction, opts.active)
+  return slimline.highlights.hl_component({ primary = status }, opts.hls, opts.sep, opts.direction, opts.active, opts.style)
 end
 
 return C

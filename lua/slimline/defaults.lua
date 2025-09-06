@@ -26,6 +26,7 @@ local M = {
   -- `<component>.sep` can be used to overwrite the global 'sep.left' and `sep.right`
   -- `<component>.hl = { primary = ..., secondary = ...}` can be used to overwrite global ones
   -- `<component>.follow` can point to another component name to follow its style (e.g. 'progress' following 'mode' by default). Follow can be disabled by setting it to `false`
+  -- `<component>.trunc_width` can be used to hide a component completely once the window width drops below that value
   configs = {
     mode = {
       verbose = false, -- Selects the `verbose` format
@@ -57,9 +58,10 @@ local M = {
     path = {
       trunc_width = 60,
       directory = true, -- Whether to show the directory
+      -- truncates the directory path. Can be disabled by setting `truncate = false`
       truncate = {
-        chars = 1,
-        full_dirs = 2,
+        chars = 1, -- number of characters for each path component
+        full_dirs = 2, -- how many path components to keep unshortened
       },
       icons = {
         folder = ' ',
@@ -85,12 +87,39 @@ local M = {
         HINT = ' ',
         INFO = ' ',
       },
+      severity = {
+        -- vim.diagnostic.SeverityFilter options
+        min = vim.diagnostic.severity.HINT,
+      },
+      hl = {
+        error = 'DiagnosticError',
+        warn = 'DiagnosticWarn',
+        hint = 'DiagnosticHint',
+        info = 'DiagnosticInfo',
+      },
     },
     filetype_lsp = {
       trunc_width = 95,
       -- Map lsp client names to custom names or ignore them by setting to `false`
       -- E.g. { ['tsserver'] = 'TS', ['pyright'] = 'Python', ['GitHub Copilot'] = false }
       map_lsps = {},
+      lsp_sep = ',', -- separator between attached LSPs
+    },
+    selectioncount = {
+      hl = {
+        primary = 'Special',
+      },
+      icon = '󰔌 ',
+    },
+    searchcount = {
+      hl = {
+        primary = 'Special',
+      },
+      icon = ' ',
+      -- Options to be passed to vim.fn.searchcount, see :h searchcount
+      options = {
+        recompute = true,
+      },
     },
     progress = {
       follow = 'mode',
@@ -99,6 +128,9 @@ local M = {
     },
     recording = {
       icon = ' ',
+      hl = {
+        primary = 'Special',
+      },
     },
   },
 

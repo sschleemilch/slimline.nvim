@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next (minor)
+
+### Added
+
+- `filetype_lsp`: Added configuration option for separator between attached LSPs `lsp_sep`
+- `progress`: Added virtual column, using default statusline format `%c%V`
+
+### Fixed
+
+- `progress`: Spacing when `icon` configured to be empty
+
+## [2.5.4] - 2025-08-10
+
+### Fixed
+
+- Highlight of `SlimlineDiagnosticInfoSep` (typo)
+
+## [2.5.3] - 2025-08-10
+
+### Fixed
+
+- Reduced spacing between `primary` and `secondary` part of components when in `style="fg"`. Was 2 spaces, is now 1. Enables a more compact line.
+
+## [2.5.2] - 2025-08-03
+
+### Fixed
+
+- Made diagnostics highlights more consistent and better integrated when being inactive and in `bg` mode
+
+## [2.5.1] - 2025-07-30
+
+### Fixed
+
+- `diagnostics`: wrong highlight names and double sections when `style=bg`
+
+## [2.5.0] - 2025-07-29
+
+### Changed
+
+- `diagnostics`: Respecting `active` state - rendering using secondary highlights just as the other components
+
+## [2.4.0] - 2025-07-20
+
+### Added
+
+- `searchcount` component
+- `selectioncount` component
+- [mini.diff](https://github.com/echasnovski/mini.diff) and [vim-fugitive](https://github.com/tpope/vim-fugitive) as `git` sources and the `git` CLI as fallback
+
+### Changed
+
+- `recording` primary highlight group to `Special` to make it a bit more eye catching by default
+
 ## [2.3.0] - 2025-07-11
 
 ### Added

@@ -17,6 +17,10 @@ Slimline.highlights = require('slimline.highlights')
 ---|'"first"'
 ---|'"last"'
 
+---@alias component.style string
+---|'"fg"'
+---|'"bg"'
+
 ---@alias group_position string
 ---|'"left"'
 ---|'"center"'
@@ -37,6 +41,7 @@ Slimline.highlights = require('slimline.highlights')
 ---@field direction component.direction
 ---@field sep sep
 ---@field hls component.highlights
+---@field style component.style
 
 ---@type components
 Slimline.active = vim.defaulttable()
@@ -115,7 +120,9 @@ local function get_component(component_ref, position, direction)
   elseif type(component_ref) == 'string' then
     local ok, cmp = pcall(require, string.format('slimline.components.%s', component_ref))
     if ok then
-      local follow = Slimline.config.configs[component_ref].follow
+      local cfg = Slimline.config.configs[component_ref]
+      local follow = cfg.follow
+      local style = (cfg and cfg.style) or Slimline.config.style
       local sep = Slimline.get_sep(follow or component_ref)
       if Slimline.config.sep.hide.first and position == 'first' then sep.left = '' end
       if Slimline.config.sep.hide.last and position == 'last' then sep.right = '' end
@@ -124,7 +131,7 @@ local function get_component(component_ref, position, direction)
         render = function(active)
           local hls = Slimline.highlights.hls.components[follow or component_ref]
           if component_ref == 'mode' or follow == 'mode' then hls = Slimline.get_mode().hls end
-          return cmp.render({ sep = sep, direction = direction, hls = hls, active = active })
+          return cmp.render({ sep = sep, direction = direction, hls = hls, active = active, style = style })
         end,
       }
     else
@@ -213,7 +220,7 @@ function Slimline.setup(opts)
   vim.go.statusline =
     '%{%(nvim_get_current_win()==#g:actual_curwin || &laststatus==3) ? v:lua.Slimline.render(1) : v:lua.Slimline.render(0)%}'
 
-  vim.api.nvim_create_autocmd('Colorscheme', {
+  vim.api.nvim_create_autocmd('ColorScheme', {
     group = Slimline.augroup,
     callback = function() Slimline.highlights.initialized = true end,
   })

@@ -18,19 +18,19 @@ function C.render(opts)
 
   local secondary = ''
 
-  if config.column then
-    local col = vim.fn.col('.')
-    secondary = string.format('%3d', col)
-  end
+  if config.column then secondary = '%3.(%c%V%)' end
 
-  primary = string.format('%s %s / %s', config.icon, primary, total)
+  primary = string.format('%s / %s', primary, total)
+
+  if config.icon ~= '' then primary = config.icon .. ' ' .. primary end
 
   return slimline.highlights.hl_component(
     { primary = primary, secondary = secondary },
     opts.hls,
     opts.sep,
     opts.direction,
-    opts.active
+    opts.active,
+    opts.style
   )
 end
 

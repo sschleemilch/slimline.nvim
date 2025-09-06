@@ -42,6 +42,8 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   local basename = 'Slimline'
   if hl:sub(1, #basename) ~= basename then hl = basename .. hl end
 
+  if next(vim.api.nvim_get_hl(0, { name = hl })) ~= nil then return hl end
+
   local hl_ref = vim.api.nvim_get_hl(0, { name = base, link = false })
   local hl_ref_bold = hl_ref.bold or false
 
@@ -72,44 +74,6 @@ local function create(hl, base, inverse, bold, bg_from_fg, bg_from_bg)
   vim.api.nvim_set_hl(0, hl, { bg = bg, fg = fg, bold = bold })
 
   return hl
-end
-
-local function create_diagnostic_highlights()
-  local slimline = require('slimline')
-  local style = slimline.config.configs.diagnostics.style or slimline.config.style
-
-  --- Make sure that Diagnostic* hl groups have base as background
-  create('DiagnosticHint', 'DiagnosticHint', false, false, nil, M.hls.base)
-  create('DiagnosticInfo', 'DiagnosticInfo', false, false, nil, M.hls.base)
-  create('DiagnosticWarn', 'DiagnosticWarn', false, false, nil, M.hls.base)
-  create('DiagnosticError', 'DiagnosticError', false, false, nil, M.hls.base)
-
-  if style == 'bg' then
-    local dv_bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualTextError', link = false }).bg
-    if dv_bg == nil then
-      create('DiagnosticVirtualTextHint', 'SlimlineDiagnosticHint', true, false, nil, nil)
-      create('DiagnosticVirtualTextInfo', 'SlimlineDiagnosticInfo', true, false, nil, nil)
-      create('DiagnosticVirtualTextWarn', 'SlimlineDiagnosticWarn', true, false, nil, nil)
-      create('DiagnosticVirtualTextError', 'SlimlineDiagnosticError', true, false, nil, nil)
-    else
-      create('DiagnosticVirtualTextHint', 'DiagnosticVirtualTextHint', false, false, nil, nil)
-      create('DiagnosticVirtualTextInfo', 'DiagnosticVirtualTextInfo', false, false, nil, nil)
-      create('DiagnosticVirtualTextWarn', 'DiagnosticVirtualTextWarn', false, false, nil, nil)
-      create('DiagnosticVirtualTextError', 'DiagnosticVirtualTextError', false, false, nil, nil)
-    end
-
-    --- Create Diagnostic Seps for bg mode
-    local bg = vim.api.nvim_get_hl(0, { name = M.hls.base, link = false }).bg
-    local fg
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextError', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextErrorSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextWarn', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextWarnSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextInfo', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextInfoSep', { bg = bg, fg = fg })
-    fg = vim.api.nvim_get_hl(0, { name = 'SlimlineDiagnosticVirtualTextHint', link = false }).bg
-    vim.api.nvim_set_hl(0, 'SlimlineDiagnosticVirtualTextHintSep', { bg = bg, fg = fg })
-  end
 end
 
 function M.create()
@@ -199,7 +163,16 @@ function M.create()
         }
       else
         if component == 'diagnostics' then
-          create_diagnostic_highlights()
+          create(prefix .. 'Error', component_config.hl.error, inverse, false, nil, M.hls.base)
+          create(prefix .. 'ErrorSep', component_config.hl.error, false, false, nil, M.hls.base)
+          create(prefix .. 'Warn', component_config.hl.warn, inverse, false, nil, M.hls.base)
+          create(prefix .. 'WarnSep', component_config.hl.warn, false, false, nil, M.hls.base)
+          create(prefix .. 'Info', component_config.hl.info, inverse, false, nil, M.hls.base)
+          create(prefix .. 'InfoSep', component_config.hl.info, false, false, nil, M.hls.base)
+          create(prefix .. 'Hint', component_config.hl.hint, inverse, false, nil, M.hls.base)
+          create(prefix .. 'HintSep', component_config.hl.hint, false, false, nil, M.hls.base)
+          create(prefix .. 'Secondary', secondary, inverse, false, nil, M.hls.base)
+          create(prefix .. 'SecondarySep', secondary, false, false, nil, M.hls.base)
         else
           local primary = config.hl.primary
           if config.configs[component] and config.configs[component].hl and config.configs[component].hl.primary then
@@ -240,53 +213,67 @@ function M.hl_content(content, hl, sep)
   return rendered
 end
 
----@param content string?
----@return string?
-function M.pad(content)
-  if content == nil or content == '' then return content end
-  return ' ' .. content .. ' '
+---@param content {primary: string?, secondary: string?}
+---@param style component.style
+---@param direction component.direction?
+---@return {primary: string?, secondary: string?}
+function M.pad(content, style, direction)
+  content.primary = ' ' .. content.primary .. ' '
+
+  if content.secondary and content.secondary ~= '' then
+    if style == 'bg' then
+      content.secondary = ' ' .. content.secondary .. ' '
+    else
+      if direction == 'right' then
+        content.secondary = content.secondary .. ' '
+      else
+        content.secondary = ' ' .. content.secondary
+      end
+    end
+  end
+
+  return content
 end
 
----@param content {primary: string, secondary: string?}
+---@param content {primary: string?, secondary: string?}
 ---@param hl component.highlights
 ---@param sep sep
 ---@param direction component.direction?
 ---@param active boolean
+---@param style component.style
 ---@return string
-function M.hl_component(content, hl, sep, direction, active)
+function M.hl_component(content, hl, sep, direction, active, style)
   active = active == nil or active
   local result
-  if content.primary == nil then return '' end
+  if content.primary == nil or content.primary == '' then return '' end
+
+  content = M.pad(content, style, direction)
 
   if content.secondary == nil then
     if active then
-      result = M.hl_content(M.pad(content.primary), hl.primary, sep)
+      result = M.hl_content(content.primary, hl.primary, sep)
     else
-      result = M.hl_content(M.pad(content.primary), hl.secondary, sep)
+      result = M.hl_content(content.primary, hl.secondary, sep)
     end
   else
     if direction == 'left' then
-      result = M.hl_content(M.pad(content.secondary), hl.secondary, { left = sep.left })
+      result = M.hl_content(content.secondary, hl.secondary, { left = sep.left })
       if active then
         result = result .. M.hl_content(sep.left, { text = hl.primary.sep2sec }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.primary, { right = sep.right })
+        result = result .. M.hl_content(content.primary, hl.primary, { right = sep.right })
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
-        result = result .. M.hl_content(M.pad(content.primary), hl.secondary, { right = sep.right })
+        if sep.left ~= '' then content.primary = ' ' .. content.primary end
+        result = result .. M.hl_content(content.primary, hl.secondary, { right = sep.right })
       end
     else
       if active then
-        result = M.hl_content(M.pad(content.primary), hl.primary, { left = sep.left })
+        result = M.hl_content(content.primary, hl.primary, { left = sep.left })
         result = result .. M.hl_content(sep.right, { text = hl.primary.sep2sec }, {})
       else
-        local fill = ' '
-        if sep.left == '' and sep.right == '' then fill = '' end
-        result = M.hl_content(M.pad(content.primary), hl.secondary, { left = sep.left })
-        result = result .. M.hl_content(fill, { text = hl.secondary.text }, {})
+        if sep.right ~= '' then content.primary = content.primary .. ' ' end
+        result = M.hl_content(content.primary, hl.secondary, { left = sep.left })
       end
-      result = result .. M.hl_content(M.pad(content.secondary), hl.secondary, { right = sep.right })
+      result = result .. M.hl_content(content.secondary, hl.secondary, { right = sep.right })
     end
   end
   result = result .. '%#' .. M.hls.base .. '#'

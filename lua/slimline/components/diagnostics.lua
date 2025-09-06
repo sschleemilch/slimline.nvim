@@ -25,7 +25,7 @@ local function get_diagnostic_count(buf_id)
     HINT = 0,
     INFO = 0,
   }
-  for _, d in ipairs(vim.diagnostic.get(buf_id)) do
+  for _, d in ipairs(vim.diagnostic.get(buf_id, { severity = config.severity })) do
     local sev = vim.diagnostic.severity[d.severity]
     res[sev] = res[sev] + 1
   end
@@ -44,37 +44,55 @@ end
 
 ---@param buffer diagnostics
 ---@param workspace diagnostics
----@return string
+---@return {active: string, inactive: string}
 local function format(buffer, workspace)
-  local parts = {}
+  local parts_active = {}
+  local parts_inactive = {}
 
   for severity, bc in pairs(buffer) do
     local capsev = capitalize(severity)
     local wc = workspace[severity]
     if wc > 0 or bc > 0 then
       local count = get_count_format(bc, wc)
-      if style == 'fg' then
-        local hl = 'SlimlineDiagnostic' .. capitalize(severity)
-        table.insert(parts, string.format('%%#%s#%s%s', hl, icons[severity], count))
-      else
-        table.insert(
-          parts,
-          slimline.highlights.hl_component({ primary = string.format('%s%s', icons[severity], count) }, {
-            primary = {
-              text = 'SlimlineDiagnosticVirtualText' .. capsev,
-              sep = 'SlimlineDiagnosticVirtualText' .. capsev .. 'Sep',
-            },
-          }, sep_, direction_, true)
+      local hls = {
+        primary = {
+          text = 'SlimlineDiagnostics' .. capsev,
+          sep = 'SlimlineDiagnostics' .. capsev .. 'Sep',
+        },
+        secondary = {
+          text = 'SlimlineDiagnosticsSecondary',
+          sep = 'SlimlineDiagnosticsSecondarySep',
+        },
+      }
+      table.insert(
+        parts_active,
+        slimline.highlights.hl_component(
+          { primary = string.format('%s%s', icons[severity], count) },
+          hls,
+          sep_,
+          direction_,
+          true,
+          style
         )
-      end
+      )
+      table.insert(
+        parts_inactive,
+        slimline.highlights.hl_component(
+          { primary = string.format('%s%s', icons[severity], count) },
+          hls,
+          sep_,
+          direction_,
+          false,
+          style
+        )
+      )
     end
   end
 
-  if #parts > 0 then table.insert(parts, string.format('%%#%s#', slimline.highlights.hls.base)) end
   local sep = slimline.config.spaces.components
-  if style == 'fg' then sep = ' ' end
+  if style == 'fg' then sep = '' end
 
-  return table.concat(parts, sep)
+  return { active = table.concat(parts_active, sep), inactive = table.concat(parts_inactive, sep) }
 end
 
 local track_diagnostics = vim.schedule_wrap(function(data)
@@ -115,7 +133,15 @@ end
 function C.render(opts)
   init(opts.sep, opts.direction)
 
-  return diagnostics[vim.api.nvim_get_current_buf()] or ''
+  local buf = vim.api.nvim_get_current_buf()
+
+  if not diagnostics[buf] then return '' end
+
+  if opts.active then
+    return diagnostics[buf].active
+  else
+    return diagnostics[buf].inactive
+  end
 end
 
 return C
