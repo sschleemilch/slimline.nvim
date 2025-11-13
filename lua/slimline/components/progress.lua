@@ -18,7 +18,7 @@ function C.render(opts)
 
   local secondary = ''
 
-  if config.column then secondary = '%3.(%c%V%)' end
+  if config.column then secondary = '%5.(%c%V%)' end
 
   primary = string.format('%s / %s', primary, total)
 
