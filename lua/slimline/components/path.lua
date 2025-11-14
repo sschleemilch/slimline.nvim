@@ -1,9 +1,12 @@
 local slimline = require('slimline')
 local C = {}
-
 local config = slimline.config.configs.path
 
+local cache = {}
+
 local function truncate(path, chars, full_dirs)
+  if cache[path] then return cache[path] end
+
   local parts = vim.split(path, '/', { trimempty = true })
 
   local truncated = {}
@@ -22,7 +25,9 @@ local function truncate(path, chars, full_dirs)
     end
   end
 
-  return table.concat(truncated, '/')
+  local result = table.concat(truncated, '/')
+  cache[path] = result
+  return result
 end
 
 ---@param opts render.options
