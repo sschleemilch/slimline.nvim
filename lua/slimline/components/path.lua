@@ -3,15 +3,8 @@ local C = {}
 
 local config = slimline.config.configs.path
 
----@param path string
----@param chars integer
----@param full_dirs integer
----@return string
 local function truncate(path, chars, full_dirs)
-  local parts = {}
-  for part in path:gmatch('[^/]+') do
-    table.insert(parts, part)
-  end
+  local parts = vim.split(path, '/', { trimempty = true })
 
   local truncated = {}
   local n_parts = #parts
@@ -19,10 +12,13 @@ local function truncate(path, chars, full_dirs)
   for i, component in ipairs(parts) do
     if i > (n_parts - full_dirs) then
       table.insert(truncated, component)
-    elseif #component > chars then
-      table.insert(truncated, component:sub(1, chars))
     else
-      table.insert(truncated, component)
+      local len = #component
+      if len > chars then
+        table.insert(truncated, component:sub(1, chars))
+      else
+        table.insert(truncated, component)
+      end
     end
   end
 
