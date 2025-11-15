@@ -290,8 +290,6 @@ function M.hl_component(content, hl, sep, direction, active, style)
   active = active == nil or active
   if content.primary == nil or content.primary == '' then return '' end
 
-  content = M.pad(content, style, direction)
-
   local cache_key = table.concat({
     (content.secondary ~= nil and 's') or '-',
     hl.primary.sep or '-',
@@ -302,7 +300,6 @@ function M.hl_component(content, hl, sep, direction, active, style)
     hl.secondary.text or '-',
     sep.left or '-',
     sep.right or '-',
-    direction or '-',
     active and 't' or 'f',
     style,
   }, '|')
@@ -311,6 +308,7 @@ function M.hl_component(content, hl, sep, direction, active, style)
 
   if not fmt then
     local fmt_content = { primary = '%s', secondary = content.secondary and '%s' or nil }
+    fmt_content = M.pad(fmt_content, style, direction)
     fmt = M.hl_component_fmt(fmt_content, hl, sep, direction, active)
     cache[cache_key] = fmt
   end
