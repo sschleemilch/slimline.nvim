@@ -1,17 +1,11 @@
 local slimline = require('slimline')
 local C = {}
-
 local config = slimline.config.configs.path
 
----@param path string
----@param chars integer
----@param full_dirs integer
----@return string
+local cache = {}
+
 local function truncate(path, chars, full_dirs)
-  local parts = {}
-  for part in path:gmatch('[^/]+') do
-    table.insert(parts, part)
-  end
+  local parts = vim.split(path, '/', { trimempty = true })
 
   local truncated = {}
   local n_parts = #parts
@@ -19,14 +13,18 @@ local function truncate(path, chars, full_dirs)
   for i, component in ipairs(parts) do
     if i > (n_parts - full_dirs) then
       table.insert(truncated, component)
-    elseif #component > chars then
-      table.insert(truncated, component:sub(1, chars))
     else
-      table.insert(truncated, component)
+      local len = #component
+      if len > chars then
+        table.insert(truncated, component:sub(1, chars))
+      else
+        table.insert(truncated, component)
+      end
     end
   end
 
-  return table.concat(truncated, '/')
+  local result = table.concat(truncated, '/')
+  return result
 end
 
 ---@param opts render.options
@@ -34,10 +32,17 @@ end
 function C.render(opts)
   if vim.bo.buftype ~= '' then return '' end
 
+  local full_path = vim.fn.expand('%:p')
+  local mod = vim.bo.modified
+  local ro = vim.bo.readonly
+  local key = full_path .. (mod and '*' or '') .. (ro and '!' or '')
+
+  if cache[key] then return cache[key] end
+
   local file = vim.fn.expand('%:t')
 
-  if vim.bo.modified then file = file .. ' ' .. config.icons.modified end
-  if vim.bo.readonly then file = file .. ' ' .. config.icons.read_only end
+  if mod then file = file .. ' ' .. config.icons.modified end
+  if ro then file = file .. ' ' .. config.icons.read_only end
 
   local path = ''
 
@@ -52,7 +57,7 @@ function C.render(opts)
     end
   end
 
-  return slimline.highlights.hl_component(
+  local result = slimline.highlights.hl_component(
     { primary = file, secondary = path },
     opts.hls,
     opts.sep,
@@ -60,6 +65,8 @@ function C.render(opts)
     opts.active,
     opts.style
   )
+  cache[key] = result
+  return result
 end
 
 return C

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next (minor)
+## [2.6.0] - 2025-11-15
 
 ### Added
 
@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `progress`: Spacing when `icon` configured to be empty
+- PERF: Caching ` hl_component()`. Content is passed into it and represented on screen.
+  However, we can cache the whole highlight building by letting it cache internally a format string based on the inputs.
+  So it will then be just a call of `string.format()` with the current content + the cache lookup.
+- PERF: Only computing `win_width` once. Remember and cache components that are visible/not visible due to the win width
+- PERF: `path`: cache content completely since its static for a given buffer
+- PERF: `progress`: Got rid of custom `Bot` ` Top` calculation and just using `%P / %L`. ` %P` does not directly translate to the cursor but more to the viewport, which is fine for me.
 
 ## [2.5.4] - 2025-08-10
 

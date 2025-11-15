@@ -1,4 +1,5 @@
 local M = {}
+local cache = {}
 
 ---@class highlights
 ---@field base string
@@ -207,9 +208,9 @@ end
 function M.hl_content(content, hl, sep)
   if content == nil then return '' end
   local rendered = ''
-  if sep.left ~= nil then rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep.left) end
-  rendered = rendered .. string.format('%%#%s#%s', hl.text, content)
-  if sep.right ~= nil then rendered = rendered .. string.format('%%#%s#%s', hl.sep, sep.right) end
+  if sep.left ~= nil then rendered = rendered .. string.format('%%%%#%s#%s', hl.sep, sep.left) end
+  rendered = rendered .. string.format('%%%%#%s#%s', hl.text, content)
+  if sep.right ~= nil then rendered = rendered .. string.format('%%%%#%s#%s', hl.sep, sep.right) end
   return rendered
 end
 
@@ -235,20 +236,18 @@ function M.pad(content, style, direction)
   return content
 end
 
----@param content {primary: string?, secondary: string?}
+--- Function to produce a format string
+--- The content is not actual final rendered content
+--- but a placeholder where items will be rendered into
+--- It's important for the format string logic that the secondary
+--- part is nil when the final one should be also nil
 ---@param hl component.highlights
 ---@param sep sep
 ---@param direction component.direction?
 ---@param active boolean
----@param style component.style
 ---@return string
-function M.hl_component(content, hl, sep, direction, active, style)
-  active = active == nil or active
+function M.hl_component_fmt(content, hl, sep, direction, active)
   local result
-  if content.primary == nil or content.primary == '' then return '' end
-
-  content = M.pad(content, style, direction)
-
   if content.secondary == nil then
     if active then
       result = M.hl_content(content.primary, hl.primary, sep)
@@ -276,8 +275,53 @@ function M.hl_component(content, hl, sep, direction, active, style)
       result = result .. M.hl_content(content.secondary, hl.secondary, { right = sep.right })
     end
   end
-  result = result .. '%#' .. M.hls.base .. '#'
+  result = result .. '%%#' .. M.hls.base .. '#'
   return result
+end
+
+---@param content {primary: string?, secondary: string?}
+---@param hl component.highlights
+---@param sep sep
+---@param direction component.direction?
+---@param active boolean
+---@param style component.style
+---@return string
+function M.hl_component(content, hl, sep, direction, active, style)
+  active = active == nil or active
+  if content.primary == nil or content.primary == '' then return '' end
+
+  local cache_key = table.concat({
+    (content.secondary ~= nil and 's') or '-',
+    hl.primary.sep or '-',
+    hl.primary.sep2sec or '-',
+    hl.primary.text,
+    hl.secondary.sep or '-',
+    hl.secondary.sep2sec or '-',
+    hl.secondary.text or '-',
+    sep.left or '-',
+    sep.right or '-',
+    active and 't' or 'f',
+    style,
+  }, '|')
+
+  local fmt = cache[cache_key]
+
+  if not fmt then
+    local fmt_content = { primary = '%s', secondary = content.secondary and '%s' or nil }
+    fmt_content = M.pad(fmt_content, style, direction)
+    fmt = M.hl_component_fmt(fmt_content, hl, sep, direction, active)
+    cache[cache_key] = fmt
+  end
+
+  if content.secondary == nil then return string.format(fmt, content.primary) end
+
+  local first = content.primary
+  local second = content.secondary
+  if direction == 'left' then
+    first = content.secondary
+    second = content.primary
+  end
+  return string.format(fmt, first, second)
 end
 
 return M
