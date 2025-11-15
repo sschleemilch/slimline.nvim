@@ -33,13 +33,16 @@ function C.render(opts)
   if vim.bo.buftype ~= '' then return '' end
 
   local full_path = vim.fn.expand('%:p')
+  local mod = vim.bo.modified
+  local ro = vim.bo.readonly
+  local key = full_path .. (mod and '*' or '') .. (ro and '!' or '')
 
-  if cache[full_path] then return cache[full_path] end
+  if cache[key] then return cache[key] end
 
   local file = vim.fn.expand('%:t')
 
-  if vim.bo.modified then file = file .. ' ' .. config.icons.modified end
-  if vim.bo.readonly then file = file .. ' ' .. config.icons.read_only end
+  if mod then file = file .. ' ' .. config.icons.modified end
+  if ro then file = file .. ' ' .. config.icons.read_only end
 
   local path = ''
 
@@ -62,7 +65,7 @@ function C.render(opts)
     opts.active,
     opts.style
   )
-  cache[full_path] = result
+  cache[key] = result
   return result
 end
 
