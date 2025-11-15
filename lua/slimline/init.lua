@@ -48,6 +48,13 @@ Slimline.active = vim.defaulttable()
 ---@type components
 Slimline.inactive = vim.defaulttable()
 
+local last_win_width
+local active_components_cache = {
+  left = nil,
+  center = nil,
+  right = nil,
+}
+
 local augroup = vim.api.nvim_create_augroup('Slimline', { clear = true })
 function Slimline.au(event, pattern, callback, desc)
   vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc })
@@ -130,7 +137,7 @@ local function get_component(component_ref, position, direction)
         trunc_width = Slimline.config.configs[component_ref].trunc_width,
         render = function(active)
           local hls = Slimline.highlights.hls.components[follow or component_ref]
-          if component_ref == 'mode' or follow == 'mode' then hls = Slimline.get_mode().hls end
+          if follow == 'mode' then hls = Slimline.get_mode().hls end
           return cmp.render({ sep = sep, direction = direction, hls = hls, active = active, style = style })
         end,
       }
@@ -141,15 +148,30 @@ local function get_component(component_ref, position, direction)
   return { render = function() return '' end }
 end
 
----@param active boolean
+---@param win_width integer
 ---@param components component[]
+---@param active boolean
+---@param type string
 ---@return string
-function Slimline.concat_components(components, active)
+function Slimline.concat_components(win_width, components, active, type)
   if #components == 0 then return '' end
   local result = ''
 
-  local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
-  components = vim.tbl_filter(function(c) return win_width >= (c.trunc_width or -1) end, components)
+  local filter = true
+  if win_width == last_win_width then
+    if active_components_cache[type] then
+      components = active_components_cache[type]
+      filter = false
+    end
+  else
+    last_win_width = win_width
+  end
+
+  if filter then
+    ---@type component[]
+    components = vim.tbl_filter(function(c) return win_width >= (c.trunc_width or -1) end, components)
+    active_components_cache[type] = components
+  end
 
   for i, component in ipairs(components) do
     local space = Slimline.config.spaces.components
@@ -170,11 +192,12 @@ function Slimline.render(active)
   local is_active = active == 1
   if not is_active then components = Slimline.inactive end
   local result = '%#Slimline#' .. Slimline.config.spaces.left
-  result = result .. Slimline.concat_components(components.left, is_active)
+  local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+  result = result .. Slimline.concat_components(win_width, components.left, is_active, 'left')
   result = result .. '%=%<'
-  result = result .. Slimline.concat_components(components.center, is_active)
+  result = result .. Slimline.concat_components(win_width, components.center, is_active, 'center')
   result = result .. '%='
-  result = result .. Slimline.concat_components(components.right, is_active)
+  result = result .. Slimline.concat_components(win_width, components.right, is_active, 'right')
   result = result .. Slimline.config.spaces.right
   return result
 end
