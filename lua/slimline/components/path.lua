@@ -5,8 +5,6 @@ local config = slimline.config.configs.path
 local cache = {}
 
 local function truncate(path, chars, full_dirs)
-  if cache[path] then return cache[path] end
-
   local parts = vim.split(path, '/', { trimempty = true })
 
   local truncated = {}
@@ -26,7 +24,6 @@ local function truncate(path, chars, full_dirs)
   end
 
   local result = table.concat(truncated, '/')
-  cache[path] = result
   return result
 end
 
@@ -34,6 +31,10 @@ end
 ---@return string
 function C.render(opts)
   if vim.bo.buftype ~= '' then return '' end
+
+  local full_path = vim.fn.expand('%:p')
+
+  if cache[full_path] then return cache[full_path] end
 
   local file = vim.fn.expand('%:t')
 
@@ -53,7 +54,7 @@ function C.render(opts)
     end
   end
 
-  return slimline.highlights.hl_component(
+  local result = slimline.highlights.hl_component(
     { primary = file, secondary = path },
     opts.hls,
     opts.sep,
@@ -61,6 +62,8 @@ function C.render(opts)
     opts.active,
     opts.style
   )
+  cache[full_path] = result
+  return result
 end
 
 return C
