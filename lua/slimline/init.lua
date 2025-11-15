@@ -145,6 +145,7 @@ end
 ---@param components component[]
 ---@return string
 function Slimline.concat_components(components, active)
+  if #components == 0 then return '' end
   local result = ''
 
   local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
