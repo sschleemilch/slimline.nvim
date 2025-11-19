@@ -35,7 +35,7 @@ function C.render(opts)
   local full_path = vim.fn.expand('%:p')
   local mod = vim.bo.modified
   local ro = vim.bo.readonly
-  local key = full_path .. (mod and '*' or '') .. (ro and '!' or '')
+  local key = full_path .. (opts.active and '+' or '') .. (mod and '*' or '') .. (ro and '!' or '')
 
   if cache[key] then return cache[key] end
 
