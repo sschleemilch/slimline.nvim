@@ -38,6 +38,7 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 ![s6](./doc/screenshots/s6.png)
 ![s23](./doc/screenshots/s23.png)
 ![split](./doc/screenshots/split.png)
+![stealth](./doc/screenshots/stealth.png)
 
 ## Components
 
@@ -521,6 +522,34 @@ vim.opt.fillchars = {
                 ['U'] = { short = 'UNK' },
             },
         },
+    }
+}
+```
+
+### Stealth
+
+Uses the default `StatusLine` and `StatusLineNC` base highlights that mimics the default statusline.
+Also sets the primary and secondary to those highlight groups which makes it very subtle.
+Removes unneeded spaces for most efficient space.
+
+```lua
+{
+    style = 'fg',
+    hl = {
+        primary = 'StatusLine',
+        secondary = 'StatusLineNC',
+        base = 'StatusLine',
+        base_inactive = 'StatusLineNC',
+    },
+    configs = {
+        progress = {
+            follow = false,
+        },
+    }
+    spaces = {
+        components = '',
+        left = '',
+        right = ''
     }
 }
 ```
