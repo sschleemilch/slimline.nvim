@@ -528,6 +528,8 @@ vim.opt.fillchars = {
 
 ### Stealth
 
+![stealth](./doc/screenshots/stealth.png)
+
 Uses the default `StatusLine` and `StatusLineNC` base highlights that mimics the default statusline.
 Also sets the primary and secondary to those highlight groups which makes it very subtle.
 Removes unneeded spaces for most efficient space.
