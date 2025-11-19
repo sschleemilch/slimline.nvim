@@ -281,6 +281,7 @@ By default, all `components` will be shown. Inactive components will use the _se
   -- Global highlights
   hl = {
     base = 'Normal', -- highlight of the background
+    base_inactive = 'Normal', -- highlight of the background when inactive
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },
@@ -313,7 +314,8 @@ Make sure to do that **before** slimline's `setup()`.
 
 | Highlight Group                      | Description                                                                                      |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Slimline                             | Background of the line                                                                           |
+| Slimline                             | Background of the line (active)                                                                  |
+| SlimlineInactive                     | Background of the line (inactive)                                                                |
 | SlimlineModeSecondary                | Secondary mode content (mode has no secondary content but progress has, which is following mode) |
 | SlimlineModeNormal                   | Normal mode                                                                                      |
 | SlimlineModeNormalSep                | Normal mode separator                                                                            |

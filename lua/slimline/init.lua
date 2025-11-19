@@ -191,7 +191,8 @@ function Slimline.render(active)
   local components = Slimline.active
   local is_active = active == 1
   if not is_active then components = Slimline.inactive end
-  local result = '%#Slimline#' .. Slimline.config.spaces.left
+  local base_hl = (active and Slimline.highlights.hls.base) or Slimline.highlights.hls.base_inactive
+  local result = '%#' .. base_hl .. '#' .. Slimline.config.spaces.left
   local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
   result = result .. Slimline.concat_components(win_width, components.left, is_active, 'left')
   result = result .. '%=%<'

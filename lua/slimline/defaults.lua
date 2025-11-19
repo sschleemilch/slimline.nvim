@@ -154,6 +154,7 @@ local M = {
   -- Global highlights
   hl = {
     base = 'Normal', -- highlight of the background
+    base_inactive = 'Normal', -- highlight of the background when inactive
     primary = 'Normal', -- highlight of primary parts (e.g. filename)
     secondary = 'Comment', -- highlight of secondary parts (e.g. filepath)
   },

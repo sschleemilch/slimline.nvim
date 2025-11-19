@@ -3,6 +3,7 @@ local cache = {}
 
 ---@class highlights
 ---@field base string
+---@field base_inactive string
 ---@field components table<string, component.highlights|mode.highlights>
 
 ---@class highlight
@@ -83,6 +84,7 @@ function M.create()
   local config = require('slimline').config
 
   M.hls.base = create('', config.hl.base)
+  M.hls.base_inactive = create('Inactive', config.hl.base_inactive)
 
   local components = {}
   for _, section in pairs(config.components) do
@@ -275,7 +277,8 @@ function M.hl_component_fmt(content, hl, sep, direction, active)
       result = result .. M.hl_content(content.secondary, hl.secondary, { right = sep.right })
     end
   end
-  result = result .. '%%#' .. M.hls.base .. '#'
+  local reset_hl = active and M.hls.base or M.hls.base_inactive
+  result = result .. '%%#' .. reset_hl .. '#'
   return result
 end
 
