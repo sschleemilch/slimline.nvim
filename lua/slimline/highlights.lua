@@ -306,9 +306,10 @@ function M.hl_component(content, hl, sep, direction, active, style)
 
   local fmt = cache[cache_key]
 
+  content = M.pad(content, style, direction)
+
   if not fmt then
     local fmt_content = { primary = '%s', secondary = content.secondary and '%s' or nil }
-    fmt_content = M.pad(fmt_content, style, direction)
     fmt = M.hl_component_fmt(fmt_content, hl, sep, direction, active)
     cache[cache_key] = fmt
   end
