@@ -10,64 +10,55 @@ local direction_ = nil
 local sep_ = vim.defaulttable()
 local initialized = false
 
----@alias diagnostics {ERROR: integer, WARN: integer, HINT: integer, INFO: integer}
+---@alias diagnostics table<vim.diagnostic.Severity, integer>
 
----@param str string
----@return string
-local function capitalize(str) return string.upper(string.sub(str, 1, 1)) .. string.lower(string.sub(str, 2)) end
+local sec_hls = {
+  text = 'SlimlineDiagnosticsSecondary',
+  sep = 'SlimlineDiagnosticsSecondarySep',
+}
 
----@param buf_id integer|nil
----@return diagnostics
-local function get_diagnostic_count(buf_id)
-  local res = {
-    ERROR = 0,
-    WARN = 0,
-    HINT = 0,
-    INFO = 0,
-  }
-  for _, d in ipairs(vim.diagnostic.get(buf_id, { severity = config.severity })) do
-    local sev = vim.diagnostic.severity[d.severity]
-    res[sev] = res[sev] + 1
-  end
-  return res
-end
+local sev2hl = {
+  [vim.diagnostic.severity.ERROR] = {
+    text = 'SlimlineDiagnosticsError',
+    sep = 'SlimlineDiagnosticsErrorSep',
+  },
+  [vim.diagnostic.severity.WARN] = {
+    text = 'SlimlineDiagnosticsWarn',
+    sep = 'SlimlineDiagnosticsWarnSep',
+  },
+  [vim.diagnostic.severity.INFO] = {
+    text = 'SlimlineDiagnosticsInfo',
+    sep = 'SlimlineDiagnosticsInfoSep',
+  },
+  [vim.diagnostic.severity.HINT] = {
+    text = 'SlimlineDiagnosticsHint',
+    sep = 'SlimlineDiagnosticsHintSep',
+  },
+}
 
----@param buffer integer
----@param workspace integer
----@return string
-local function get_count_format(buffer, workspace)
-  local count = ''
-  if buffer > 0 then count = string.format('%d', buffer) end
-  if workspace > 0 and buffer ~= workspace then count = string.format('%s(%d)', count, workspace) end
-  return count
-end
+local sev2icon_key = {
+  [vim.diagnostic.severity.ERROR] = 'ERROR',
+  [vim.diagnostic.severity.WARN] = 'WARN',
+  [vim.diagnostic.severity.INFO] = 'INFO',
+  [vim.diagnostic.severity.HINT] = 'HINT',
+}
 
----@param buffer diagnostics
----@param workspace diagnostics
+---@param counts diagnostics
 ---@return {active: string, inactive: string}
-local function format(buffer, workspace)
+local function format(counts)
   local parts_active = {}
   local parts_inactive = {}
 
-  for severity, bc in pairs(buffer) do
-    local capsev = capitalize(severity)
-    local wc = workspace[severity]
-    if wc > 0 or bc > 0 then
-      local count = get_count_format(bc, wc)
+  for severity, count in pairs(counts) do
+    if count > 0 then
       local hls = {
-        primary = {
-          text = 'SlimlineDiagnostics' .. capsev,
-          sep = 'SlimlineDiagnostics' .. capsev .. 'Sep',
-        },
-        secondary = {
-          text = 'SlimlineDiagnosticsSecondary',
-          sep = 'SlimlineDiagnosticsSecondarySep',
-        },
+        primary = sev2hl[severity],
+        secondary = sec_hls,
       }
       table.insert(
         parts_active,
         slimline.highlights.hl_component(
-          { primary = string.format('%s%s', icons[severity], count) },
+          { primary = string.format('%s%d', icons[sev2icon_key[severity]], count) },
           hls,
           sep_,
           direction_,
@@ -78,7 +69,7 @@ local function format(buffer, workspace)
       table.insert(
         parts_inactive,
         slimline.highlights.hl_component(
-          { primary = string.format('%s%s', icons[severity], count) },
+          { primary = string.format('%s%d', icons[sev2icon_key[severity]], count) },
           hls,
           sep_,
           direction_,
@@ -101,17 +92,14 @@ local track_diagnostics = vim.schedule_wrap(function(data)
     return
   end
 
-  if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then return end
+  if vim.fn.mode() == 'i' then return end
 
-  local buffer_counts = get_diagnostic_count(0)
-  local workspace_counts = {
-    ERROR = 0,
-    WARN = 0,
-    HINT = 0,
-    INFO = 0,
-  }
-  if config.workspace then workspace_counts = get_diagnostic_count(nil) end
-  diagnostics[data.buf] = format(buffer_counts, workspace_counts)
+  --- @type integer?
+  local bufnr = 0
+  if config.workspace then bufnr = nil end
+
+  local counts = vim.diagnostic.count(bufnr)
+  diagnostics[data.buf] = format(counts)
   vim.cmd.redrawstatus()
 end)
 
