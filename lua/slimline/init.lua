@@ -151,16 +151,16 @@ end
 ---@param win_width integer
 ---@param components component[]
 ---@param active boolean
----@param type string
+---@param direction component.direction
 ---@return string
-function Slimline.concat_components(win_width, components, active, type)
+function Slimline.concat_components(win_width, components, active, direction)
   if #components == 0 then return '' end
   local result = ''
 
   local filter = true
   if win_width == last_win_width then
-    if active_components_cache[type] then
-      components = active_components_cache[type]
+    if active_components_cache[direction] then
+      components = active_components_cache[direction]
       filter = false
     end
   else
@@ -173,11 +173,12 @@ function Slimline.concat_components(win_width, components, active, type)
     active_components_cache[type] = components
   end
 
-  for i, component in ipairs(components) do
-    local space = Slimline.config.spaces.components
-    if i == 1 then space = '' end
-    result = result .. space .. component.render(active)
+  local parts = {}
+  for _, component in ipairs(components) do
+    local rendered = component.render(active)
+    if rendered ~= '' then table.insert(parts, rendered) end
   end
+  result = result .. table.concat(parts, Slimline.config.spaces.components)
   return result
 end
 
