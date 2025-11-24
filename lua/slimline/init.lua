@@ -48,6 +48,9 @@ Slimline.active = vim.defaulttable()
 ---@type components
 Slimline.inactive = vim.defaulttable()
 
+---@type table<string, boolean>
+local disabled_filetypes_cache = {}
+
 local last_win_width
 local active_components_cache = {
   left = nil,
@@ -170,7 +173,7 @@ function Slimline.concat_components(win_width, components, active, direction)
   if filter then
     ---@type component[]
     components = vim.tbl_filter(function(c) return win_width >= (c.trunc_width or -1) end, components)
-    active_components_cache[type] = components
+    active_components_cache[direction] = components
   end
 
   local parts = {}
@@ -187,7 +190,11 @@ end
 function Slimline.render(active)
   Slimline.highlights.create()
 
-  if vim.tbl_contains(Slimline.config.disabled_filetypes, vim.bo.filetype) then return '%#Slimline#' end
+  if disabled_filetypes_cache[vim.bo.filetype] == nil then
+    disabled_filetypes_cache[vim.bo.filetype] = vim.tbl_contains(Slimline.config.disabled_filetypes, vim.bo.filetype)
+  end
+
+  if disabled_filetypes_cache[vim.bo.filetype] == true then return '' end
 
   local components = Slimline.active
   local is_active = active == 1
