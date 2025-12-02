@@ -31,6 +31,28 @@ local track_lsp = vim.schedule_wrap(function(data)
   end
 end)
 
+local function withMiniIcons(filetype)
+  local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
+  filetype = icon .. ' ' .. filetype
+  return filetype
+end
+
+local function withWebDevIcons(filetype)
+  local icon = WebDevIcons.get_icon_by_filetype(filetype, { default = false }) --luacheck: ignore
+  if type(icon) == 'string' and string.len(icon) > 0 then filetype = icon .. ' ' .. filetype end
+  return filetype
+end
+
+local function withIcon(filetype)
+  if with_mini_icons then
+    return withMiniIcons(filetype)
+  elseif with_web_devicons then
+    return withWebDevIcons(filetype)
+  else
+    return filetype
+  end
+end
+
 local function init()
   if initialized then return end
   local ok
@@ -53,13 +75,7 @@ function C.render(opts)
 
   local filetype = vim.bo.filetype
   if filetype == '' then filetype = '[No Name]' end
-  local icon
-  if with_mini_icons then
-    icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
-  elseif with_web_devicons then
-    icon = WebDevIcons.get_icon_by_filetype(filetype, { default = false }) --luacheck: ignore
-  end
-  if type(icon) == 'string' and string.len(icon) > 0 then filetype = icon .. ' ' .. filetype end
+  filetype = withIcon(filetype)
 
   return slimline.highlights.hl_component(
     { primary = filetype or '', secondary = lsp_clients[vim.api.nvim_get_current_buf()] or '' },
