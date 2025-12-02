@@ -41,6 +41,11 @@ function C.render(opts)
     status.added = minidiff.add or 0
     status.removed = minidiff.delete or 0
     status.changed = minidiff.change or 0
+  elseif vim.fn.exists('*GitGutterGetHunkSummary') == 1 then
+    local gitgutter = vim.fn.GitGutterGetHunkSummary() or {}
+    status.added = gitgutter[1] or 0
+    status.changed = gitgutter[2] or 0
+    status.removed = gitgutter[3] or 0
   end
 
   local mods = {}

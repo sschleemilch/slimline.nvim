@@ -46,7 +46,7 @@ Here are some screenshots that might be a bit outdated. See [recipes](#recipes) 
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | mode           | Current mode. Automatically sets `vim.opt.showmode = false`                                                                                                                                                                                                                              |
 | path           | Filename and the relative path as well as modified / read-only info. The directory path will be truncated. Can be disabled and configured                                                                                                                                                |
-| git            | Branch and Diff infos (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only). Uses the `git` CLI as fallback to retrieve the branch) |
+| git            | Branch and Diff infos (requires [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only), [vim-gitgutter](https://github.com/airblade/vim-gitgutter) (diff-only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only). Uses the `git` CLI as fallback to retrieve the branch) |
 | diagnostics    | `vim.diagnostic` infos. This component is event driven and will not poll the information on every statusline draw.                                                                                                                                                                       |
 | filetype_lsp   | File type and attached LSPs. Attached LSPs are evaluated event driven on LSP attach / detach events. LSP names can be mapped to custom names or disabled using `configs.filetype_lsp.map_lsps`.                                                                                          |
 | progress       | File progress in %, overall number of lines as well as the cursor column (byte index and virtual if they differ)                                                                                                                                                                         |
@@ -99,7 +99,7 @@ require("slimline").setup({})
 
 Optional dependencies:
 
-- [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only) if you want the `git` component. Otherwise, it will not be rendered
+- [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only), [vim-gitgutter](https://github.com/airblade/vim-gitgutter) (diff-only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only) if you want the `git` component. Otherwise, it will not be rendered
 - [mini.icons](https://github.com/echasnovski/mini.icons) or [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) if you want filetype icons
 
 You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) for icons and separators.
