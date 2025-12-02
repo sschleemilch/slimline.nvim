@@ -1,9 +1,11 @@
 local C = {}
-local with_icons = false
+local with_mini_icons = false
+local with_web_devicons = false
 local initialized = false
 
 local lsp_clients = {}
-local MiniIcons = {}
+local MiniIcons = nil
+local WebDevIcons = nil
 
 local slimline = require('slimline')
 local config = slimline.config.configs.filetype_lsp
@@ -33,7 +35,12 @@ local function init()
   if initialized then return end
   local ok
   ok, MiniIcons = pcall(require, 'mini.icons')
-  if ok then with_icons = true end
+  if ok then
+    with_mini_icons = true
+  else
+    ok, WebDevIcons = pcall(require, 'nvim-web-devicons')
+    if ok then with_web_devicons = true end
+  end
   initialized = true
 
   slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
@@ -46,10 +53,13 @@ function C.render(opts)
 
   local filetype = vim.bo.filetype
   if filetype == '' then filetype = '[No Name]' end
-  if with_icons then
-    local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
-    filetype = icon .. ' ' .. filetype
+  local icon
+  if with_mini_icons then
+    icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
+  elseif with_web_devicons then
+    icon = WebDevIcons.get_icon_by_filetype(filetype, { default = false }) --luacheck: ignore
   end
+  if type(icon) == 'string' and string.len(icon) > 0 then filetype = icon .. ' ' .. filetype end
 
   return slimline.highlights.hl_component(
     { primary = filetype or '', secondary = lsp_clients[vim.api.nvim_get_current_buf()] or '' },
