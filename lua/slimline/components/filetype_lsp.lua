@@ -1,6 +1,4 @@
 local C = {}
-local with_mini_icons = false
-local with_web_devicons = false
 local initialized = false
 
 local lsp_clients = {}
@@ -31,6 +29,8 @@ local track_lsp = vim.schedule_wrap(function(data)
   end
 end)
 
+local withIcon = function(filetype) return filetype end
+
 local function withMiniIcons(filetype)
   local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
   filetype = icon .. ' ' .. filetype
@@ -43,25 +43,15 @@ local function withWebDevIcons(filetype)
   return filetype
 end
 
-local function withIcon(filetype)
-  if with_mini_icons then
-    return withMiniIcons(filetype)
-  elseif with_web_devicons then
-    return withWebDevIcons(filetype)
-  else
-    return filetype
-  end
-end
-
 local function init()
   if initialized then return end
   local ok
   ok, MiniIcons = pcall(require, 'mini.icons')
   if ok then
-    with_mini_icons = true
+    withIcon = withMiniIcons
   else
     ok, WebDevIcons = pcall(require, 'nvim-web-devicons')
-    if ok then with_web_devicons = true end
+    if ok then withIcon = withWebDevIcons end
   end
   initialized = true
 
