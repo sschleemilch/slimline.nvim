@@ -100,7 +100,7 @@ require("slimline").setup({})
 Optional dependencies:
 
 - [gitsigns](https://github.com/lewis6991/gitsigns.nvim), [mini.diff](https://github.com/echasnovski/mini.diff) (diff only), [vim-gitgutter](https://github.com/airblade/vim-gitgutter) (diff-only) or [vim-fugitive](https://github.com/tpope/vim-fugitive) (branch only) if you want the `git` component. Otherwise, it will not be rendered
-- [mini.icons](https://github.com/echasnovski/mini.icons) if you want filetype icons
+- [mini.icons](https://github.com/echasnovski/mini.icons) or [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) if you want filetype icons
 
 You'll also need to have a patched [nerd font](https://www.nerdfonts.com/) for icons and separators.
 

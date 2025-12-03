@@ -1,9 +1,9 @@
 local C = {}
-local with_icons = false
 local initialized = false
 
 local lsp_clients = {}
-local MiniIcons = {}
+local MiniIcons = nil
+local WebDevIcons = nil
 
 local slimline = require('slimline')
 local config = slimline.config.configs.filetype_lsp
@@ -29,11 +29,30 @@ local track_lsp = vim.schedule_wrap(function(data)
   end
 end)
 
+local withIcon = function(filetype) return filetype end
+
+local function withMiniIcons(filetype)
+  local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
+  filetype = icon .. ' ' .. filetype
+  return filetype
+end
+
+local function withWebDevIcons(filetype)
+  local icon = WebDevIcons.get_icon_by_filetype(filetype, { default = false }) --luacheck: ignore
+  if type(icon) == 'string' and string.len(icon) > 0 then filetype = icon .. ' ' .. filetype end
+  return filetype
+end
+
 local function init()
   if initialized then return end
   local ok
   ok, MiniIcons = pcall(require, 'mini.icons')
-  if ok then with_icons = true end
+  if ok then
+    withIcon = withMiniIcons
+  else
+    ok, WebDevIcons = pcall(require, 'nvim-web-devicons')
+    if ok then withIcon = withWebDevIcons end
+  end
   initialized = true
 
   slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
@@ -46,10 +65,7 @@ function C.render(opts)
 
   local filetype = vim.bo.filetype
   if filetype == '' then filetype = '[No Name]' end
-  if with_icons then
-    local icon = MiniIcons.get('filetype', filetype) --luacheck: ignore
-    filetype = icon .. ' ' .. filetype
-  end
+  filetype = withIcon(filetype)
 
   return slimline.highlights.hl_component(
     { primary = filetype or '', secondary = lsp_clients[vim.api.nvim_get_current_buf()] or '' },
