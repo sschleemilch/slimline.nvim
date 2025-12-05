@@ -91,9 +91,15 @@ function C.render(opts)
   local status = get_diff()
 
   local mods = {}
-  if status.added > 0 then table.insert(mods, string.format('%s%s', icons.added, status.added)) end
-  if status.changed > 0 then table.insert(mods, string.format('%s%s', icons.modified, status.changed)) end
-  if status.removed > 0 then table.insert(mods, string.format('%s%s', icons.removed, status.removed)) end
+  if status then
+    if status.added and status.added > 0 then table.insert(mods, string.format('%s%s', icons.added, status.added)) end
+    if status.changed and status.changed > 0 then
+      table.insert(mods, string.format('%s%s', icons.modified, status.changed))
+    end
+    if status.removed and status.removed > 0 then
+      table.insert(mods, string.format('%s%s', icons.removed, status.removed))
+    end
+  end
 
   return slimline.highlights.hl_component(
     { primary = branch_display, secondary = #mods > 0 and table.concat(mods, ' ') or '' },
