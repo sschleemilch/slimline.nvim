@@ -32,9 +32,9 @@ local function init_provider_gitsigns()
     local status = vim.b.gitsigns_status_dict
     local diff = { added = 0, removed = 0, changed = 0 }
     if status and status.head then
-      diff.added = status.added
-      diff.removed = status.removed
-      diff.changed = status.changed
+      diff.added = status.added or 0
+      diff.removed = status.removed or 0
+      diff.changed = status.changed or 0
     end
     return diff
   end
