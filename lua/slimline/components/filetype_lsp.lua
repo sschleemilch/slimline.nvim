@@ -56,6 +56,10 @@ local function init()
   initialized = true
 
   slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
+
+  vim.schedule(function()
+    track_lsp({ buf = vim.api.nvim_get_current_buf() })
+  end)
 end
 
 ---@param opts render.options
