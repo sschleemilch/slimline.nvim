@@ -8,12 +8,12 @@ local WebDevIcons = nil
 local slimline = require('slimline')
 local config = slimline.config.configs.filetype_lsp
 
-local track_lsp = vim.schedule_wrap(function(data)
-  if not vim.api.nvim_buf_is_valid(data.buf) then
-    lsp_clients[data.buf] = nil
+local track_lsp = vim.schedule_wrap(function(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    lsp_clients[buf] = nil
     return
   end
-  local attached_clients = vim.lsp.get_clients({ bufnr = data.buf })
+  local attached_clients = vim.lsp.get_clients({ bufnr = buf })
 
   local it = vim.iter(attached_clients)
   it:map(function(client)
@@ -23,9 +23,9 @@ local track_lsp = vim.schedule_wrap(function(data)
   end)
   local names = it:totable()
   if #names > 0 then
-    lsp_clients[data.buf] = string.format('%s', table.concat(names, config.lsp_sep))
+    lsp_clients[buf] = string.format('%s', table.concat(names, config.lsp_sep))
   else
-    lsp_clients[data.buf] = nil
+    lsp_clients[buf] = nil
   end
 end)
 
@@ -55,11 +55,11 @@ local function init()
   end
   initialized = true
 
-  slimline.au({ 'LspAttach', 'LspDetach', 'BufEnter' }, '*', track_lsp, 'Track LSP')
+  slimline.au({ 'LspAttach', 'LspDetach' }, '*', function(data) track_lsp(data.buf) end, 'Track LSP')
 
-  vim.schedule(function()
-    track_lsp({ buf = vim.api.nvim_get_current_buf() })
-  end)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then track_lsp(buf) end
+  end
 end
 
 ---@param opts render.options
