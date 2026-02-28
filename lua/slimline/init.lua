@@ -63,40 +63,51 @@ function Slimline.au(event, pattern, callback, desc)
   vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc })
 end
 
---- @param key string
---- @param hls component.highlights
---- @return mode
-local function get_mode_table(key, hls)
-  local entry = Slimline.config.configs.mode.format[key]
-  entry.hls = {
-    primary = hls.primary,
-    secondary = Slimline.highlights.hls.components.mode.secondary,
+--- @type table<string, mode>?
+local mode_map_cache = nil
+
+--- Build the mode map from config and current highlight groups.
+--- Called once at startup and again after ColorScheme changes.
+local function build_mode_map()
+  local hls = Slimline.highlights.hls.components.mode
+  local format = Slimline.config.configs.mode.format
+  local secondary = hls.secondary
+
+  --- @param key string
+  --- @param mode_hls component.highlights
+  --- @return mode
+  local function entry(key, mode_hls)
+    local fmt = format[key]
+    return {
+      verbose = fmt.verbose,
+      short = fmt.short,
+      hls = { primary = mode_hls.primary, secondary = secondary },
+    }
+  end
+
+  -- Note that: \19 = ^S and \22 = ^V.
+  mode_map_cache = {
+    ['n'] = entry('n', hls.normal),
+    ['v'] = entry('v', hls.visual),
+    ['V'] = entry('V', hls.visual),
+    ['\22'] = entry('\22', hls.visual),
+    ['s'] = entry('s', hls.visual),
+    ['S'] = entry('S', hls.visual),
+    ['\19'] = entry('\19', hls.visual),
+    ['i'] = entry('i', hls.insert),
+    ['R'] = entry('R', hls.replace),
+    ['c'] = entry('c', hls.command),
+    ['r'] = entry('r', hls.command),
+    ['!'] = entry('!', hls.command),
+    ['t'] = entry('t', hls.command),
+    ['U'] = entry('U', hls.other),
   }
-  return entry
 end
 
 --- @return mode
 function Slimline.get_mode()
-  local hls = Slimline.highlights.hls.components.mode
-  -- Note that: \19 = ^S and \22 = ^V.
-  local mode_map = {
-    ['n'] = get_mode_table('n', hls.normal),
-    ['v'] = get_mode_table('v', hls.visual),
-    ['V'] = get_mode_table('V', hls.visual),
-    ['\22'] = get_mode_table('\22', hls.visual),
-    ['s'] = get_mode_table('s', hls.visual),
-    ['S'] = get_mode_table('S', hls.visual),
-    ['\19'] = get_mode_table('\19', hls.visual),
-    ['i'] = get_mode_table('i', hls.insert),
-    ['R'] = get_mode_table('R', hls.replace),
-    ['c'] = get_mode_table('c', hls.command),
-    ['r'] = get_mode_table('r', hls.command),
-    ['!'] = get_mode_table('!', hls.command),
-    ['t'] = get_mode_table('t', hls.command),
-  }
-
-  local mode = mode_map[vim.fn.mode()] or get_mode_table('U', hls.other)
-  return mode
+  if not mode_map_cache then build_mode_map() end
+  return mode_map_cache[vim.fn.mode()] or mode_map_cache['U']
 end
 
 ---@param component string
@@ -199,7 +210,7 @@ function Slimline.render(active)
   local components = Slimline.active
   local is_active = active == 1
   if not is_active then components = Slimline.inactive end
-  local base_hl = (active and Slimline.highlights.hls.base) or Slimline.highlights.hls.base_inactive
+  local base_hl = (is_active and Slimline.highlights.hls.base) or Slimline.highlights.hls.base_inactive
   local result = '%#' .. base_hl .. '#' .. Slimline.config.spaces.left
   local win_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
   result = result .. Slimline.concat_components(win_width, components.left, is_active, 'left')
@@ -254,8 +265,11 @@ function Slimline.setup(opts)
     '%{%(nvim_get_current_win()==#g:actual_curwin || &laststatus==3) ? v:lua.Slimline.render(1) : v:lua.Slimline.render(0)%}'
 
   vim.api.nvim_create_autocmd('ColorScheme', {
-    group = Slimline.augroup,
-    callback = function() Slimline.highlights.initialized = true end,
+    group = augroup,
+    callback = function()
+      Slimline.highlights.initialized = true
+      mode_map_cache = nil
+    end,
   })
 end
 

@@ -4,16 +4,8 @@ local slimline = require('slimline')
 
 local initialized = false
 
-local function get_branch_from_cli()
-  local handle = io.popen('git rev-parse --abbrev-ref HEAD 2>/dev/null')
-  if not handle then return '' end
-  local branch = handle:read('*a'):gsub('\n', '') or ''
-  handle:close()
-  return branch
-end
-
---- @type function(): string
-local get_branch = get_branch_from_cli
+--- @type function(): string?
+local get_branch = function() return nil end
 
 --- @class gitdiff
 --- @field added integer
@@ -50,7 +42,9 @@ local function init()
     return
   end
 
-  if vim.fn.exists('*FugitiveHead') == 1 then get_branch = function() return vim.fn['FugitiveHead']() end end
+  if vim.fn.exists('*FugitiveHead') == 1 then
+    get_branch = function() return vim.fn['FugitiveHead']() end
+  end
 
   ok, _ = pcall(require, 'mini.diff')
   if ok then
