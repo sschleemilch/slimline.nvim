@@ -42,7 +42,13 @@ local function init()
     return
   end
 
-  if vim.fn.exists('*FugitiveHead') == 1 then
+  ok, _ = pcall(require, 'mini.git')
+  if ok then
+    get_branch = function()
+      local summary = vim.b.minigit_summary
+      return summary and summary.head_name or nil
+    end
+  elseif vim.fn.exists('*FugitiveHead') == 1 then
     get_branch = function() return vim.fn['FugitiveHead']() end
   end
 
