@@ -41,7 +41,7 @@ local function init()
     init_provider_gitsigns()
     return
   end
-  
+
   ok, _ = pcall(require, 'mini.git')
   if ok then
     get_branch = function()
