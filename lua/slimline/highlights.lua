@@ -219,18 +219,24 @@ end
 ---@param content {primary: string?, secondary: string?}
 ---@param style component.style
 ---@param direction component.direction?
+---@param sep sep
 ---@return {primary: string?, secondary: string?}
-function M.pad(content, style, direction)
-  content.primary = ' ' .. content.primary .. ' '
+function M.pad(content, style, direction, sep)
+  local pad = ' '
+  if style == 'bg' then pad = require('slimline').config.spaces.padding end
+
+  content.primary = pad .. content.primary .. pad
 
   if content.secondary and content.secondary ~= '' then
     if style == 'bg' then
-      content.secondary = ' ' .. content.secondary .. ' '
+      content.secondary = pad .. content.secondary .. pad
+      if direction == 'right' and sep.right ~= '' and pad == '' then content.secondary = ' ' .. content.secondary end
+      if direction == 'left' and sep.left ~= '' and pad == '' then content.secondary = content.secondary .. ' ' end
     else
       if direction == 'right' then
-        content.secondary = content.secondary .. ' '
+        content.secondary = content.secondary .. pad
       else
-        content.secondary = ' ' .. content.secondary
+        content.secondary = pad .. content.secondary
       end
     end
   end
@@ -309,7 +315,7 @@ function M.hl_component(content, hl, sep, direction, active, style)
 
   local fmt = cache[cache_key]
 
-  content = M.pad(content, style, direction)
+  content = M.pad(content, style, direction, sep)
 
   if not fmt then
     local fmt_content = { primary = '%s', secondary = content.secondary and '%s' or nil }
